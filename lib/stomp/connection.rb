@@ -422,13 +422,18 @@ module Stomp
 
       def _transmit(used_socket, command, headers = {}, body = '')
         @transmit_semaphore.synchronize do
+          # The content-length should be expressed in bytes.
+          # Ruby 1.8: String#length => # of bytes; Ruby 1.9: String#length => # of characters
+          # With Unicode strings, # of bytes != # of characters.  So, use String#bytesize when available.
+          body_length_bytes = body.respond_to?(:bytesize) ? body.bytesize : body.length
+ 
           # ActiveMQ interprets every message as a BinaryMessage 
           # if content_length header is included. 
           # Using :suppress_content_length => true will suppress this behaviour
           # and ActiveMQ will interpret the message as a TextMessage.
           # For more information refer to http://juretta.com/log/2009/05/24/activemq-jms-stomp/
           # Lets send this header in the message, so it can maintain state when using unreceive
-          headers['content-length'] = "#{body.length}" unless headers[:suppress_content_length]
+          headers['content-length'] = "#{body_length_bytes}" unless headers[:suppress_content_length]
           
           used_socket.puts command  
           headers.each {|k,v| used_socket.puts "#{k}:#{v}" }

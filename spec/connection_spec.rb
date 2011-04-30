@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'spec_helper'
 
 describe Stomp::Connection do
@@ -88,6 +89,11 @@ describe Stomp::Connection do
       it "should suppress it when receiving :suppress_content_length => true" do
         @tcp_socket.should_not_receive(:puts).with("content-length:7")
         @connection.publish "/queue", "message", :suppress_content_length => true
+      end
+      
+      it "should get the correct byte length when dealing with Unicode characters" do
+        @tcp_socket.should_receive(:puts).with("content-length:18")
+        @connection.publish "/queue", "сообщение"  # 'сообщение' is 'message' in Russian
       end
     end
     
