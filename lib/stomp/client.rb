@@ -309,7 +309,7 @@ module Stomp
           # For backward compatibility, some messages may already exist with no
           # subscription id, in which case we can attempt to synthesize one.
           set_subscription_id_if_missing(message.headers['destination'], message.headers)
-          subscription_id = message.headers['id']
+          subscription_id = message.headers[:id]
         end
         @listeners[subscription_id]
       end
