@@ -330,7 +330,7 @@ module Stomp
     # Return a pending message if one is available, otherwise
     # return nil
     def poll
-      # No need for a read lock here.  The receive method eventually fullfills
+      # No need for a read lock here.  The receive method eventually fulfills
       # that requirement.
       return nil if @socket.nil? || !@socket.ready?
       receive
@@ -338,7 +338,7 @@ module Stomp
 
     # Receive a frame, block until the frame is received
     def __old_receive
-      # The recive my fail so we may need to retry.
+      # The receive may fail so we may need to retry.
       while TRUE
         begin
           used_socket = socket
@@ -358,7 +358,7 @@ module Stomp
 
     def receive
       super_result = __old_receive
-      if super_result.nil? && @reliable
+      if super_result.nil? && @reliable && !closed?
         errstr = "connection.receive returning EOF as nil - resetting connection.\n"
         if @logger && @logger.respond_to?(:on_miscerr)
           @logger.on_miscerr(log_params, errstr)
@@ -497,15 +497,19 @@ module Stomp
         ssl.connect
         ssl
       end
-      
+
       def close_socket
         begin
-          @socket.close
+          # Need to set @closed = true before closing the socket
+          # within the @read_semaphore thread
+          @closed = true
+          @read_semaphore.synchronize do
+            @socket.close
+          end
         rescue
           #Ignoring if already closed
         end
-
-        @closed = true
+        @closed
       end
 
       def open_socket
