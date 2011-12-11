@@ -18,13 +18,13 @@ begin; require 'rubygems'; rescue; end
 require 'stomp'
 
 #
-# This simple script is inspired by the netcat utility.  It allows you to send
+# This simple script is inspired by the netcat utility.  It allows you to publish
 # input into this process to stomp destination.
 #
 # Usage: catstomp (destination-name)
 #
 # Example: ls | catstomp /topic/foo
-#   Would send the output of the ls command to the stomp destination /topic/foo
+#   Would publish the output of the ls command to the stomp destination /topic/foo
 #
 begin
 
@@ -47,7 +47,7 @@ begin
     @headers['reply-to'] = $*[1] if $*[1] != nil
 
     STDIN.each_line { |line|
-        @conn.send @destination, line, @headers
+        @conn.publish @destination, line, @headers
     }
 
 rescue
