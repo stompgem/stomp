@@ -40,6 +40,7 @@ module Stomp
     #       {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
     #       {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
     #     ],
+    #     :reliable => true,
     #     :initial_reconnect_delay => 0.01,
     #     :max_reconnect_delay => 30.0,
     #     :use_exponential_back_off => true,
@@ -104,7 +105,7 @@ module Stomp
     def hashed_initialize(params)
       
       @parameters = refine_params(params)
-      @reliable = true
+      @reliable =  @parameters[:reliable]
       @reconnect_delay = @parameters[:initial_reconnect_delay]
       @connect_headers = @parameters[:connect_headers]
       @parse_timeout =  @parameters[:parse_timeout]
@@ -168,6 +169,7 @@ module Stomp
       
       default_params = {
         :connect_headers => {},
+        :reliable => true,
         # Failover parameters
         :initial_reconnect_delay => 0.01,
         :max_reconnect_delay => 30.0,

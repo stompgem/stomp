@@ -10,6 +10,7 @@ describe Stomp::Connection do
         {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
       ],
+      :reliable => true,
       :initial_reconnect_delay => 0.01,
       :max_reconnect_delay => 30.0,
       :use_exponential_back_off => true,
@@ -43,6 +44,7 @@ describe Stomp::Connection do
           {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false},
           {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false}
         ],
+        "reliable" => true,
         "initialReconnectDelay" => 0.01,
         "maxReconnectDelay" => 30.0,
         "useExponentialBackOff" => true,
@@ -57,10 +59,7 @@ describe Stomp::Connection do
       @connection = Stomp::Connection.new(used_hash)
       @connection.instance_variable_get(:@parameters).should == @parameters
     end
-    
-    it "should be reliable" do
-      @connection.instance_variable_get(:@reliable).should be_true
-    end
+   
     it "should start with first host in array" do
       @connection.instance_variable_get(:@host).should == "localhost"
     end
@@ -74,6 +73,14 @@ describe Stomp::Connection do
       hash = {:hosts => [{:login => "login2", :passcode => "passcode2", :host => "remotehost", :ssl => false}]}
       @connection = Stomp::Connection.new hash
       @connection.instance_variable_get(:@port).should == 61613
+    end
+
+    context "should be able pass reliable as part of hash" do
+      it "should be false if reliable is set to false" do
+        hash = @parameters.merge({:reliable => false })
+        connection = Stomp::Connection.new(hash)
+        connection.instance_variable_get(:@reliable).should be_false
+      end
     end
     
     context "when dealing with content-length header" do
@@ -270,6 +277,7 @@ describe Stomp::Connection do
             # Once connected the host is sent to the end of array
             {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false}
           ],
+          :reliable => true,
           :initial_reconnect_delay => 0.01,
           :max_reconnect_delay => 30.0,
           :use_exponential_back_off => true,
@@ -306,6 +314,7 @@ describe Stomp::Connection do
           :max_reconnect_attempts => 10,
           :randomize => true,
           :backup => false,
+          :reliable => false,
           :connect_timeout => 0,
           :parse_timeout => 20,
           :connect_headers => {:lerolero => "ronaldo"},
