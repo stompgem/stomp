@@ -29,7 +29,7 @@ Support of Stomp protocol level 1.1 is announced as of gem version 1.2.0.
     #remotehost1 uses SSL, remotehost2 doesn't
     client = Stomp::Client.new("failover:(stomp+ssl://login1:passcode1@remotehost1:61612,stomp://login2:passcode2@remotehost2:61613)?#{options}")
     
-    client.send("/my/queue", "hello world!")
+    client.publish("/my/queue", "hello world!")
     client.subscribe("/my/queue") do |msg|
       p msg
     end
