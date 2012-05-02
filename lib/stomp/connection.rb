@@ -684,10 +684,10 @@ module Stomp
             if @ssl.cert_file # Any check will do here
               raise Stomp::Error::SSLNoCertFileError if !File::exists?(@ssl.cert_file)
               raise Stomp::Error::SSLUnreadableCertFileError if !File::readable?(@ssl.cert_file)
-              ctx.cert = OpenSSL::X509::Certificate.new(File.open(@ssl.cert_file))
+              ctx.cert = OpenSSL::X509::Certificate.new(File.read(@ssl.cert_file))
               raise Stomp::Error::SSLNoKeyFileError if !File::exists?(@ssl.key_file)
               raise Stomp::Error::SSLUnreadableKeyFileError if !File::readable?(@ssl.key_file)
-              ctx.key  = OpenSSL::PKey::RSA.new(File.open(@ssl.key_file))
+              ctx.key  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file))
             end
 
             # Cipher list
