@@ -14,6 +14,8 @@ module  Stomp
         attr_accessor  :cert_file
         #  The  client  private  key  file.
         attr_accessor  :key_file
+        #  The  client  private  key  password.
+        attr_accessor  :key_password
         #  SSL  Connect  Verify  Result.    The  result  of  the  handshake.
         attr_accessor  :verify_result
         #  The  certificate  of  the  connection  peer  (the  server),  received  during
@@ -38,6 +40,7 @@ module  Stomp
           #  Client  authentication  parameters
           @cert_file  =  opts[:cert_file]                  #  Client  cert
           @key_file  =  opts[:key_file]                      #  Client  key
+          @key_password  =  opts[:key_password]                      #  Client  key password
           #
           raise  Stomp::Error::SSLClientParamsError if @cert_file.nil?  &&  !@key_file.nil?
           raise  Stomp::Error::SSLClientParamsError if !@cert_file.nil?  &&  @key_file.nil?
