@@ -687,7 +687,7 @@ module Stomp
               ctx.cert = OpenSSL::X509::Certificate.new(File.read(@ssl.cert_file))
               raise Stomp::Error::SSLNoKeyFileError if !File::exists?(@ssl.key_file)
               raise Stomp::Error::SSLUnreadableKeyFileError if !File::readable?(@ssl.key_file)
-              ctx.key  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file))
+              ctx.key  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file), @ssl.key_password)
             end
 
             # Cipher list
