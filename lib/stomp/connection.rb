@@ -843,7 +843,7 @@ module Stomp
         return unless (@connect_headers[:"accept-version"] && @connect_headers[:host])
         return if @connection_frame.command == Stomp::CMD_ERROR
         cfh = @connection_frame.headers.symbolize_keys
-        @protocol = cfh[:version]
+        @protocol = cfh[:version] || "1.1" # default to 1.1 in case no version is present (HornetQ)
         # Should not happen, but check anyway
         raise Stomp::Error::UnsupportedProtocolError unless Stomp::SUPPORTED.index(@protocol)
         # Heartbeats
