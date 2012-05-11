@@ -28,6 +28,25 @@ require 'stomp'
 #
 begin
 
+   if ARGV[0] == '-h' || ARGV[0] == '--help'
+      $stdout.puts
+      $stdout.puts 'Usage: stompcat DESTINATION'
+      $stdout.puts
+      $stdout.puts 'Receives data from a stomp destination and outputs it to STDOUT'
+      $stdout.puts
+      $stdout.puts 'Example: stompcat /topic/foo'
+      $stdout.puts
+      $stdout.puts 'Defaults:'
+      $stdout.puts "DESTINATION\t/topic/default"
+      $stdout.puts "STOMP_HOST\tlocalhost"
+      $stdout.puts "STOMP_PORT\t61613"
+      $stdout.puts "STOMP_USER\t"
+      $stdout.puts "STOMP_PASSWORD\t"
+      $stdout.puts
+      $stdout.puts 'You can override the host, port, user, or password through environment variables'
+      exit 0
+    end
+
     @port = 61613
     @host = "localhost"
     @user = ENV["STOMP_USER"];
