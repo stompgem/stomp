@@ -7,7 +7,7 @@ require 'client_shared_examples'
 describe Stomp::Client do
 
   before(:each) do
-    @mock_connection = mock('connection')
+    @mock_connection = mock('connection', :autoflush= => true)
     Stomp::Connection.stub!(:new).and_return(@mock_connection)
   end
 
@@ -31,6 +31,23 @@ describe Stomp::Client do
 
     it_should_behave_like "standard Client"
 
+  end
+
+  describe "(autoflush)" do
+    it "should delegate to the connection for accessing the autoflush property" do
+      @mock_connection.should_receive(:autoflush)
+      Stomp::Client.new.autoflush
+    end
+
+    it "should delegate to the connection for setting the autoflush property" do
+      @mock_connection.should_receive(:autoflush=).with(true)
+      Stomp::Client.new.autoflush = true
+    end
+
+    it "should set the autoflush property on the connection when passing in autoflush as a parameter to the Stomp::Client" do
+      @mock_connection.should_receive(:autoflush=).with(true)
+      Stomp::Client.new("login", "password", 'localhost', 61613, false, true)
+    end
   end
 
   describe "(created with invalid params)" do

@@ -35,7 +35,7 @@ module Stomp
     #   stomp://login:passcode@host:port
     #   stomp://login:passcode@host.domain.tld:port
     #
-    def initialize(login = '', passcode = '', host = 'localhost', port = 61613, reliable = false)
+    def initialize(login = '', passcode = '', host = 'localhost', port = 61613, reliable = false, autoflush = false)
 
       # Parse stomp:// URL's or set params
       if login.is_a?(Hash)
@@ -49,7 +49,6 @@ module Stomp
         @port = first_host[:port] || Connection::default_port(first_host[:ssl])
         
         @reliable = true
-        
       elsif login =~ /^stomp:\/\/#{url_regex}/ # e.g. stomp://login:passcode@host:port or stomp://host:port
         @login = $2 || ""
         @passcode = $3 || ""
@@ -94,6 +93,7 @@ module Stomp
         @connection = Connection.new(@parameters)
       else
         @connection = Connection.new(@login, @passcode, @host, @port, @reliable)
+        @connection.autoflush = autoflush
       end
       
       start_listeners
@@ -269,6 +269,14 @@ module Stomp
     # Return nil of no message available, else the message
     def poll
       @connection.poll
+    end
+
+    def autoflush=(af)
+      @connection.autoflush = af
+    end
+
+    def autoflush
+      @connection.autoflush
     end
 
     private

@@ -10,12 +10,13 @@ module Stomp
   # Low level connection which maps commands and supports
   # synchronous receives
   class Connection
-    attr_reader :connection_frame
-    attr_reader :disconnect_receipt
-    attr_reader :protocol
-    attr_reader :session
-    attr_reader :hb_received # Heartbeat received on time
-    attr_reader :hb_sent # Heartbeat sent successfully
+    attr_reader   :connection_frame
+    attr_reader   :disconnect_receipt
+    attr_reader   :protocol
+    attr_reader   :session
+    attr_reader   :hb_received # Heartbeat received on time
+    attr_reader   :hb_sent # Heartbeat sent successfully
+    attr_accessor :autoflush
     #alias :obj_send :send
 
     def self.default_port(ssl)
@@ -87,6 +88,7 @@ module Stomp
         @parse_timeout = 5		# To override, use hashed parameters
         @connect_timeout = 0	# To override, use hashed parameters
         @logger = nil     		# To override, use hashed parameters
+        @autoflush = false    # To override, use hashed parameters or setter
         warn "login looks like a URL, do you have the correct parameters?" if @login =~ /:\/\//
       end
 
@@ -112,6 +114,7 @@ module Stomp
       @parse_timeout =  @parameters[:parse_timeout]
       @connect_timeout =  @parameters[:connect_timeout]
       @logger =  @parameters[:logger]
+      @autoflush = @parameters[:autoflush]
       #sets the first host to connect
       change_host
     end
@@ -638,6 +641,7 @@ module Stomp
           used_socket.puts
           used_socket.write body
           used_socket.write "\0"
+          used_socket.flush if autoflush
 
           if @protocol >= Stomp::SPL_11
             @ls = Time.now.to_f if @hbs
