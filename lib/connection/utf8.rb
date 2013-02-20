@@ -263,7 +263,7 @@ module Stomp
           end
         else
           vs = v.to_s
-          eh[Stomp::HeaderCodec::encode(ks)] = Stomp::HeaderCodec::encode(vs)
+          eh[Stomp::HeaderCodec::encode(ks).to_sym] = Stomp::HeaderCodec::encode(vs)
         end
       end
       eh

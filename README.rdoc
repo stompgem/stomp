@@ -60,7 +60,7 @@ See _CHANGELOG.rdoc_ for details.
 ===Positional Parameter Usage
 
     client = Stomp::Client.new("test", "user", "localhost", 61613)
-    client.send("/queue/mine", "hello world!")
+    client.publish("/queue/mine", "hello world!")
     client.subscribe("/queue/mine") do |msg|
       p msg
     end
