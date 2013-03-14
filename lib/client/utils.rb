@@ -9,6 +9,66 @@ module Stomp
 
     private
 
+    def parse_hash_params(params)
+      return false unless params.is_a?(Hash)
+
+      @parameters = params
+      first_host = @parameters[:hosts][0]
+      @login = first_host[:login]
+      @passcode = first_host[:passcode]
+      @host = first_host[:host]
+      @port = first_host[:port] || Connection::default_port(first_host[:ssl])
+      @reliable = true
+      true
+    end
+    private :parse_hash_params
+
+    def parse_stomp_url(login)
+      regexp = /^stomp:\/\/#{url_regex}/ # e.g. stomp://login:passcode@host:port or stomp://host:port
+      return false unless login =~ regexp
+
+      @login = $2 || ""
+      @passcode = $3 || ""
+      @host = $4
+      @port = $5.to_i
+      @reliable = false
+      true
+    end
+    private :parse_stomp_url
+
+    # e.g. failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)?option1=param
+    def parse_failover_url(login)
+      regexp = /^failover:(\/\/)?\(stomp(\+ssl)?:\/\/#{url_regex}(,stomp(\+ssl)?:\/\/#{url_regex}\))+(\?(.*))?$/
+      return false unless login =~ regexp
+
+      first_host = {}
+      first_host[:ssl] = !$2.nil?
+      @login = first_host[:login] = $4 || ""
+      @passcode = first_host[:passcode] = $5 || ""
+      @host = first_host[:host] = $6
+      @port = first_host[:port] = $7.to_i || Connection::default_port(first_host[:ssl])
+      options = $16 || ""
+      parts = options.split(/&|=/)
+      options = Hash[*parts]
+      hosts = [first_host] + parse_hosts(login)
+      @parameters = {}
+      @parameters[:hosts] = hosts
+      @parameters.merge! filter_options(options)
+      @reliable = true
+      true
+    end
+    private :parse_failover_url
+
+    def parse_positional_params(login, passcode, host, port, reliable)
+      @login = login
+      @passcode = passcode
+      @host = host
+      @port = port.to_i
+      @reliable = reliable
+      true
+    end
+    private :parse_positional_params
+
     # Set a subscription id in the headers hash if one does not already exist.
     # For simplicities sake, all subscriptions have a subscription ID.
     # setting an id in the SUBSCRIPTION header is described in the stomp protocol docs:

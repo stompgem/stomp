@@ -12,8 +12,6 @@ module Stomp
   # in that thread if you have much message volume.
   class Client
 
-    public
-
     # The login ID used by the client.
     attr_reader :login
 
@@ -81,69 +79,31 @@ module Stomp
     #   e.g. c = Stomp::Client.new(urlstring)
     #
     def initialize(login = '', passcode = '', host = 'localhost', port = 61613, reliable = false, autoflush = false)
-
-      # Parse stomp:// URL's or set params
-      if login.is_a?(Hash)
-        @parameters = login
-
-        first_host = @parameters[:hosts][0]
-
-        @login = first_host[:login]
-        @passcode = first_host[:passcode]
-        @host = first_host[:host]
-        @port = first_host[:port] || Connection::default_port(first_host[:ssl])
-
-        @reliable = true
-      elsif login =~ /^stomp:\/\/#{url_regex}/ # e.g. stomp://login:passcode@host:port or stomp://host:port
-        @login = $2 || ""
-        @passcode = $3 || ""
-        @host = $4
-        @port = $5.to_i
-        @reliable = false
-      elsif login =~ /^failover:(\/\/)?\(stomp(\+ssl)?:\/\/#{url_regex}(,stomp(\+ssl)?:\/\/#{url_regex}\))+(\?(.*))?$/ 
-        # e.g. failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)?option1=param
-        first_host = {}
-        first_host[:ssl] = !$2.nil?
-        @login = first_host[:login] = $4 || ""
-        @passcode = first_host[:passcode] = $5 || ""
-        @host = first_host[:host] = $6
-        @port = first_host[:port] = $7.to_i || Connection::default_port(first_host[:ssl])
-
-        options = $16 || ""
-        parts = options.split(/&|=/)
-        options = Hash[*parts]
-
-        hosts = [first_host] + parse_hosts(login)
-
-        @parameters = {}
-        @parameters[:hosts] = hosts
-
-        @parameters.merge! filter_options(options)
-
-        @reliable = true
-      else
-        @login = login
-        @passcode = passcode
-        @host = host
-        @port = port.to_i
-        @reliable = reliable
-      end
+      parse_hash_params(login) ||
+        parse_stomp_url(login) ||
+        parse_failover_url(login) ||
+        parse_positional_params(login, passcode, host, port, reliable)
 
       check_arguments!()
 
       @id_mutex = Mutex.new()
       @ids = 1
 
+      create_connection(autoflush)
+
+      start_listeners()
+
+    end
+
+    def create_connection(autoflush)
       if @parameters
         @connection = Connection.new(@parameters)
       else
         @connection = Connection.new(@login, @passcode, @host, @port, @reliable)
         @connection.autoflush = autoflush
       end
-
-      start_listeners()
-
     end
+    private :create_connection
 
     # open is syntactic sugar for 'Client.new', see 'initialize' for usage.
     def self.open(login = '', passcode = '', host = 'localhost', port = 61613, reliable = false)
