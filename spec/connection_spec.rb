@@ -430,7 +430,14 @@ describe Stomp::Connection do
       
       @connection.instance_variable_set(:@connection_attempts, limit)
       @connection.send(:max_reconnect_attempts?).should be_true
+    end
+
+    # These should be raised for the user to deal with
+    it "should not rescue MaxReconnectAttempts" do
+      @connection = Stomp::Connection.new(@parameters)
+      @connection.stub(:socket).and_raise(Stomp::Error::MaxReconnectAttempts)
       
+      expect { @connection.receive() }.to raise_error
     end
   end
 

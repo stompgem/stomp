@@ -229,6 +229,8 @@ module Stomp
         begin
           used_socket = socket()
           return _receive(used_socket)
+        rescue Stomp::Error::MaxReconnectAttempts
+          raise
         rescue
           @failure = $!
           raise unless @reliable
