@@ -217,22 +217,23 @@ describe Stomp::Connection do
         @message.headers[:retry_count].should == 5
       end
       
-      it "should not send the message to the dead letter queue as persistent if redeliveries equal max redeliveries" do
+      it "should not send the message to the dead letter queue as persistent if retry_count is less than max redeliveries" do
         max_redeliveries = 5
         dead_letter_queue = "/queue/Dead"
         
-        @message.headers["retry_count"] = max_redeliveries
+        @message.headers["retry_count"] = max_redeliveries - 1
         transaction_id = "transaction-#{@message.headers["message-id"]}-#{@message.headers["retry_count"]}"
         @retry_headers = @retry_headers.merge :transaction => transaction_id, :retry_count => @message.headers["retry_count"] + 1
         @connection.should_receive(:publish).with(@message.headers["destination"], @message.body, @retry_headers)
         @connection.unreceive @message, :dead_letter_queue => dead_letter_queue, :max_redeliveries => max_redeliveries
       end
       
+      # If the retry_count has reached max_redeliveries, then we're done.
       it "should send the message to the dead letter queue as persistent if max redeliveries have been reached" do
         max_redeliveries = 5
         dead_letter_queue = "/queue/Dead"
         
-        @message.headers["retry_count"] = max_redeliveries + 1
+        @message.headers["retry_count"] = max_redeliveries
         transaction_id = "transaction-#{@message.headers["message-id"]}-#{@message.headers["retry_count"]}"
         @retry_headers = @retry_headers.merge :persistent => true, :transaction => transaction_id, :retry_count => @message.headers["retry_count"] + 1, :original_destination=> @message.headers["destination"]
         @connection.should_receive(:publish).with(dead_letter_queue, @message.body, @retry_headers)

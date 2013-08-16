@@ -349,7 +349,7 @@ module Stomp
           self.ack(message_id, :transaction => transaction_id)
         end
 
-        if retry_count <= options[:max_redeliveries]
+        if message.headers[:retry_count] <= options[:max_redeliveries]
           self.publish(message.headers[:destination], message.body, 
             message.headers.merge(:transaction => transaction_id))
         else
