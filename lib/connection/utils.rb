@@ -192,7 +192,7 @@ module Stomp
       return res_params
     end
 
-    # change_host selects the next host for retires.
+    # change_host selects the next host for retries.
     def change_host
       @parameters[:hosts] = @parameters[:hosts].sort_by { rand } if @parameters[:randomize]
 
@@ -205,7 +205,6 @@ module Stomp
       @port = current_host[:port] || Connection::default_port(@ssl)
       @login = current_host[:login] || ""
       @passcode = current_host[:passcode] || ""
-
     end
 
     # max_reconnect_attempts? returns nil or the number of maximum reconnect

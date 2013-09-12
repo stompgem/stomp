@@ -13,25 +13,20 @@ module Stomp
       return false unless params.is_a?(Hash)
 
       @parameters = params
-      first_host = @parameters[:hosts][0]
-      @login = first_host[:login]
-      @passcode = first_host[:passcode]
-      @host = first_host[:host]
-      @port = first_host[:port] || Connection::default_port(first_host[:ssl])
-      @reliable = true
+      @parameters[:reliable] = true
+
       true
     end
 
     def parse_stomp_url(login)
       regexp = /^stomp:\/\/#{URL_REPAT}/
-      return false unless login =~ regexp
+      return false unless url = regexp.match(login)
 
-      @login = $3 || ""
-      @passcode = $4 || ""
-      @host = $5
-      @port = $6.to_i
-
-      @reliable = false
+      @parameters = { :reliable => false,
+                      :hosts => [ { :login => url[3] || "",
+                                    :passcode => url[4] || "",
+                                    :host => url[5],
+                                    :port => url[6].to_i} ] }
       true
     end
 
@@ -40,31 +35,28 @@ module Stomp
       rval = nil
       if md = FAILOVER_REGEX.match(login)
         finhosts = parse_hosts(login)
-        #
-        @login = finhosts[0][:login] || ""
-        @passcode = finhosts[0][:passcode] || ""
-        @host = finhosts[0][:host] || ""
-        @port = finhosts[0][:port] || ""
-        #
+
         options = {}
-        if md_last = md[md.size-1]
+        if md_last = md[-1]
           parts = md_last.split(/&|=/)
-          raise Stomp::Error::MalformedFailoverOptionsError unless (parts.size % 2 ) == 0
+          raise Stomp::Error::MalformedFailoverOptionsError unless ( parts.size % 2 ) == 0
           options = Hash[*parts]
         end
-        @parameters = {:hosts => finhosts}.merge! filter_options(options)
-        @reliable = true
+
+        @parameters = {:hosts => finhosts}.merge!(filter_options(options))
+
+        @parameters[:reliable] = true
         rval = true
       end
       rval
     end
 
     def parse_positional_params(login, passcode, host, port, reliable)
-      @login = login
-      @passcode = passcode
-      @host = host
-      @port = port.to_i
-      @reliable = reliable
+      @parameters = { :reliable => reliable,
+                      :hosts => [ { :login => login,
+                                    :passcode => passcode,
+                                    :host => host,
+                                    :port => port.to_i } ] }
       true
     end
 
@@ -108,9 +100,12 @@ end
 
     # A very basic check of required arguments.
     def check_arguments!()
-      raise ArgumentError if @host.nil? || @host.empty?
-      raise ArgumentError if @port.nil? || @port == '' || @port < 1 || @port > 65535
-      raise ArgumentError unless @reliable.is_a?(TrueClass) || @reliable.is_a?(FalseClass)
+      first_host = @parameters && @parameters[:hosts] && @parameters[:hosts].first
+
+      raise ArgumentError if first_host.nil?
+      raise ArgumentError if first_host[:host].nil? || first_host[:host].empty?
+      raise ArgumentError if first_host[:port].nil? || first_host[:port] == '' || first_host[:port] < 1 || first_host[:port] > 65535
+      raise ArgumentError unless @parameters[:reliable].is_a?(TrueClass) || @parameters[:reliable].is_a?(FalseClass)
     end
 
     # filter_options returns a new Hash of filtered options.
@@ -149,7 +144,7 @@ end
         while true
           message = @connection.receive
           # AMQ specific behavior
-          if message.nil? && (!@reliable)
+          if message.nil? && (!@parameters[:reliable])
             raise Stomp::Error::NilMessageError
           end
           if message # message can be nil on rapid AMQ stop / start sequences

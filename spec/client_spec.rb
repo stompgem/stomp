@@ -7,8 +7,8 @@ require 'client_shared_examples'
 describe Stomp::Client do
 
   before(:each) do
-    @mock_connection = mock('connection', :autoflush= => true)
-    Stomp::Connection.stub!(:new).and_return(@mock_connection)
+    @mock_connection = double('connection', :autoflush= => true)
+    Stomp::Connection.stub(:new).and_return(@mock_connection)
   end
 
   describe "(created with no params)" do
@@ -31,6 +31,29 @@ describe Stomp::Client do
 
     it_should_behave_like "standard Client"
 
+  end
+
+  describe 'delegated params' do
+    before :each do
+      @mock_connection = double('connection', :autoflush= => true,
+                                              :login => 'dummy login',
+                                              :passcode => 'dummy passcode',
+                                              :port => 12345,
+                                              :host => 'dummy host',
+                                              :ssl => 'dummy ssl')
+      Stomp::Connection.stub(:new).and_return(@mock_connection)
+      @client = Stomp::Client.new
+    end
+
+    describe 'it should delegate parameters to its connection' do
+      subject { @client }
+
+      its(:login) { should eql 'dummy login' }
+      its(:passcode) { should eql 'dummy passcode' }
+      its(:port) { should eql 12345 }
+      its(:host) { should eql 'dummy host' }
+      its(:ssl) { should eql 'dummy ssl' }
+    end
   end
 
   describe "(autoflush)" do
@@ -98,17 +121,17 @@ describe Stomp::Client do
 
 
   describe "(created with positional params)" do
-
     before(:each) do
       @client = Stomp::Client.new('testlogin', 'testpassword', 'localhost', '12345', false)
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('testlogin')
-      @client.passcode.should eql('testpassword')
-      @client.host.should eql('localhost')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => 'testlogin',
+                                                              :passcode => 'testpassword',
+                                                              :host => 'localhost',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('testlogin', 'testpassword', 'localhost', '12345', false)
     end
 
     it_should_behave_like "standard Client"
@@ -122,11 +145,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('')
-      @client.passcode.should eql('')
-      @client.host.should eql('foobar')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => '',
+                                                              :passcode => '',
+                                                              :host => 'foobar',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://foobar:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -140,11 +164,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('')
-      @client.passcode.should eql('')
-      @client.host.should eql('foo-bar')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => '',
+                                                              :passcode => '',
+                                                              :host => 'foo-bar',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://foo-bar:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -158,11 +183,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('test-login')
-      @client.passcode.should eql('testpasscode')
-      @client.host.should eql('foobar')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => 'test-login',
+                                                              :passcode => 'testpasscode',
+                                                              :host => 'foobar',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://test-login:testpasscode@foobar:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -176,11 +202,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('test-login')
-      @client.passcode.should eql('testpasscode')
-      @client.host.should eql('foo-bar')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => 'test-login',
+                                                              :passcode => 'testpasscode',
+                                                              :host => 'foo-bar',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://test-login:testpasscode@foo-bar:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -197,11 +224,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('')
-      @client.passcode.should eql('')
-      @client.host.should eql('host.foobar.com')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => '',
+                                                              :passcode => '',
+                                                              :host => 'host.foobar.com',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://host.foobar.com:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -215,11 +243,12 @@ describe Stomp::Client do
     end
 
     it "should properly parse the URL provided" do
-      @client.login.should eql('testlogin')
-      @client.passcode.should eql('testpasscode')
-      @client.host.should eql('host.foobar.com')
-      @client.port.should eql(12345)
-      @client.reliable.should be_false
+      Stomp::Connection.should_receive(:new).with(:hosts => [{:login => 'testlogin',
+                                                              :passcode => 'testpasscode',
+                                                              :host => 'host.foobar.com',
+                                                              :port => 12345}],
+                                                  :reliable => false)
+      Stomp::Client.new('stomp://testlogin:testpasscode@host.foobar.com:12345')
     end
 
     it_should_behave_like "standard Client"
@@ -236,7 +265,8 @@ describe Stomp::Client do
         :back_off_multiplier => 2,
         :max_reconnect_attempts => 0,
         :randomize => false,
-        :connect_timeout => 0
+        :connect_timeout => 0,
+        :reliable => true
       }
     end
     it "should properly parse a URL with failover://" do
@@ -303,14 +333,15 @@ describe Stomp::Client do
       url = "failover:(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)?#{query}"
       
       #
-      @parameters = {  
+      @parameters = {
         :initial_reconnect_delay => 5.0,
         :max_reconnect_delay => 60.0,
         :use_exponential_back_off => false,
         :back_off_multiplier => 3,
         :max_reconnect_attempts => 4,
         :randomize => true,
-        :connect_timeout => 0
+        :connect_timeout => 0,
+        :reliable => true
       }
       
       @parameters[:hosts] = [

@@ -2,6 +2,7 @@
 
 require 'thread'
 require 'digest/sha1'
+require 'forwardable'
 
 module Stomp
 
@@ -11,24 +12,13 @@ module Stomp
   # Receives all happen in one thread, so consider not doing much processing
   # in that thread if you have much message volume.
   class Client
+    extend Forwardable
 
-    # The login ID used by the client.
-    attr_reader :login
-
-    # The login credentials used by the client.
-    attr_reader :passcode
-
-    # The Stomp host specified by the client.
-    attr_reader :host
-
-    # The Stomp host's listening port.
-    attr_reader :port
-
-    # Is this connection reliable?
-    attr_reader :reliable
-
-    # Parameters Hash, possibly nil for a non-hashed connect.
+    # Parameters hash
     attr_reader :parameters
+
+    def_delegators :@connection, :login, :passcode, :port, :host, :ssl
+    def_delegator :@parameters, :reliable
 
     # A new Client object can be initialized using three forms:
     #
@@ -100,12 +90,8 @@ module Stomp
     end
 
     def create_connection(autoflush)
-      if @parameters
-        @connection = Connection.new(@parameters)
-      else
-        @connection = Connection.new(@login, @passcode, @host, @port, @reliable)
-        @connection.autoflush = autoflush
-      end
+      @connection = Connection.new(@parameters)
+      @connection.autoflush = autoflush
     end
     private :create_connection
 

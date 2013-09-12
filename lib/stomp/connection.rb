@@ -38,6 +38,9 @@ module Stomp
     # dynamically by calling code.
     attr_accessor :autoflush
 
+    # Currently-connected host and port
+    attr_reader :host, :port
+
     # default_port returns the default port used by the gem for TCP or SSL.
     def self.default_port(ssl)
       ssl ? 61612 : 61613
