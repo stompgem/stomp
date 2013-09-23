@@ -343,11 +343,15 @@ module Stomp
       @closed = false
       if @parameters # nil in some rspec tests
         unless @reconnect_delay
-          @reconnect_delay = @parameters[:initial_reconnect_delay] ? @parameters[:initial_reconnect_delay] : 0.01
+          @reconnect_delay = @parameters[:initial_reconnect_delay] || 0.01
         end
       end
       # Use keepalive
       used_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
+
+      # TCP_NODELAY option (disables Nagle's algorithm)
+      used_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, (@parameters && @parameters[:tcp_nodelay]))
+
       used_socket
     end
 
