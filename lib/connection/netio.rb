@@ -348,8 +348,8 @@ module Stomp
     def connect(used_socket)
       @connect_headers = {} unless @connect_headers # Caller said nil/false
       headers = @connect_headers.clone
-      headers[:login] = @login
-      headers[:passcode] = @passcode
+      headers[:login] = @login unless @login.to_s.empty?
+      headers[:passcode] = @passcode unless @login.to_s.empty?
       _pre_connect
       if !@hhas10 && @stompconn
         _transmit(used_socket, Stomp::CMD_STOMP, headers)
