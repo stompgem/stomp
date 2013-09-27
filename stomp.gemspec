@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian McCallister", "Marius Mathiesen", "Thiago Morello", "Guy M. Allard"]
-  s.date = "2013-09-24"
+  s.date = "2013-09-27"
   s.description = "Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge."
   s.email = ["brianm@apache.org", "marius@stones.com", "morellon@gmail.com", "allard.guy.m@gmail.com"]
   s.executables = ["catstomp", "stompcat"]
@@ -30,7 +30,6 @@ Gem::Specification.new do |s|
     "examples/publisher.rb",
     "examples/put11conn_ex1.rb",
     "examples/putget11_rh1.rb",
-    "examples/slogger.rb",
     "examples/ssl_uc1.rb",
     "examples/ssl_uc1_ciphers.rb",
     "examples/ssl_uc2.rb",
@@ -57,6 +56,7 @@ Gem::Specification.new do |s|
     "lib/stomp/ext/hash.rb",
     "lib/stomp/message.rb",
     "lib/stomp/null_logger.rb",
+    "lib/stomp/slogger.rb",
     "lib/stomp/sslparams.rb",
     "lib/stomp/version.rb",
     "test/test_client.rb",
@@ -89,7 +89,6 @@ Gem::Specification.new do |s|
     "examples/publisher.rb",
     "examples/put11conn_ex1.rb",
     "examples/putget11_rh1.rb",
-    "examples/slogger.rb",
     "examples/ssl_uc1.rb",
     "examples/ssl_uc1_ciphers.rb",
     "examples/ssl_uc2.rb",
@@ -116,6 +115,7 @@ Gem::Specification.new do |s|
     "lib/stomp/ext/hash.rb",
     "lib/stomp/message.rb",
     "lib/stomp/null_logger.rb",
+    "lib/stomp/slogger.rb",
     "lib/stomp/sslparams.rb",
     "lib/stomp/version.rb",
     "notes/heartbeat_readme.txt",

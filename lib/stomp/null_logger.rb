@@ -1,7 +1,7 @@
 module Stomp
   class NullLogger
     def on_miscerr(parms, error_msg)
-      $stderr.print params
+      $stderr.print parms
       $stderr.print error_msg
     end
 

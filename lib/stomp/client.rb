@@ -85,8 +85,26 @@ module Stomp
 
       @start_timeout = @parameters[:start_timeout] || 10
       Timeout.timeout(@start_timeout, Stomp::Error::StartTimeoutException.new(@start_timeout)) do
+        create_error_handler
         create_connection(autoflush)
         start_listeners()
+      end
+    end
+
+    def create_error_handler
+      client_thread = Thread.current
+
+      @error_listener = lambda do |error|
+        exception = case error.body
+                      when /ResourceAllocationException/i
+                        Stomp::Error::ProducerFlowControlException.new(error)
+                      when /ProtocolException/i
+                        Stomp::Error::ProtocolException.new(error)
+                      else
+                        Stomp::Error::BrokerException.new(error)
+                    end
+
+        client_thread.raise exception
       end
     end
 
@@ -120,9 +138,7 @@ module Stomp
       replay_list = @replay_messages_by_txn[name]
       if replay_list
         replay_list.each do |message|
-          if listener = find_listener(message)
-            listener.call(message)
-          end
+          find_listener(message) # find_listener also calls the listener
         end
       end
     end

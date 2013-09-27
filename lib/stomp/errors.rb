@@ -46,15 +46,6 @@ module Stomp
       end
     end
 
-    # StartTimeoutException is raised if:
-    # * A timeout occurs during initialization when creating connection and
-    # starting listeners
-    class StartTimeoutException < RuntimeError
-      def message
-        "Timeout creating connection and starting listeners."
-      end
-    end
-
     # NoCurrentConnection is raised if:
     # * Any method is called when a current connection does not exist.
     # * And @closed_check is true (the default).
@@ -227,6 +218,57 @@ module Stomp
     class ConnectReadTimeout < RuntimeError
       def message
         "Connect read for CONNECTED/ERROR timeout"
+      end
+    end
+
+    class StompException < RuntimeError; end
+
+    class BrokerException < StompException
+      attr_reader :headers, :message, :receipt_id, :broker_backtrace
+
+      def initialize(message)
+        @message          = message.headers.delete('message')
+        @receipt_id       = message.headers.delete('receipt-id') || 'no receipt id'
+        @headers          = message.headers
+        @broker_backtrace = message.body
+      end
+    end
+
+    class ProducerFlowControlException < BrokerException
+      attr_reader :producer_id, :dest_name
+
+      def initialize(message)
+        super(message)
+        msg_headers = /.*producer\s+\((.*)\).*to\s+prevent\s+flooding\s+([^\s]*)\.\s+/i.match(@message)
+
+        @producer_id = msg_headers && msg_headers[1]
+        @dest_name   = msg_headers && msg_headers[2]
+      end
+    end
+
+    class ProtocolException < BrokerException
+      def initialize(message)
+        super(message)
+      end
+    end
+
+    class StartTimeoutException < StompException
+      def initialize(timeout)
+        @timeout = timeout
+      end
+
+      def message
+        "Client failed to start in #{@timeout} seconds"
+      end
+    end
+
+    class ReadReceiptTimeoutException < StompException
+      def initialize(timeout)
+        @timeout = timeout
+      end
+
+      def message
+        "Read receipt not received after #{@timeout} seconds"
       end
     end
 

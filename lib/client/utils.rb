@@ -71,13 +71,6 @@ module Stomp
       end
     end
 
-    # Register a receipt listener.
-    def register_receipt_listener(listener)
-      id = uuid
-      @receipt_listeners[id] = listener
-      id
-    end
-
     # Parse a stomp URL.
     def parse_hosts(url)
       hosts = []
@@ -127,35 +120,54 @@ module Stomp
         set_subscription_id_if_missing(message.headers['destination'], message.headers)
         subscription_id = message.headers[:id]
       end
-      @listeners[subscription_id]
+
+      listener = @listeners[subscription_id]
+      listener.call(message) if listener
     end
 
-    # Start a single listener thread.  Misnamed I think.
-    def start_listeners()
+    # Register a receipt listener.
+    def register_receipt_listener(listener)
+      id = uuid
+      @receipt_listeners[id] = listener
+      id
+    end
+
+    def find_receipt_listener(message)
+      listener = @receipt_listeners[message.headers['receipt-id']]
+      listener.call(message) if listener
+    end
+
+    def create_listener_maps
       @listeners = {}
       @receipt_listeners = {}
       @replay_messages_by_txn = {}
 
+      @listener_map = Hash.new do |message|
+        @logger.on_miscerr(@connection.log_params, "Received unknown frame type: '#{message.command}'\n")
+      end
+
+      @listener_map[Stomp::CMD_MESSAGE] = lambda {|message| find_listener(message) }
+      @listener_map[Stomp::CMD_RECEIPT] = lambda {|message| find_receipt_listener(message) }
+      @listener_map[Stomp::CMD_ERROR]   = @error_listener
+    end
+
+    # Start a single listener thread.  Misnamed I think.
+    def start_listeners()
+      create_listener_maps
+
       @listener_thread = Thread.start do
-        while true
+        loop do
           message = @connection.receive
           # AMQ specific behavior
           if message.nil? && (!@parameters[:reliable])
             raise Stomp::Error::NilMessageError
           end
-          if message # message can be nil on rapid AMQ stop / start sequences
-          # OK, we have some real data
-            if message.command == Stomp::CMD_MESSAGE
-              if listener = find_listener(message)
-                listener.call(message)
-              end
-            elsif message.command == Stomp::CMD_RECEIPT
-              if listener = @receipt_listeners[message.headers['receipt-id']]
-                listener.call(message)
-              end
-            end
-          end
-        end # while true
+
+          next unless message # message can be nil on rapid AMQ stop/start sequences
+
+          @listener_map[message.command].call(message)
+        end
+
       end
     end # method start_listeners
 

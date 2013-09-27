@@ -375,4 +375,24 @@ describe Stomp::Client do
     
   end
 
+
+  describe '#error_listener' do
+    context 'on getting a ResourceAllocationException' do
+      let(:message) do
+        message = Stomp::Message.new('')
+        message.body = "javax.jms.ResourceAllocationException: Usage"
+        message.headers = {'message' => %q{message = "Usage Manager Memory Limit reached. Stopping producer (ID:producer) to prevent flooding queue://errors. See } }
+        message.command = Stomp::CMD_ERROR
+        message
+      end
+  
+      it 'should handle ProducerFlowControlException errors by raising' do
+        expect do
+          @client = Stomp::Client.new
+          @error_listener = @client.instance_variable_get(:@error_listener)
+          @error_listener.call(message)
+        end.to raise_exception(Stomp::Error::ProducerFlowControlException)
+      end
+    end
+  end
 end
