@@ -51,13 +51,25 @@ require 'logger'	# use the standard Ruby logger .....
 # Callback parameters: are a copy of the @parameters instance variable for
 # the Stomp::Connection.
 #
-class Slogger
+class Slogger < Stomp::NullLogger
 
   # Initialize a new callback logger instance.
   def initialize(init_parms = nil)
+    _init
+    @log.info("Logger initialization complete.")
+  end
+
+  def _init
     @log = Logger::new(STDOUT)		# User preference
     @log.level = Logger::DEBUG		# User preference
-    @log.info("Logger initialization complete.")
+  end
+
+  def marshal_dump
+    []
+  end
+
+  def marshal_load(array)
+    _init
   end
 
   # Log connecting events

@@ -2,6 +2,7 @@
 
 require 'thread'
 require 'digest/sha1'
+require 'timeout'
 require 'forwardable'
 
 module Stomp
@@ -80,13 +81,31 @@ module Stomp
 
       check_arguments!()
 
-      @id_mutex = Mutex.new()
-      @ids = 1
+      @logger = @parameters[:logger] ||= Stomp::NullLogger.new
 
-      create_connection(autoflush)
+      @start_timeout = @parameters[:start_timeout] || 10
+      Timeout.timeout(@start_timeout, Stomp::Error::StartTimeoutException.new(@start_timeout)) do
+        create_error_handler
+        create_connection(autoflush)
+        start_listeners()
+      end
+    end
 
-      start_listeners()
+    def create_error_handler
+      client_thread = Thread.current
 
+      @error_listener = lambda do |error|
+        exception = case error.body
+                      when /ResourceAllocationException/i
+                        Stomp::Error::ProducerFlowControlException.new(error)
+                      when /ProtocolException/i
+                        Stomp::Error::ProtocolException.new(error)
+                      else
+                        Stomp::Error::BrokerException.new(error)
+                    end
+
+        client_thread.raise exception
+      end
     end
 
     def create_connection(autoflush)
@@ -119,9 +138,7 @@ module Stomp
       replay_list = @replay_messages_by_txn[name]
       if replay_list
         replay_list.each do |message|
-          if listener = find_listener(message)
-            listener.call(message)
-          end
+          find_listener(message) # find_listener also calls the listener
         end
       end
     end
@@ -159,7 +176,7 @@ module Stomp
     # Acknowledge a message, used when a subscription has specified
     # client acknowledgement ( connection.subscribe("/queue/a",{:ack => 'client'}).
     # Accepts a transaction header ( :transaction => 'some_transaction_id' ).
-    def acknowledge(message, headers = {})
+    def ack(message, headers = {})
       txn_id = headers[:transaction]
       if txn_id
         # lets keep around messages ack'd in this transaction in case we rollback
@@ -175,14 +192,20 @@ module Stomp
       end
       if protocol() == Stomp::SPL_12
         @connection.ack(message.headers['ack'], headers)
+      elsif protocol == Stomp::SPL_11
+        headers.merge!(:subscription => message.headers['subscription'])
+        @connection.ack(message.headers['message-id'], headers)
       else
         @connection.ack(message.headers['message-id'], headers)
       end
     end
 
+    # For posterity, we alias:
+    alias acknowledge ack
+
     # Stomp 1.1+ NACK.
-    def nack(message_id, headers = {})
-      @connection.nack(message_id, headers)
+    def nack(message, headers = {})
+      @connection.nack(message, headers)
     end
 
     # Unreceive a message, sending it back to its queue or to the DLQ.
@@ -240,6 +263,7 @@ module Stomp
 
     # set_logger identifies a new callback logger.
     def set_logger(logger)
+      @logger = logger
       @connection.set_logger(logger)
     end
 

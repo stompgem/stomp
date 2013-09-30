@@ -116,9 +116,7 @@ module Stomp
             used_socket = open_socket() # sets @closed = false if OK
             # Open is complete
             connect(used_socket)
-            if @logger && @logger.respond_to?(:on_connected)
-              @logger.on_connected(log_params)
-            end
+            @logger.on_connected(log_params)
             @connection_attempts = 0
           rescue
             @failure = $!
@@ -132,16 +130,13 @@ module Stomp
             # b) should never be retried
             raise if @failure.is_a?(Stomp::Error::ProtocolError11p)
 
-            if @logger && @logger.respond_to?(:on_connectfail)
-              # on_connectfail may raise
-              begin
-                @logger.on_connectfail(log_params)
-              rescue Exception => aex
-                raise if aex.is_a?(Stomp::Error::LoggerConnectionError)
-              end
-            else
-              $stderr.print "connect to #{@host} failed: #{$!} will retry(##{@connection_attempts}) in #{@reconnect_delay}\n"
+            # on_connectfail may raise
+            begin
+              @logger.on_connectfail(log_params)
+            rescue Exception => aex
+              raise if aex.is_a?(Stomp::Error::LoggerConnectionError)
             end
+            $stderr.print "connect to #{@host} failed: #{$!} will retry(##{@connection_attempts}) in #{@reconnect_delay}\n"
             raise Stomp::Error::MaxReconnectAttempts if max_reconnect_attempts?
 
             sleep(@reconnect_delay)
@@ -183,6 +178,7 @@ module Stomp
         :max_hbrlck_fails => 0,
         :fast_hbs_adjust => 0.0,
         :connread_timeout => 0,
+        :tcp_nodelay => true
       }
 
       res_params = default_params.merge(params)
@@ -236,11 +232,9 @@ module Stomp
           @failure = $!
           raise unless @reliable
           errstr = "receive failed: #{$!}"
-          if @logger && @logger.respond_to?(:on_miscerr)
-            @logger.on_miscerr(log_params, "es_oldrecv: " + errstr)
-          else
-            $stderr.print errstr
-          end
+          @logger.on_miscerr(log_params, "es_oldrecv: " + errstr)
+          $stderr.print errstr
+
           # !!! This initiates a re-connect !!!
           _reconn_prep()
         end

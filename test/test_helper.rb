@@ -81,6 +81,21 @@ module TestBase
     conn
   end
 
+  # Get a Stomp Anonymous Connection.
+  def get_anonymous_connection()
+    ch = get_conn_headers()
+    hash = { :hosts => [
+        {:host => host, :port => port, :ssl => nil},
+    ],
+             :reliable => false,
+             :connect_headers => ch,
+             :stompconn => get_stomp_conn(),
+             :usecrlf => get_crlf(),
+    }
+    conn = Stomp::Connection.open(hash)
+    conn
+  end
+
   # Get a Stomp SSL Connection.
   def get_ssl_connection()
     ch = get_conn_headers()

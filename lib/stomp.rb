@@ -24,6 +24,7 @@ require 'stomp/version'         # Stomp#Version#STRING
 require 'stomp/errors'          # All Stomp# exceptions
 require 'stomp/codec'           # Stomp 1.1 codec
 require 'stomp/sslparams'       # Stomp SSL support
+require 'stomp/null_logger'     # A NullLogger class
 
 # Private methods in #Client
 require 'client/utils'          # private Client Utility methods

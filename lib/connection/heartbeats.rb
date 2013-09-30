@@ -100,20 +100,17 @@ module Stomp
           sleep(slt)
           next unless @socket # nil under some circumstances ??
           curt = Time.now.to_f
-          if @logger && @logger.respond_to?(:on_hbfire)
-            @logger.on_hbfire(log_params, "send_fire", :curt => curt, :last_sleep => slt)
-          end
+          @logger.on_hbfire(log_params, "send_fire", :curt => curt, :last_sleep => slt)
+
           delta = curt - @ls
           # Be tolerant (minus), and always do this the first time through.
           # Reintroduce logic removed in d922fa.
           compval = (@hbsend_interval - (@hbsend_interval/5.0)) / 1000000.0
           if delta > compval || first_time
             first_time = false
-            if @logger && @logger.respond_to?(:on_hbfire)
-              @logger.on_hbfire(log_params, "send_heartbeat", :last_sleep => slt,
-                :curt => curt, :last_send => @ls, :delta => delta,
-                :compval => compval)
-            end
+            @logger.on_hbfire(log_params, "send_heartbeat", :last_sleep => slt,
+                              :curt => curt, :last_send => @ls, :delta => delta,
+                              :compval => compval)
             # Send a heartbeat
             @transmit_semaphore.synchronize do
               begin
@@ -124,10 +121,8 @@ module Stomp
                 @hbsend_count += 1
               rescue Exception => sendex
                 @hb_sent = false # Set the warning flag
-                if @logger && @logger.respond_to?(:on_hbwrite_fail)
-                  @logger.on_hbwrite_fail(log_params, {"ticker_interval" => sleeptime,
-                  "exception" => sendex})
-                end
+                @logger.on_hbwrite_fail(log_params, {"ticker_interval" => sleeptime,
+                                                     "exception" => sendex})
                 if @hbser
                   raise # Re-raise if user requested this, otherwise ignore
                 end
@@ -165,16 +160,12 @@ module Stomp
           next unless @socket # nil under some circumstances ??
           rdrdy = _is_ready?(@socket)
           curt = Time.now.to_f
-          if @logger && @logger.respond_to?(:on_hbfire)
-            @logger.on_hbfire(log_params, "receive_fire", :curt => curt)
-          end
+          @logger.on_hbfire(log_params, "receive_fire", :curt => curt)
           #
           begin
             delta = curt - @lr
             if delta > sleeptime
-              if @logger && @logger.respond_to?(:on_hbfire)
-                @logger.on_hbfire(log_params, "receive_heartbeat", {})
-              end
+              @logger.on_hbfire(log_params, "receive_heartbeat", {})
               # Client code could be off doing something else (that is, no reading of
               # the socket has been requested by the caller).  Try to  handle that case.
               lock = @read_semaphore.try_lock
@@ -201,22 +192,20 @@ module Stomp
                   @read_semaphore.unlock # Release read lock
                   @hb_received = false
                   read_fail_count += 1
-                  if @logger && @logger.respond_to?(:on_hbread_fail)
-                    @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
-                      "read_fail_count" => read_fail_count, "lock_fail" => false,
-                      "lock_fail_count" => lock_fail_count})
-                  end
+                  @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
+                                                      "read_fail_count" => read_fail_count,
+                                                      "lock_fail" => false,
+                                                      "lock_fail_count" => lock_fail_count})
                 end
               else  # try_lock failed
                 # Shrug.  Could not get lock.  Client must be actually be reading.
                 @hb_received = false
                 # But notify caller if possible
                 lock_fail_count += 1
-                if @logger && @logger.respond_to?(:on_hbread_fail)
-                  @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
-                    "read_fail_count" => read_fail_count, "lock_fail" => true,
-                    "lock_fail_count" => lock_fail_count})
-                end
+                @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
+                                                    "read_fail_count" => read_fail_count,
+                                                    "lock_fail" => true,
+                                                    "lock_fail_count" => lock_fail_count})
               end # of the try_lock
 
             else # delta <= sleeptime
@@ -225,11 +214,10 @@ module Stomp
               lock_fail_count = 0 # reset
             end # of the if delta > sleeptime
           rescue Exception => recvex
-            if @logger && @logger.respond_to?(:on_hbread_fail)
-              @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
-                "exception" => recvex, "read_fail_count" => read_fail_count,
-                "lock_fail_count" => lock_fail_count})
-            end
+            @logger.on_hbread_fail(log_params, {"ticker_interval" => sleeptime,
+                                                "exception" => recvex,
+                                                "read_fail_count" => read_fail_count,
+                                                "lock_fail_count" => lock_fail_count})
             fail_hard = true
           end
           # Do we want to attempt a retry?

@@ -5,8 +5,10 @@ require 'client_shared_examples'
 
 
 describe Stomp::Client do
+  let(:null_logger) { double("mock Stomp::NullLogger") }
 
   before(:each) do
+    Stomp::NullLogger.stub(:new).and_return(null_logger)
     @mock_connection = double('connection', :autoflush= => true)
     Stomp::Connection.stub(:new).and_return(@mock_connection)
   end
@@ -130,6 +132,7 @@ describe Stomp::Client do
                                                               :passcode => 'testpassword',
                                                               :host => 'localhost',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('testlogin', 'testpassword', 'localhost', '12345', false)
     end
@@ -139,7 +142,6 @@ describe Stomp::Client do
   end
 
   describe "(created with non-authenticating stomp:// URL and non-TLD host)" do
-
     before(:each) do
       @client = Stomp::Client.new('stomp://foobar:12345')
     end
@@ -149,6 +151,7 @@ describe Stomp::Client do
                                                               :passcode => '',
                                                               :host => 'foobar',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://foobar:12345')
     end
@@ -168,6 +171,7 @@ describe Stomp::Client do
                                                               :passcode => '',
                                                               :host => 'foo-bar',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://foo-bar:12345')
     end
@@ -187,6 +191,7 @@ describe Stomp::Client do
                                                               :passcode => 'testpasscode',
                                                               :host => 'foobar',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://test-login:testpasscode@foobar:12345')
     end
@@ -206,6 +211,7 @@ describe Stomp::Client do
                                                               :passcode => 'testpasscode',
                                                               :host => 'foo-bar',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://test-login:testpasscode@foo-bar:12345')
     end
@@ -228,6 +234,7 @@ describe Stomp::Client do
                                                               :passcode => '',
                                                               :host => 'host.foobar.com',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://host.foobar.com:12345')
     end
@@ -247,6 +254,7 @@ describe Stomp::Client do
                                                               :passcode => 'testpasscode',
                                                               :host => 'host.foobar.com',
                                                               :port => 12345}],
+                                                  :logger => null_logger,
                                                   :reliable => false)
       Stomp::Client.new('stomp://testlogin:testpasscode@host.foobar.com:12345')
     end
@@ -276,6 +284,8 @@ describe Stomp::Client do
         {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
       ]
+
+      @parameters.merge!({:logger => null_logger})
       
       Stomp::Connection.should_receive(:new).with(@parameters)
       
@@ -292,6 +302,8 @@ describe Stomp::Client do
         {:login => "login3", :passcode => "passcode3", :host => "remotehost2", :port => 61618, :ssl => false}
       ]
       
+      @parameters.merge!({:logger => null_logger})
+      
       Stomp::Connection.should_receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
@@ -306,6 +318,8 @@ describe Stomp::Client do
         {:login => "", :passcode => "", :host => "remotehost", :port => 61617, :ssl => false}
       ]
       
+      @parameters.merge!({:logger => null_logger})
+      
       Stomp::Connection.should_receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
@@ -319,6 +333,8 @@ describe Stomp::Client do
         {:login => "", :passcode => "", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "", :passcode => "", :host => "remotehost", :port => 61617, :ssl => false}
       ]
+      
+      @parameters.merge!({:logger => null_logger})
       
       Stomp::Connection.should_receive(:new).with(@parameters)
       
@@ -349,6 +365,8 @@ describe Stomp::Client do
         {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
       ]
       
+      @parameters.merge!({:logger => null_logger})
+      
       Stomp::Connection.should_receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
@@ -357,4 +375,24 @@ describe Stomp::Client do
     
   end
 
+
+  describe '#error_listener' do
+    context 'on getting a ResourceAllocationException' do
+      let(:message) do
+        message = Stomp::Message.new('')
+        message.body = "javax.jms.ResourceAllocationException: Usage"
+        message.headers = {'message' => %q{message = "Usage Manager Memory Limit reached. Stopping producer (ID:producer) to prevent flooding queue://errors. See } }
+        message.command = Stomp::CMD_ERROR
+        message
+      end
+  
+      it 'should handle ProducerFlowControlException errors by raising' do
+        expect do
+          @client = Stomp::Client.new
+          @error_listener = @client.instance_variable_get(:@error_listener)
+          @error_listener.call(message)
+        end.to raise_exception(Stomp::Error::ProducerFlowControlException)
+      end
+    end
+  end
 end

@@ -4,14 +4,13 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{stomp}
-  s.version = "1.2.16"
-  s.license = "Apache 2.0"
+  s.name = "stomp"
+  s.version = "1.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian McCallister", "Marius Mathiesen", "Thiago Morello", "Guy M. Allard"]
-  s.date = %q{2013-08-19}
-  s.description = %q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
+  s.date = "2013-09-30"
+  s.description = "Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge."
   s.email = ["brianm@apache.org", "marius@stones.com", "morellon@gmail.com", "allard.guy.m@gmail.com"]
   s.executables = ["catstomp", "stompcat"]
   s.extra_rdoc_files = [
@@ -31,7 +30,6 @@ Gem::Specification.new do |s|
     "examples/publisher.rb",
     "examples/put11conn_ex1.rb",
     "examples/putget11_rh1.rb",
-    "examples/slogger.rb",
     "examples/ssl_uc1.rb",
     "examples/ssl_uc1_ciphers.rb",
     "examples/ssl_uc2.rb",
@@ -57,8 +55,11 @@ Gem::Specification.new do |s|
     "lib/stomp/errors.rb",
     "lib/stomp/ext/hash.rb",
     "lib/stomp/message.rb",
+    "lib/stomp/null_logger.rb",
+    "lib/stomp/slogger.rb",
     "lib/stomp/sslparams.rb",
     "lib/stomp/version.rb",
+    "test/test_anonymous.rb",
     "test/test_client.rb",
     "test/test_codec.rb",
     "test/test_connection.rb",
@@ -89,7 +90,6 @@ Gem::Specification.new do |s|
     "examples/publisher.rb",
     "examples/put11conn_ex1.rb",
     "examples/putget11_rh1.rb",
-    "examples/slogger.rb",
     "examples/ssl_uc1.rb",
     "examples/ssl_uc1_ciphers.rb",
     "examples/ssl_uc2.rb",
@@ -115,6 +115,8 @@ Gem::Specification.new do |s|
     "lib/stomp/errors.rb",
     "lib/stomp/ext/hash.rb",
     "lib/stomp/message.rb",
+    "lib/stomp/null_logger.rb",
+    "lib/stomp/slogger.rb",
     "lib/stomp/sslparams.rb",
     "lib/stomp/version.rb",
     "notes/heartbeat_readme.txt",
@@ -124,6 +126,7 @@ Gem::Specification.new do |s|
     "spec/message_spec.rb",
     "spec/spec_helper.rb",
     "stomp.gemspec",
+    "test/test_anonymous.rb",
     "test/test_client.rb",
     "test/test_codec.rb",
     "test/test_connection.rb",
@@ -134,14 +137,14 @@ Gem::Specification.new do |s|
     "test/test_urlogin.rb",
     "test/tlogger.rb"
   ]
-  s.homepage = %q{https://github.com/stompgem/stomp}
+  s.homepage = "https://github.com/stompgem/stomp"
+  s.licenses = ["Apache 2.0"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Ruby client for the Stomp messaging protocol}
+  s.rubygems_version = "2.0.5"
+  s.summary = "Ruby client for the Stomp messaging protocol"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
+    s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rspec>, [">= 2.3"])

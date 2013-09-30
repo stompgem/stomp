@@ -5,8 +5,8 @@ module Stomp
   # Define the gem version.
   module Version  #:nodoc: all
     MAJOR = 1
-    MINOR = 2
-    PATCH = 16
+    MINOR = 3
+    PATCH = 0
     STRING = "#{MAJOR}.#{MINOR}.#{PATCH}"
   end
 end

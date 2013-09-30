@@ -29,6 +29,7 @@ describe Stomp::Connection do
       :max_hbrlck_fails => 0,
       :fast_hbs_adjust => 0.0,
       :connread_timeout => 0,
+      :tcp_nodelay => true,
    }
         
     #POG:
@@ -353,6 +354,7 @@ describe Stomp::Connection do
           :max_hbrlck_fails => 0,
           :fast_hbs_adjust => 0.0,
           :connread_timeout => 0,
+          :tcp_nodelay => true,
         }
         
         used_hash =  {
@@ -393,6 +395,7 @@ describe Stomp::Connection do
           :max_hbrlck_fails => 456,
           :fast_hbs_adjust => 0.2,
           :connread_timeout => 42,
+          :tcp_nodelay => true,
         }
         
         @connection = Stomp::Connection.new(used_hash)
