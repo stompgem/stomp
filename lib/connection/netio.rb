@@ -267,6 +267,10 @@ module Stomp
             ctx.key  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file), @ssl.key_password)
           end
 
+          if @ssl.protocol # User supplied a protocol
+            ctx.ssl_protocol = @ssl.protocol
+          end
+
           # Cipher list
           if !@ssl.use_ruby_ciphers # No Ruby ciphers (the default)
             if @ssl.ciphers # User ciphers list?

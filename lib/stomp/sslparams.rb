@@ -28,6 +28,10 @@ module Stomp
   # the handshake.
   attr_accessor :peer_cert
 
+  # Optional specification of SSL protocol to use.  Must be one of
+  # OpenSSL::SSL::SSLContext::METHODS
+  attr_accessor :protocol
+
   # Optional list of SSL ciphers to be used.  In the format documented for
   # Ruby's OpenSSL.
   attr_accessor :ciphers
@@ -56,6 +60,7 @@ module Stomp
    raise Stomp::Error::SSLClientParamsError if @cert_file.nil? && !@key_file.nil?
    raise Stomp::Error::SSLClientParamsError if !@cert_file.nil? && @key_file.nil?
    #
+   @protocol = opts[:protocol]
    @ciphers = opts[:ciphers]
    @use_ruby_ciphers = opts[:use_ruby_ciphers] ? opts[:use_ruby_ciphers] : false
    #
