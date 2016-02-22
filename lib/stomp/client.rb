@@ -87,7 +87,7 @@ module Stomp
       check_arguments!()
 
       begin
-        timeout(@start_timeout) {
+        Timeout::timeout(@start_timeout) {
           create_error_handler
           create_connection(autoflush)
           start_listeners()
