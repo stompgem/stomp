@@ -9,11 +9,11 @@ describe Stomp::Message do
     context 'with invalid parameters' do
       it 'should return an empty message when receiving an empty string or nil parameter' do
         message = Stomp::Message.new('')
-        message.should be_empty
+        expect(message).to be_empty
       end
 
       it 'should raise Stomp::Error::InvalidFormat when receiving a invalid formated message' do
-        lambda{ Stomp::Message.new('any invalid format') }.should raise_error(Stomp::Error::InvalidFormat)
+        expect{ Stomp::Message.new('any invalid format') }.to raise_error(Stomp::Error::InvalidFormat)
       end
     end
 
@@ -24,15 +24,15 @@ describe Stomp::Message do
       end
 
       it 'should parse the headers' do
-        subject.headers.should ==  {'session' => 'host_address'}
+        expect(subject.headers).to eq({'session' => 'host_address'})
       end
 
       it 'should parse the body' do
-        subject.body.should == @message[3]
+        expect(subject.body).to eq(@message[3])
       end
 
       it 'should parse the command' do
-        subject.command.should == @message[0].chomp
+        expect(subject.command).to eq(@message[0].chomp)
       end
     end
     
@@ -43,15 +43,15 @@ describe Stomp::Message do
       end
 
       it 'should parse the headers' do
-        subject.headers.should ==  {'session' => 'host_address'}
+        expect(subject.headers).to eq({'session' => 'host_address'})
       end
 
       it 'should parse the body' do
-        subject.body.should == @message[3]
+        expect(subject.body).to eq(@message[3])
       end
 
       it 'should parse the command' do
-        subject.command.should == @message[0].chomp
+        expect(subject.command).to eq(@message[0].chomp)
       end
     end
   end
