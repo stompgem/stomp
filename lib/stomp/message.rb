@@ -102,8 +102,6 @@ module Stomp
       "<Stomp::Message headers=#{headers.inspect} body='#{body}' command='#{command}' >"
     end
 
-    private
-
     # is_blank? tests if a data value is nil or empty.
     def is_blank?(value)
       value.nil? || (value.respond_to?(:empty?) && value.empty?)

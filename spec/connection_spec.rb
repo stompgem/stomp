@@ -130,18 +130,18 @@ describe Stomp::Connection do
       it "should be false if reliable is set to false" do
         hash = @parameters.merge({:reliable => false })
         connection = Stomp::Connection.new(hash)
-        expect(connection.instance_variable_get(:@reliable)).to be_false
+        expect(connection.instance_variable_get(:@reliable)).to be false
       end
       
       it "should be true if reliable is set to true" do
         hash = @parameters.merge({:reliable => true })
         connection = Stomp::Connection.new(hash)
-        expect(connection.instance_variable_get(:@reliable)).to be_true
+        expect(connection.instance_variable_get(:@reliable)).to be true
       end
       
       it "should be true if reliable is not set" do
         connection = Stomp::Connection.new(@parameters)
-        expect(connection.instance_variable_get(:@reliable)).to be_true
+        expect(connection.instance_variable_get(:@reliable)).to be true
       end
     end
     
@@ -425,11 +425,11 @@ describe Stomp::Connection do
   describe "when closing a socket" do
     it "should close the tcp connection" do
       expect(@tcp_socket).to receive(:close)
-      expect(@connection.__send__(:close_socket)).to be_true # Use Object.__send__
+      expect(@connection.__send__(:close_socket)).to be true # Use Object.__send__
     end
     it "should ignore exceptions" do
       expect(@tcp_socket).to receive(:close).and_raise "exception"
-      expect(@connection.__send__(:close_socket)).to be_true # Use Object.__send__
+      expect(@connection.__send__(:close_socket)).to be true # Use Object.__send__
     end
   end
 
@@ -438,11 +438,11 @@ describe Stomp::Connection do
       host = @parameters[:hosts][0]
       @connection = Stomp::Connection.new(host[:login], host[:passcode], host[:host], host[:port], reliable = true, 5, connect_headers = {})
       @connection.instance_variable_set(:@connection_attempts, 10000)
-      expect(@connection.send(:max_reconnect_attempts?)).to be_false
+      expect(@connection.send(:max_reconnect_attempts?)).to be false
     end
     it "should return false if max_reconnect_attempts = 0" do
       @connection.instance_variable_set(:@connection_attempts, 10000)
-      expect(@connection.send(:max_reconnect_attempts?)).to be_false
+      expect(@connection.send(:max_reconnect_attempts?)).to be false
     end
     it "should return true if connection attempts > max_reconnect_attempts" do
       limit = 10000
@@ -450,10 +450,10 @@ describe Stomp::Connection do
       @connection = Stomp::Connection.new(@parameters)
       
       @connection.instance_variable_set(:@connection_attempts, limit-1)
-      expect(@connection.send(:max_reconnect_attempts?)).to be_false
+      expect(@connection.send(:max_reconnect_attempts?)).to be false
       
       @connection.instance_variable_set(:@connection_attempts, limit)
-      expect(@connection.send(:max_reconnect_attempts?)).to be_true
+      expect(@connection.send(:max_reconnect_attempts?)).to be true
     end
     # These should be raised for the user to deal with
     it "should not rescue MaxReconnectAttempts" do

@@ -10,6 +10,7 @@ describe Stomp::Message do
       it 'should return an empty message when receiving an empty string or nil parameter' do
         message = Stomp::Message.new('')
         expect(message).to be_empty
+        # message.should be_empty
       end
 
       it 'should raise Stomp::Error::InvalidFormat when receiving a invalid formated message' do
