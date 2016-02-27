@@ -460,7 +460,7 @@ describe Stomp::Connection do
       @connection = Stomp::Connection.new(@parameters)
       allow(@connection).to receive(:socket).and_raise(Stomp::Error::MaxReconnectAttempts)
       
-      expect { @connection.receive() }.to raise_error
+      expect { @connection.receive() }.to raise_error(RuntimeError)
     end
   end
 

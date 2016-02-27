@@ -99,31 +99,31 @@ describe Stomp::Client do
     it "should return ArgumentError if port is nil" do
       expect {
         @client = Stomp::Client.new('login', 'passcode', 'localhost', nil)
-      }.to raise_error
+      }.to raise_error(ArgumentError)
     end
 
     it "should return ArgumentError if port is < 1" do
       expect {
         @client = Stomp::Client.new('login', 'passcode', 'localhost', 0)
-      }.to raise_error
+      }.to raise_error(ArgumentError)
     end
 
     it "should return ArgumentError if port is > 65535" do
       expect {
         @client = Stomp::Client.new('login', 'passcode', 'localhost', 65536)
-      }.to raise_error
+      }.to raise_error(ArgumentError)
     end
 
     it "should return ArgumentError if port is empty" do
       expect {
         @client = Stomp::Client.new('login', 'passcode', 'localhost', '')
-      }.to raise_error
+      }.to raise_error(ArgumentError)
     end
 
     it "should return ArgumentError if reliable is something other than true or false" do
       expect {
         @client = Stomp::Client.new('login', 'passcode', 'localhost', '12345', 'foo')
-      }.to raise_error
+      }.to raise_error(ArgumentError)
     end
 
   end

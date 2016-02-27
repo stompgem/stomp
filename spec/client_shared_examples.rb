@@ -42,7 +42,7 @@ shared_examples_for "standard Client" do
     it "should raise RuntimeError if not passed a block" do
       expect {
         @client.subscribe(@destination)
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
 
     it "should not raise an error when passed a block" do
@@ -55,14 +55,14 @@ shared_examples_for "standard Client" do
       expect {
         @client.subscribe(@destination)
         @client.subscribe(@destination)
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
 
     it "should raise RuntimeError with duplicate id headers" do
       expect {
         @client.subscribe(@destination, {'id' => 'abcdef'})
         @client.subscribe(@destination, {'id' => 'abcdef'})
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
 
   end
