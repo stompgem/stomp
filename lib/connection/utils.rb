@@ -257,6 +257,7 @@ module Stomp
 
     # _reconn_prep prepares for a reconnect retry
     def _reconn_prep()
+      close_socket()
       if @parameters
         change_host()
       end
