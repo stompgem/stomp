@@ -245,9 +245,13 @@ module Stomp
           @failure = $!
           raise unless @reliable
           errstr = "receive failed: #{$!}"
-          unless slog(:on_miscerr, log_params, "es_oldrecv: " + errstr)
-            $stderr.print errstr
-          end
+          unless slog(:on_miscerr, log_params, "es1_oldrecv: " + errstr)
+            $stderr.print "\non_miscerr\n"
+            $stderr.print log_params.inspect
+            $stderr.print "\n"
+            $stderr.print "es2_oldrecv: " + errstr
+            $stderr.print "\n"
+#         end
 
           # !!! This initiates a re-connect !!!
           _reconn_prep()
