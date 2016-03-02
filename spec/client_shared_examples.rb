@@ -11,58 +11,58 @@ shared_examples_for "standard Client" do
 
   describe "the closed? method" do
     it "should be false when the connection is open" do
-      @mock_connection.stub!(:closed?).and_return(false)
-      @client.closed?.should == false
+      allow(@mock_connection).to receive(:closed?).and_return(false)
+      expect(@client.closed?).to eq(false)
     end
 
     it "should be true when the connection is closed" do
-      @mock_connection.stub!(:closed?).and_return(true)
-      @client.closed?.should == true
+      allow(@mock_connection).to receive(:closed?).and_return(true)
+      expect(@client.closed?).to eq(true)
     end
   end
 
   describe "the open? method" do
     it "should be true when the connection is open" do
-      @mock_connection.stub!(:open?).and_return(true)
-      @client.open?.should == true
+      allow(@mock_connection).to receive(:open?).and_return(true)
+      expect(@client.open?).to eq(true)
     end
 
     it "should be false when the connection is closed" do
-      @mock_connection.stub!(:open?).and_return(false)
-      @client.open?.should == false
+      allow(@mock_connection).to receive(:open?).and_return(false)
+      expect(@client.open?).to eq(false)
     end
   end
 
   describe "the subscribe method" do
 
     before(:each) do
-      @mock_connection.stub!(:subscribe).and_return(true)
+      allow(@mock_connection).to receive(:subscribe).and_return(true)
     end
 
     it "should raise RuntimeError if not passed a block" do
-      lambda {
+      expect {
         @client.subscribe(@destination)
-      }.should raise_error
+      }.to raise_error(RuntimeError)
     end
 
     it "should not raise an error when passed a block" do
-      lambda {
+      expect {
         @client.subscribe(@destination) {|msg| received = msg}
-      }.should_not raise_error
+      }.not_to raise_error
     end
 
     it "should raise RuntimeError on duplicate subscriptions" do
-      lambda {
+      expect {
         @client.subscribe(@destination)
         @client.subscribe(@destination)
-      }.should raise_error
+      }.to raise_error(RuntimeError)
     end
 
     it "should raise RuntimeError with duplicate id headers" do
-      lambda {
+      expect {
         @client.subscribe(@destination, {'id' => 'abcdef'})
         @client.subscribe(@destination, {'id' => 'abcdef'})
-      }.should raise_error
+      }.to raise_error(RuntimeError)
     end
 
   end

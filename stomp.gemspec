@@ -4,19 +4,20 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{stomp}
-  s.version = "1.3.4"
+  s.name = "stomp"
+  s.version = "1.3.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian McCallister", "Marius Mathiesen", "Thiago Morello", "Guy M. Allard"]
-  s.date = %q{2014-12-02}
-  s.description = %q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
+  s.date = "2016-03-02"
+  s.description = "Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge."
   s.email = ["brianm@apache.org", "marius@stones.com", "morellon@gmail.com", "allard.guy.m@gmail.com"]
   s.executables = ["catstomp", "stompcat"]
   s.extra_rdoc_files = [
     "CHANGELOG.rdoc",
     "LICENSE",
     "README.rdoc",
+    "examples/amqdurasub.rb",
     "examples/client11_ex1.rb",
     "examples/client11_putget1.rb",
     "examples/conn11_ex1.rb",
@@ -80,6 +81,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "bin/catstomp",
     "bin/stompcat",
+    "examples/amqdurasub.rb",
     "examples/client11_ex1.rb",
     "examples/client11_putget1.rb",
     "examples/conn11_ex1.rb",
@@ -143,23 +145,22 @@ Gem::Specification.new do |s|
     "test/test_urlogin.rb",
     "test/tlogger.rb"
   ]
-  s.homepage = %q{https://github.com/stompgem/stomp}
+  s.homepage = "https://github.com/stompgem/stomp"
   s.licenses = ["Apache 2.0"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Ruby client for the Stomp messaging protocol}
+  s.rubygems_version = "2.0.3"
+  s.summary = "Ruby client for the Stomp messaging protocol"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
+    s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, [">= 2.3"])
+      s.add_development_dependency(%q<rspec>, [">= 2.14.1"])
     else
-      s.add_dependency(%q<rspec>, [">= 2.3"])
+      s.add_dependency(%q<rspec>, [">= 2.14.1"])
     end
   else
-    s.add_dependency(%q<rspec>, [">= 2.3"])
+    s.add_dependency(%q<rspec>, [">= 2.14.1"])
   end
 end
 

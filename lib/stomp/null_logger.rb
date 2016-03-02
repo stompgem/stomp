@@ -3,8 +3,11 @@
 module Stomp
   class NullLogger
     def on_miscerr(parms, error_msg)
-      $stderr.print parms
+      $stderr.print "\non_miscerr\n"
+      $stderr.print parms.inspect
+      $stderr.print "\n"
       $stderr.print error_msg
+      $stderr.print "\n"
     end
 
     def on_connecting(parms); end
