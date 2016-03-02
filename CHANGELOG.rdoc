@@ -1,3 +1,14 @@
+== 1.3.5 20160302
+
+* Add AMQ specific durable topic example.
+* Output error to stderr only in logger is undefined.
+* Move README changelog lower.
+* Handle newline at start of receive buffer.
+* Use Timeout::timeout instead of deprecated kernel version.
+* If socket open on reconnect, close it before new open.
+* On misc_err, make error messages more readable.
+* Attempt to support both Rspec 2.14.1+ and 3.x.
+
 == 1.3.4 20141202
 
 * Change :start_timeout default to 0 (might break some clients) (#98).
