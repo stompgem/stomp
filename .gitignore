@@ -4,4 +4,6 @@ coverage/*
 *.gem
 *~
 temp*
+# Ignore vscode artifacts
+.vscode/
 
