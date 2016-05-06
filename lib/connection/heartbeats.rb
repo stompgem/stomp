@@ -253,6 +253,7 @@ module Stomp
       end
       @socket = nil
       used_socket = socket()
+      return used_socket
     end
 
   end # class Connection

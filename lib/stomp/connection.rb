@@ -111,6 +111,8 @@ module Stomp
       @hb_sent = true           # Assumed at first
       @hbs = @hbr = false       # Sending/Receiving heartbeats. Assume no for now.
       @jruby = false            # Assumed at first
+      # Initialize some variables
+      @closed, @socket, @hhas10, @rt, @st = true, nil, false, nil, nil
       if defined?(RUBY_ENGINE) && RUBY_ENGINE =~ /jruby/
         @jruby = true
       end
