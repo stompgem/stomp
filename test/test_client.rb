@@ -524,7 +524,7 @@ class TestClient < Test::Unit::TestCase
           # this is ugly .....
           if acli.protocol() == Stomp::SPL_10
             acli.subscribe(dest) { |m| 
-              msg = m
+              _ = m
               lock.synchronize do
                 msg_ctr += 1
               end
@@ -533,7 +533,7 @@ class TestClient < Test::Unit::TestCase
             }
           else
             acli.subscribe(dest, :id => acli.uuid()) { |m| 
-              msg = m
+              _ = m
               lock.synchronize do
                 msg_ctr += 1
               end
@@ -547,7 +547,7 @@ class TestClient < Test::Unit::TestCase
     #
     1.upto(@max_msgs) do |mnum|
       msg = Time.now.to_s + " #{mnum}"
-      @client.publish(dest, message_text)
+      @client.publish(dest, msg)
     end
     #
     max_sleep = (RUBY_VERSION =~ /1\.8\.6/) ? 30 : 5
@@ -569,7 +569,7 @@ class TestClient < Test::Unit::TestCase
     #
     assert_raise Stomp::Error::NoCurrentConnection do
       m = Stomp::Message.new("")
-      @client.acknowledge(m) {|r| receipt = r}
+      @client.acknowledge(m) {|r| _ = r}
     end
     #
     assert_raise Stomp::Error::NoCurrentConnection do
@@ -585,7 +585,7 @@ class TestClient < Test::Unit::TestCase
     end
     #
     assert_raise Stomp::Error::NoCurrentConnection do
-      @client.subscribe("dummy_data", {:ack => 'auto'}) {|msg| received = msg}
+      @client.subscribe("dummy_data", {:ack => 'auto'}) {|msg| _ = msg}
     end
     #
     assert_raise Stomp::Error::NoCurrentConnection do
@@ -662,7 +662,7 @@ class TestClient < Test::Unit::TestCase
     ex_vals = dflt_data_ex()
     ex_vals.each do |hsv|
       assert_raise ArgumentError do
-        cli = Stomp::Client.open(hsv)
+        _ = Stomp::Client.open(hsv)
       end
     end
   end

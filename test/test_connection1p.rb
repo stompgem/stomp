@@ -34,12 +34,12 @@ class TestConnection1P < Test::Unit::TestCase
     #
     cha = {:host => "localhost"}
     assert_raise Stomp::Error::ProtocolErrorConnect do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+      _ = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     end    
     #
     chb = {"accept-version" => "1.0"}
     assert_raise Stomp::Error::ProtocolErrorConnect do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, chb)
+      _ = Stomp::Connection.open(user, passcode, host, port, false, 5, chb)
     end    
   end
 
@@ -62,11 +62,11 @@ class TestConnection1P < Test::Unit::TestCase
       :max_reconnect_attempts => 10,
     }
     assert_raise Stomp::Error::ProtocolErrorConnect do
-      conn = Stomp::Connection.open(hash)
+      _ = Stomp::Connection.open(hash)
     end
     hash[:connect_headers] = {"accept-version" => "1.1"}
     assert_raise Stomp::Error::ProtocolErrorConnect do
-      conn = Stomp::Connection.open(hash)
+      _ = Stomp::Connection.open(hash)
     end
   end
 
