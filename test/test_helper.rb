@@ -13,8 +13,8 @@ else
 end
 
 begin
-  dummy = RUBY_ENGINE
-rescue NameError => ne
+  _ = RUBY_ENGINE
+rescue NameError
   RUBY_ENGINE = "unknown"
 end
 
@@ -169,6 +169,7 @@ module TestBase
   def make_destination
     name = caller_method_name unless name
     qname = ENV['STOMP_DOTQUEUE'] ? "/queue/test.ruby.stomp." + name : "/queue/test/ruby/stomp/" + name
+    return qname
   end
 
   #
@@ -182,6 +183,7 @@ module TestBase
   # Check for JRuby before a connection exists
   def jruby?()
     jr = defined?(RUBY_ENGINE) && RUBY_ENGINE =~ /jruby/ ? true : false
+    return jr
   end
 
   # OK Data For Default Tests
