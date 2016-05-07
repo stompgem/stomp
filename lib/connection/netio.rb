@@ -49,7 +49,7 @@ module Stomp
           end until line =~ /^\s?\n$/
 
           # Checks if it includes content_length header
-          content_length = message_header.match /content-length\s?:\s?(\d+)\s?\n/
+          content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
           message_body = ''
 
           # If content_length is present, read the specified amount of bytes
@@ -127,6 +127,7 @@ module Stomp
           _transmit(used_socket, command, headers, body)
           return
         rescue Stomp::Error::MaxReconnectAttempts => e
+          _ = e
           raise
         rescue
           @failure = $!

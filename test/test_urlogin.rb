@@ -49,6 +49,8 @@ class TestURLLogins < Test::Unit::TestCase
     ]
 
     @badparms = "failover://(stomp://#{hostname}:#{portnum})?a=b&noequal"
+    
+    @client = nil
   end
 
   def teardown
@@ -78,7 +80,7 @@ class TestURLLogins < Test::Unit::TestCase
   # test failover:// with bad parameters
   def test_0020_failover_badparms()
     assert_raise(Stomp::Error::MalformedFailoverOptionsError) {
-      c = Stomp::Client.new(@badparms)
+      _ = Stomp::Client.new(@badparms)
     }
   end
 

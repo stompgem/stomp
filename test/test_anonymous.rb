@@ -203,11 +203,11 @@ class TestAnonymous < Test::Unit::TestCase
     end
     #
     assert_raise Stomp::Error::NoCurrentConnection do
-      m = @conn.receive
+      _ = @conn.receive
     end
     #
     assert_raise Stomp::Error::NoCurrentConnection do
-      m = @conn.poll
+      _ = @conn.poll
     end
   end
 
@@ -225,7 +225,7 @@ class TestAnonymous < Test::Unit::TestCase
     conn_subscribe make_destination
     @conn.publish make_destination, "a\0"
     msg = @conn.receive
-    assert_match /^<Stomp::Message headers=/ , msg.to_s
+    assert_match(/^<Stomp::Message headers=/ , msg.to_s)
     checkEmsg(@conn)
   end
 
@@ -309,7 +309,7 @@ class TestAnonymous < Test::Unit::TestCase
     1.upto(@max_threads) do |tnum|
       Thread.new(@conn) do |amq|
         while true
-          received = amq.receive
+          _ = amq.receive
           lock.synchronize do
             msg_ctr += 1
           end
