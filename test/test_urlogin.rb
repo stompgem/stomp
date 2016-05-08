@@ -14,12 +14,12 @@ end
 =end
 class TestURLLogins < Test::Unit::TestCase
   include TestBase
-  
+
   def setup
     hostname = host()
     portnum = port()
     sslpn = ssl_port()
-    @tdstomp = [ 
+    @tdstomp = [
           "stomp://guestl:guestp@#{hostname}:#{portnum}",
           "stomp://#{hostname}:#{portnum}",
           "stomp://@#{hostname}:#{portnum}",
@@ -32,10 +32,10 @@ class TestURLLogins < Test::Unit::TestCase
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc&coyote=kaboom",
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc",
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc&coyote=kaboom&randomize=true",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "localhost" + ":#{portnum}" + ")",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "localhost" + ":#{portnum}" + ")",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "localhost" + ":#{portnum}" + ")?a=b",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "localhost" + ":#{portnum}" + ")?c=d&e=f",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")?a=b",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")?c=d&e=f",
       "failover://(stomp://usera:passa@#{hostname}:#{portnum})",
       "failover://(stomp://usera:@#{hostname}:#{portnum})",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})",
@@ -49,7 +49,7 @@ class TestURLLogins < Test::Unit::TestCase
     ]
 
     @badparms = "failover://(stomp://#{hostname}:#{portnum})?a=b&noequal"
-    
+
     @client = nil
   end
 
@@ -85,4 +85,3 @@ class TestURLLogins < Test::Unit::TestCase
   end
 
 end unless ENV['STOMP_RABBIT']
-

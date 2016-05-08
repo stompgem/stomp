@@ -200,6 +200,9 @@ module Stomp
 
     # open_tcp_socket opens a TCP socket.
     def open_tcp_socket()
+
+      ## $stderr.print("h: #{@host}, p: #{@port}\n")
+
       tcp_socket = nil
       slog(:on_connecting, log_params)
       Timeout::timeout(@connect_timeout, Stomp::Error::SocketOpenTimeout) do
@@ -378,7 +381,7 @@ module Stomp
       @disconnect_receipt = nil
       @session = @connection_frame.headers["session"] if @connection_frame
       # replay any subscriptions.
-      @subscriptions.each {|k,v| 
+      @subscriptions.each {|k,v|
         _transmit(used_socket, Stomp::CMD_SUBSCRIBE, v)
       }
     end
@@ -415,4 +418,3 @@ module Stomp
   end # class Connection
 
 end # module Stomp
-
