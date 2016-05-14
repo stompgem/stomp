@@ -1,0 +1,4 @@
+# No html in this directory
+*.html
+*.htm
+
