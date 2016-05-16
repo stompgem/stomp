@@ -4,7 +4,8 @@ require 'rubygems' if RUBY_VERSION < "1.9"
 require 'stomp'
 
 # Focus on this gem's capabilities.
-require 'memory_profiler'
+# require 'memory_profiler'
+require 'memory-profiler'
 
 if Kernel.respond_to?(:require_relative)
   require_relative("stomp_adhoc_common")
@@ -47,7 +48,7 @@ class Issue121Examp01
     raise "START: Connection failed!!" unless @client.open?
     raise "START: Unexpected protocol level!!" if @client.protocol() == Stomp::SPL_10
     cf = @client.connection_frame()
-    puts "START: Connection frame: #{cf}"
+    puts "START: Connection frame\n#{cf}"
     raise "START: Connect error!!: #{cf.body}" if @client.connection_frame().command == Stomp::CMD_ERROR
     @session = @client.connection_frame().headers['session']
     puts "START: Queue/Topic Name: #{@queue}"
@@ -71,7 +72,7 @@ class Issue121Examp01
           mo,
           hs) {|m|
             ip = m
-            puts "PUB: HAVE_RECEIPT: #{ip}"
+            puts "PUB: HAVE_RECEIPT:\n#{ip}"
         }
       else
         @client.publish(@queue, mo, hs)
@@ -86,7 +87,7 @@ class Issue121Examp01
     @client.subscribe(@queue, sh) {|m|
       rmc += 1
       rm = m
-      puts "SUB: HAVE_MESSAGE: #{rm}"
+      puts "SUB: HAVE_MESSAGE:\n#{rm}"
       if rmc >= @nmsgs
         done = true
         Thread.done
@@ -104,10 +105,33 @@ class Issue121Examp01
 end # class
 
 #
-puts "BEG: Memory Profiler Version is: #{MemoryProfiler::VERSION}"
+# puts "BEG: Memory Profiler Version is: #{MemoryProfiler::VERSION}"
+MemoryProfiler::start_daemon( :limit=>5, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
 #
+=begin
+5.times do |i|
+  blah = Hash.new([])
+  rpt  = MemoryProfiler.start( :limit=>10 ) do
+    100.times{ blah[1] << 'aaaaa' }
+    1000.times{ blah[2] << 'bbbbb' }
+  end
+  puts "Starting 7 second stagger, time: #{i}"
+  puts MemoryProfiler.format(rpt)
+  sleep 7
+end
+=end
+
 e = Issue121Examp01.new
-e.start
-e.publish
-e.subscribe
-e.shutdown
+5.times do |i|
+  rpt  = MemoryProfiler.start( :limit=>10 ) do
+    # e = Issue121Examp01.new
+    e.start
+    e.publish
+    e.subscribe
+    e.shutdown
+  end
+  puts MemoryProfiler.format(rpt)
+  sleep 1
+end
+
+MemoryProfiler::stop_daemon
