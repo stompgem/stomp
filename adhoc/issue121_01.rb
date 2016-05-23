@@ -61,6 +61,7 @@ class Issue121Examp01
     puts "SHUT: Shutdown complete"
   end # shutdown
 
+  # pub
   def publish
     m = "Message: "
     @nmsgs.times do |n|
@@ -80,6 +81,7 @@ class Issue121Examp01
     end # do @nmsgs
   end # publish
 
+  # sub
   def subscribe
     puts "SUB: Subscribe starts For: #{@queue}"
     rmc, done = 0, false
@@ -108,19 +110,6 @@ end # class
 # puts "BEG: Memory Profiler Version is: #{MemoryProfiler::VERSION}"
 MemoryProfiler::start_daemon( :limit=>5, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
 #
-=begin
-5.times do |i|
-  blah = Hash.new([])
-  rpt  = MemoryProfiler.start( :limit=>10 ) do
-    100.times{ blah[1] << 'aaaaa' }
-    1000.times{ blah[2] << 'bbbbb' }
-  end
-  puts "Starting 7 second stagger, time: #{i}"
-  puts MemoryProfiler.format(rpt)
-  sleep 7
-end
-=end
-
 e = Issue121Examp01.new
 5.times do |i|
   rpt  = MemoryProfiler.start( :limit=>10 ) do
@@ -133,5 +122,5 @@ e = Issue121Examp01.new
   puts MemoryProfiler.format(rpt)
   sleep 1
 end
-
+#
 MemoryProfiler::stop_daemon
