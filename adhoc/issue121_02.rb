@@ -31,8 +31,13 @@ class Issue121Examp02
     @id = "issue121_02"
     @block = cli_block()
     #
-    cmin, cmax = 1292, 67782 # From the issue discussion
-    PayloadGenerator::initialize(min= cmin, max= cmax)
+    @cmin, @cmax = 1292, 67782 # From the issue discussion
+    PayloadGenerator::initialize(min= @cmin, max= @cmax)
+    @ffmts = "%16.6f"
+    #
+    mps = 5.6 # see issue discussion
+    @to, @nmts, @nts, @umps = 0.0, Time.now.to_f, @nmsgs, mps
+    @tslt = 1.0 / @umps
   end # initialize
 
   # Startup
@@ -60,13 +65,34 @@ class Issue121Examp02
     puts "START: Session: #{@session}"
     puts "START: NMSGS: #{@nmsgs}"
     puts "START: Block: #{@block}"
+    puts "START: Wanted Messages Per Second: #{@umps}"
+    puts "START: Sleep Time: #{@tslt}"
     $stdout.flush
   end # start
 
   #
   def shutdown
     @client.close
+    #
+    te = Time.now.to_f
+    et = te - @nmts
+    avgsz = @to / @nts
+    mps = @nts.to_f / et
+    #
+    fet = sprintf(@ffmts, et)
+    favgsz = sprintf(@ffmts, avgsz)
+    fmps = sprintf(@ffmts, mps)
+    #
+    sep = "=" * 72
+    puts sep
+    puts "\tNumber of payloads generated: #{@nts}"
+    puts "\tMin Length: #{@cmin}, Max Length: #{@cmax}"
+    puts "\tAVG_SIZE: #{favgsz}, ELAPS_SEC: #{fet}(seconds)"
+    puts "\tNMSGS_PER_SEC: #{fmps}"
+    puts sep
+    #
     puts "SHUT: Shutdown complete"
+    $stdout.flush
   end # shutdown
 
   # pub
@@ -76,8 +102,9 @@ class Issue121Examp02
 
     @nmsgs.times do |n|
       nm += 1
-      puts "PUB: NEXT MESSAGE NUMBER: #{nm}"
+      puts "PUB: NEXT MESSAGE NUMBER: #{nm}"; $stdout.flush
       mo = PayloadGenerator::payload()
+      @to += mo.bytesize()
       hs = {:session => @session}
 
       if @block
@@ -86,26 +113,32 @@ class Issue121Examp02
           mo,
           hs) {|m|
             puts "PUB: HAVE_RECEIPT:\nID: #{m.headers['receipt-id']}"
+            $stdout.flush
             ip = m
-            Thread::done
         }
         sleep 0.01 until ip
       else
         @client.publish(@queue, mo, hs)
       end # if @block
 
+      puts "PUB: start user sleep"
+      sleep @tslt # see issue discussion
+      puts "PUB: end user sleep"
+      $stdout.flush
     end # @nmsgs.times do
 
+    puts "PUB: end of publish"
+    $stdout.flush
   end # publish
 
 end # class
 
 #
 # :limit => is max number of classes to report on
-MemoryProfiler::start_daemon( :limit=>5, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
+MemoryProfiler::start_daemon( :limit=>25, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
 #
-5.times do |i|
-  rpt  = MemoryProfiler.start( :limit=> 10 ) do
+1.times do |i|
+  rpt  = MemoryProfiler.start( :limit=> 25 ) do
     e = Issue121Examp02.new
     e.start
     e.publish
