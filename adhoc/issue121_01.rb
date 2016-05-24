@@ -53,6 +53,8 @@ class Issue121Examp01
     @session = @client.connection_frame().headers['session']
     puts "START: Queue/Topic Name: #{@queue}"
     puts "START: Session: #{@session}"
+    puts "START: Block: #{@block}"
+    $stdout.flush
   end # start
 
   #
@@ -64,21 +66,28 @@ class Issue121Examp01
   # pub
   def publish
     m = "Message: "
+    nm = 0
     @nmsgs.times do |n|
+      nm += 1
+      puts "PUB: NEXT MESSAGE NUMBER: #{nm}"
       mo = "#{m} #{n}"
-      puts mo
+      puts "PUB: PAYLOAD: #{mo}"
       hs = {:session => @session}
-      if @block
+     if @block
+        ip = false
         @client.publish(@queue,
           mo,
           hs) {|m|
+            puts "PUB: HAVE_RECEIPT:\nID: #{m.headers['receipt-id']}"
             ip = m
-            puts "PUB: HAVE_RECEIPT:\n#{ip}"
         }
+        sleep 0.01 until ip
       else
         @client.publish(@queue, mo, hs)
-      end
-    end # do @nmsgs
+      end # if @block
+
+    end # @nmsgs.times do
+
   end # publish
 
   # sub
@@ -91,16 +100,12 @@ class Issue121Examp01
       rm = m
       puts "SUB: HAVE_MESSAGE:\n#{rm}"
       if rmc >= @nmsgs
+        puts "SUB: Subscribe is ending for #{@queue}"
         done = true
         Thread.done
-        puts "SUB: Subscribe is ending for #{@queue}"
       end
     }
-    while !done do
-      ts = rand(6)
-      ts = 1 if ts == 0
-      break if done
-    end
+    sleep 0.01 until done
     puts "SUB: Receives Done For: #{@queue}"
   end # subscribe
 
@@ -110,10 +115,9 @@ end # class
 # puts "BEG: Memory Profiler Version is: #{MemoryProfiler::VERSION}"
 MemoryProfiler::start_daemon( :limit=>5, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
 #
-e = Issue121Examp01.new
 5.times do |i|
   rpt  = MemoryProfiler.start( :limit=>10 ) do
-    # e = Issue121Examp01.new
+    e = Issue121Examp01.new
     e.start
     e.publish
     e.subscribe

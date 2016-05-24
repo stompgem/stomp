@@ -59,7 +59,8 @@ class Issue121Examp02
     puts "START: Queue/Topic Name: #{@queue}"
     puts "START: Session: #{@session}"
     puts "START: NMSGS: #{@nmsgs}"
-    puts "START: BLOCK: #{@block}"
+    puts "START: Block: #{@block}"
+    $stdout.flush
   end # start
 
   #
@@ -72,39 +73,40 @@ class Issue121Examp02
   def publish
     m = "Message: "
     nm = 0
+
     @nmsgs.times do |n|
       nm += 1
       puts "PUB: NEXT MESSAGE NUMBER: #{nm}"
-      p [ "nilcheck1", !@block.nil?, @block ]
       mo = PayloadGenerator::payload()
-      p [ "nilcheck2", !@block.nil?, @block ]
       hs = {:session => @session}
-      p [ "nilcheck3", !@block.nil?, @block ]
-      if !@block.nil?
-        p [ "good" ]
+
+      if @block
+        ip = false
         @client.publish(@queue,
           mo,
           hs) {|m|
+            puts "PUB: HAVE_RECEIPT:\nID: #{m.headers['receipt-id']}"
             ip = m
-            puts "PUB: HAVE_RECEIPT:\n#{ip}"
+            Thread::done
         }
+        sleep 0.01 until ip
       else
-        p [ "bad" ]
         @client.publish(@queue, mo, hs)
-      end
-    end # do @nmsgs
+      end # if @block
+
+    end # @nmsgs.times do
+
   end # publish
 
 end # class
 
 #
 # :limit => is max number of classes to report on
-MemoryProfiler::start_daemon( :limit=>10, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
+MemoryProfiler::start_daemon( :limit=>5, :delay=>10, :marshal_size=>true, :sort_by=>:absdelta )
 #
-e = Issue121Examp02.new
-1.times do |i|
+5.times do |i|
   rpt  = MemoryProfiler.start( :limit=> 10 ) do
-    # e = Issue121Examp02.new
+    e = Issue121Examp02.new
     e.start
     e.publish
     # No subscribes here, just publish
