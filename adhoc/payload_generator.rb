@@ -5,7 +5,6 @@ class PayloadGenerator
   private
 
   @@BSTRING = ""
-  @@BSTRLEN = 0
 
   public
 
@@ -19,7 +18,6 @@ class PayloadGenerator
     end
     #
     @@BSTRING = "9" * @@max
-    @@BSTRLEN = @@BSTRING
     nil
   end # of initialize
 
