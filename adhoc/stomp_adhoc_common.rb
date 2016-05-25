@@ -92,4 +92,8 @@ module Stomp11Common
     ENV['STOMP_CLI_BLOCK']
   end
 
+  # True if connection should ask for a receipt
+  def conn_receipt()
+    ENV['STOMP_RECEIPT']
+  end
 end # module
