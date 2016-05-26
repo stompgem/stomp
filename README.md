@@ -8,7 +8,7 @@ An implementation of the Stomp protocol for Ruby. See:
 
 * [STOMP 1.0, 1.1, and 1.2] (http://stomp.github.com/index.html)
 
-## Hash Login Example Usage (this is the recommended login technique):
+## Hash Login Example Usage (**this is the recommended login technique**):
 
 ```ruby
   hash = {
@@ -47,10 +47,10 @@ An implementation of the Stomp protocol for Ruby. See:
       :sslctx_newparm => nil,             # Param for SSLContext.new
     }
 
-    # for client
+    # for a client
     client = Stomp::Client.new(hash)
 
-    # for connection
+    # for a connection
     connection = Stomp::Connection.new(hash)
 ```
 
@@ -66,10 +66,9 @@ An implementation of the Stomp protocol for Ruby. See:
 
 ### Stomp URL Usage:
 
-```ruby
-    # Stomp URL :
-    # A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
+A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
+```ruby
     stomp://host:port
     stomp://host.domain.tld:port
     stomp://login:passcode@host:port
@@ -723,3 +722,4 @@ Wayne Robinson
 </td>
 <tr>
 </table>
+
