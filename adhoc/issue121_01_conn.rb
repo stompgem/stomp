@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 require 'stomp'
+require 'tmpdir'
 
 # Focus on this gem's capabilities.
 require 'memory_profiler'
@@ -147,8 +148,10 @@ end # class
     e.shutdown
   end
   n = Time.now
-  nf = n.strftime("%Y%m%dT%H%M%S.%N%Z")
-  rpt.pretty_print(to_file: "/tmp/memory_profiler-ng-conn-#{nf}"  )
+  nf = "memory_profiler-ng"
+  nf << n.strftime("%Y%m%dT%H%M%S.%N%Z")
+  where_name = File::join(Dir::tmpdir(), nf)
+  rpt.pretty_print(to_file: where_name  )
   # sleep 1
 end
 #
