@@ -122,9 +122,11 @@ class Issue121Examp03
         @client.publish(@queue, mo, hs)
       end # if @block
 
-      puts "PUB: start user sleep"
-      sleep @tslt # see issue discussion
-      puts "PUB: end user sleep"
+      if nm < @nmsgs
+        puts "PUB: start user sleep"
+        sleep @tslt # see issue discussion
+        puts "PUB: end user sleep"
+      end
       $stdout.flush
     end # @nmsgs.times do
 
