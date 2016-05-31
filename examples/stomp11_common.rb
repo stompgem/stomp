@@ -21,7 +21,7 @@ module Stomp11Common
   end
   # Server port
   def port()
-    (ENV['STOMP_PORT'] || 62613).to_i # !! The author runs Apollo listening here
+    (ENV['STOMP_PORT'] || 61613).to_i # !! The author runs AMQ listening here
   end
   # Required vhost name
   def virt_host()
@@ -44,5 +44,11 @@ module Stomp11Common
   def nmsgs()
     (ENV['STOMP_NMSGS'] || 1).to_i # Number of messages
   end
+
+  # Include "suppress-content-length' header
+  def suppresscl()
+    ENV['STOMP_SUPPRESS_CL']
+  end
+
 end
 
