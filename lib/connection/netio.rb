@@ -13,6 +13,7 @@ module Stomp
 
     # Really read from the wire.
     def _receive(read_socket, connread = false)
+      # p [ "ioscheck", @iosto ]
       @read_semaphore.synchronize do
         line = nil
         if connread
@@ -35,64 +36,65 @@ module Stomp
         line = '' if line == "\n"
         # p [ "wiredatain_01", line ]
         line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-        # If the reading hangs for more than X seconds, abort the parsing process.
-        # X defaults to 5.  Override allowed in connection hash parameters.
-        Timeout::timeout(@parse_timeout, Stomp::Error::PacketParsingTimeout) do
-          # Reads the beginning of the message until it runs into a empty line
-          message_header = ''
-          begin
-            message_header += line
-            line = read_socket.gets
-            # p [ "wiredatain_02", line ]
-            raise Stomp::Error::StompServerError if line.nil?
-            line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-          end until line =~ /^\s?\n$/
+        # Reads the beginning of the message until it runs into a empty line
+        message_header = ''
+        begin
+          message_header += line
+          raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
+          line = read_socket.gets
+          # p [ "wiredatain_02", line ]
+          raise  if line.nil?
+          line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
+        end until line =~ /^\s?\n$/
 
-          # Checks if it includes content_length header
-          content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
-          message_body = ''
+        # Checks if it includes content_length header
+        content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
+        message_body = ''
 
-          # If content_length is present, read the specified amount of bytes
-          if content_length
-            message_body = read_socket.read content_length[1].to_i
-            raise Stomp::Error::InvalidMessageLength unless parse_char(read_socket.getc) == "\0"
-            # Else read the rest of the message until the first \0
-          else
-            message_body = read_socket.readline("\0")
-            message_body.chop!
-          end
-
-          # If the buffer isn't empty, reads trailing new lines.
-          #
-          # Note: experiments with JRuby seem to show that socket.ready? never
-          # returns true.  It appears that in cases where Ruby returns true
-          # that JRuby returns a Fixnum.  We attempt to adjust for this
-          # in the _is_ready? method.
-          #
-          # Note 2: the draining of new lines must be done _after_ a message
-          # is read.  Do _not_ leave them on the wire and attempt to drain them
-          # at the start of the next read.  Attempting to do that breaks the
-          # asynchronous nature of the 'poll' method.
-          while _is_ready?(read_socket)
-            last_char = read_socket.getc
-            break unless last_char
-            if parse_char(last_char) != "\n"
-              read_socket.ungetc(last_char)
-              break
-            end
-          end
-
-          if @protocol >= Stomp::SPL_11
-            @lr = Time.now.to_f if @hbr
-          end
-          # Adds the excluded \n and \0 and tries to create a new message with it
-          msg = Message.new(message_header + "\n" + message_body + "\0", @protocol >= Stomp::SPL_11)
-          #
-          if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
-            msg.headers = _decodeHeaders(msg.headers)
-          end
-          msg
+        # If content_length is present, read the specified amount of bytes
+        if content_length
+          raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
+          message_body = read_socket.read content_length[1].to_i
+          raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
+          raise Stomp::Error::InvalidMessageLength unless parse_char(read_socket.getc) == "\0"
+          # Else read the rest of the message until the first \0
+        else
+          raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
+          message_body = read_socket.readline("\0")
+          message_body.chop!
         end
+
+        # If the buffer isn't empty, reads trailing new lines.
+        #
+        # Note: experiments with JRuby seem to show that socket.ready? never
+        # returns true.  It appears that in cases where Ruby returns true
+        # that JRuby returns a Fixnum.  We attempt to adjust for this
+        # in the _is_ready? method.
+        #
+        # Note 2: the draining of new lines must be done _after_ a message
+        # is read.  Do _not_ leave them on the wire and attempt to drain them
+        # at the start of the next read.  Attempting to do that breaks the
+        # asynchronous nature of the 'poll' method.
+        while _is_ready?(read_socket)
+          raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
+          last_char = read_socket.getc
+          break unless last_char
+          if parse_char(last_char) != "\n"
+            read_socket.ungetc(last_char)
+            break
+          end
+        end
+
+        if @protocol >= Stomp::SPL_11
+          @lr = Time.now.to_f if @hbr
+        end
+        # Adds the excluded \n and \0 and tries to create a new message with it
+        msg = Message.new(message_header + "\n" + message_body + "\0", @protocol >= Stomp::SPL_11)
+        #
+        if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
+          msg.headers = _decodeHeaders(msg.headers)
+        end
+        msg
       end
     end
 
@@ -352,7 +354,7 @@ module Stomp
       @closed = false
       if @parameters # nil in some rspec tests
         unless @reconnect_delay
-          @reconnect_delay = @parameters[:initial_reconnect_delay] || 0.01
+          @reconnect_delay = @parameters[:initial_reconnect_delay] || iosto1
         end
       end
       # Use keepalive
@@ -360,6 +362,8 @@ module Stomp
 
       # TCP_NODELAY option (disables Nagle's algorithm)
       used_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, !!(@parameters && @parameters[:tcp_nodelay]))
+
+      @iosto = @parse_timeout ? @parse_timeout.to_f : 0.0
 
       used_socket
     end
