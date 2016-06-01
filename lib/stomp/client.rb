@@ -86,6 +86,8 @@ module Stomp
       @start_timeout = @parameters[:start_timeout] || 0
       check_arguments!()
 
+      # p [ "cldbg01", @parameters ]
+
       begin
         Timeout::timeout(@start_timeout) {
           create_error_handler
@@ -93,6 +95,7 @@ module Stomp
           start_listeners()
         }
       rescue TimeoutError
+        # p [ "cldbg02" ]
         ex = Stomp::Error::StartTimeoutException.new(@start_timeout)
         raise ex
       end
@@ -116,6 +119,7 @@ module Stomp
     end
 
     def create_connection(autoflush)
+      # p [ "ccon01", @parameters ]
       @connection = Connection.new(@parameters)
       @connection.autoflush = autoflush
     end
