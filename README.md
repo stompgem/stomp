@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bbatsov/rubocop.svg?branch=master)](https://travis-ci.org/stompgem/stomp)
+
 # README
 
 * [Project Information](https://github.com/stompgem/stomp)
