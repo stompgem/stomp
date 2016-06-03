@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/bbatsov/rubocop.svg?branch=master)](https://travis-ci.org/stompgem/stomp)
+[![Code Climate](https://codeclimate.com/github/stompgem/stomp/badges/gpa.svg)](https://codeclimate.com/github/stompgem/stomp)
 
 # README
 
