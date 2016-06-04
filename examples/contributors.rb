@@ -4,22 +4,26 @@ class UserData
 
   public
   attr_accessor :count
-  attr_reader   :time
+  attr_reader   :ad, :cd
   #
-  def initialize(time = nil)
-    @count, @time = 1, time
+  def initialize(ad = nil, cd = nil)
+    @count, @ad, @cd = 1, ad, cd
   end
   #  
   def to_s
-    "UserData: time=>#{@time}, count =>#{@count}"
+    "UserData: AuthorDate=>#{@ad}, CommitDate=>#{@cd}, CommitCount =>#{@count}"
   end
 end
+# tABLE Data
+ttab_s = "<table border=\"1\" style=\"width:100%;border: 1px solid black;\">\n"
+ttab_e = "</table>\n"
 # Row Data
 trow_s = "<tr>\n"
-trow_e = "<tr>\n"
+trow_e = "</tr>\n"
 # Header Data
 th_s = "<th style=\"border: 1px solid black;padding-left: 10px;\" >\n"
 th_c1 = "First Author Date"
+th_c1b = "First Commit Date"
 th_c2 = "(Commit Count)"
 th_c3 = "Name / E-mail"
 th_e = "</th>\n"
@@ -27,15 +31,22 @@ th_e = "</th>\n"
 td_s = "<td style=\"border: 1px solid black;padding-left: 10px;\" >\n"
 td_e = "</td>\n"
 #
+puts ttab_s # table start
+#
 userList = {}
 while s = gets do
   s.chomp!
-  t, n, e = s.split(";")
+  ad, cd, n, e = s.split(";")
   hk = "#{n}|#{e}"
   if userList.has_key?(hk)
     userList[hk].count += 1
   else
-    userList[hk] = UserData.new(t)
+    userList[hk] = UserData.new(ad, cd)
+=begin
+    if ad != cd
+      puts "NE: #{ad}, #{cd}, #{n}, #{e}"
+    end
+=end
   end
 
 end
@@ -45,6 +56,12 @@ puts trow_s
 puts th_s
 puts th_c1
 puts th_e
+#
+=begin
+puts th_s
+puts th_c1b
+puts th_e
+=end
 #
 puts th_s
 puts th_c2
@@ -63,8 +80,14 @@ userList.each do |k, v|
   puts trow_s
   #
   puts td_s
-  puts "#{v.time}"
+  puts "#{v.ad}"
   puts td_e
+=begin
+  #
+  puts td_s
+  puts "#{v.cd}"
+  puts td_e
+=end
   #
   puts td_s
   puts oc
@@ -79,3 +102,5 @@ userList.each do |k, v|
   #  
   puts trow_e  
 end
+#
+puts ttab_e # table end

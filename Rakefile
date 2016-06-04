@@ -32,7 +32,7 @@ begin
     gem.name = "stomp"
     gem.version = Stomp::Version::STRING
     gem.summary = %Q{Ruby client for the Stomp messaging protocol}
-    gem.license = "Apache 2.0"
+    gem.license = "Apache-2.0"
     gem.description = %Q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
     gem.email = ["brianm@apache.org", 'marius@stones.com', 'morellon@gmail.com',
        'allard.guy.m@gmail.com' ]

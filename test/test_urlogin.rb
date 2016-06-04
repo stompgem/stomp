@@ -43,6 +43,9 @@ class TestURLLogins < Test::Unit::TestCase
       "failover://(stomp://usera:@#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})?a=b&c=d",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})?a=b&c=d&connect_timeout=2020",
+    ]
+
+    @sslfailover = [
       "failover://(stomp+ssl://#{hostname}:#{sslpn})",
       "failover://(stomp+ssl://usera:passa@#{hostname}:#{sslpn})",
       "failover://(stomp://usera:@#{hostname}:#{portnum},stomp+ssl://#{hostname}:#{sslpn})",
@@ -67,9 +70,21 @@ class TestURLLogins < Test::Unit::TestCase
     end
   end
 
-  # test failover:// urls
-  def test_0020_failover_urls()
+  # test failover:// urls - tcp
+  def test_0020_failover_urls_tcp()
     @tdfailover.each_with_index do |url, ndx|
+      # p [ "xurl", url, "xndx", ndx ]
+      c = Stomp::Client.new(url)
+      assert !c.nil?, url
+      assert c.open?, url
+      c.close
+    end
+  end
+
+  # test failover:// urls - ssl
+  def test_0020_failover_urls_ssl()
+    @sslfailover.each_with_index do |url, ndx|
+      # p [ "sslxurl", url, "sslxndx", ndx ]
       c = Stomp::Client.new(url)
       assert !c.nil?, url
       assert c.open?, url

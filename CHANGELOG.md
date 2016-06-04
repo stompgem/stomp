@@ -1,5 +1,20 @@
 # Stomp Gem Change Log
 
+## 1.4.0 20160603
+
+* Connection parameter :parse_timeout now means IO:select wait time for socket
+    reads.  Consumer clients should see a significantly reduced memory
+    footprint.  If the default (5 seconds) is not used by your client,
+    we suggest you test carefully.
+* Add example programs for sending / receiving large messages.
+* Changelog format is changed from .rdoc to .md.
+* README format is changed from .rdoc to .md.
+* README format change of contributor's list.
+* Add example utilities for generating the contributor's list.
+* Eliminate many warnings when using 'rake test', mostly from the 2.x Ruby series.
+* Get rakefile up to date.
+* Add the 'adhoc' subdirectory, an area for experiments and issue recreation code.
+
 ## 1.3.5 20160302
 
 * Add AMQ specific durable topic example.
@@ -22,7 +37,7 @@
 * Do not attempt to write empty message bodies.
 * Explicity close ssl socket on connection timeout.
 * Fix incorrect behavior for empty header keys (#93)
-* Do not override explicit :reliable #> false.
+* Do not override explicit :reliable => false.
 * Fix client fail-over fails (#98)
 
 ## 1.3.2 20131208
@@ -33,7 +48,7 @@
 * start_timeout and tcp_nodelay parameters
 * SSL Fix, revert not setting default ciphers.
 * Copy hash params at init.
-* Fix ssl #> true for Ruby 1.9.x and 2.x.
+* Fix ssl => true for Ruby 1.9.x and 2.x.
 * Expanded list of STOMP default SSL ciphers:
 * Do not change caller's :hosts array
 * Issue #78, again.
@@ -165,7 +180,7 @@
 * Update sample code to reflect removal of 'send'
 * Add on_ssl_connectfail callback and allow clients to signal quit from the callback
 * Ensure that SSL certificates and SSL related files exist and are readable
-* Allow SSL file checks before connect using SSLParams.new(:fsck #> true, ...)
+* Allow SSL file checks before connect using SSLParams.new(:fsck => true, ...)
 * Correct a test for Windows compatibility
 
 ## 1.2.1 20120313
