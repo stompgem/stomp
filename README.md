@@ -10,57 +10,56 @@ An implementation of the Stomp protocol for Ruby. See:
 
 ## Hash Login Example Usage (**this is the recommended login technique**):
 
-```ruby
-  hash = {
-      :hosts => [
+```
+    hash = {
+        :hosts => [
         # First connect is to remotehost1
         {:login => "login1", :passcode => "passcode1", :host => "remotehost1", :port => 61612, :ssl => true},
         # First failover connect is to remotehost2
         {:login => "login2", :passcode => "passcode2", :host => "remotehost2", :port => 61613, :ssl => false},
+        ],
+        # These are the default parameters and do not need to be set
+        :reliable => true,                  # reliable (use failover)
+        :initial_reconnect_delay => 0.01,   # initial delay before reconnect (secs)
+        :max_reconnect_delay => 30.0,       # max delay before reconnect
+        :use_exponential_back_off => true,  # increase delay between reconnect attpempts
+        :back_off_multiplier => 2,          # next delay multiplier
+        :max_reconnect_attempts => 0,       # retry forever, use # for maximum attempts
+        :randomize => false,                # do not radomize hosts hash before reconnect
+        :connect_timeout => 0,              # Timeout for TCP/TLS connects, use # for max seconds
+        :connect_headers => {},             # user supplied CONNECT headers (req'd for Stomp 1.1+)
+        :parse_timeout => 5,                # IO::select wait time on socket reads
+        :logger => nil,                     # user suplied callback logger instance
+        :dmh => false,                      # do not support multihomed IPV4 / IPV6 hosts during failover
+        :closed_check => true,              # check first if closed in each protocol method
+        :hbser => false,                    # raise on heartbeat send exception
+        :stompconn => false,                # Use STOMP instead of CONNECT
+        :usecrlf => false,                  # Use CRLF command and header line ends (1.2+)
+        :max_hbread_fails => 0,             # Max HB read fails before retry.  0 => never retry
+        :max_hbrlck_fails => 0,             # Max HB read lock obtain fails before retry.  0 => never retry
+        :fast_hbs_adjust => 0.0,            # Fast heartbeat senders sleep adjustment, seconds, needed ...
+                                            # For fast heartbeat senders.  'fast' == YMMV.  If not
+                                            # correct for your environment, expect unnecessary fail overs
+        :connread_timeout => 0,             # Timeout during CONNECT for read of CONNECTED/ERROR, secs
+        :tcp_nodelay => true,               # Turns on the TCP_NODELAY socket option; disables Nagle's algorithm
+        :start_timeout => 0,                # Timeout around Stomp::Client initialization
+        :sslctx_newparm => nil,             # Param for SSLContext.new
+      }
 
-      ],
-      # These are the default parameters and do not need to be set
-      :reliable => true,                  # reliable (use failover)
-      :initial_reconnect_delay => 0.01,   # initial delay before reconnect (secs)
-      :max_reconnect_delay => 30.0,       # max delay before reconnect
-      :use_exponential_back_off => true,  # increase delay between reconnect attpempts
-      :back_off_multiplier => 2,          # next delay multiplier
-      :max_reconnect_attempts => 0,       # retry forever, use # for maximum attempts
-      :randomize => false,                # do not radomize hosts hash before reconnect
-      :connect_timeout => 0,              # Timeout for TCP/TLS connects, use # for max seconds
-      :connect_headers => {},             # user supplied CONNECT headers (req'd for Stomp 1.1+)
-      :parse_timeout => 5,                # receive / read timeout, secs
-      :logger => nil,                     # user suplied callback logger instance
-      :dmh => false,                      # do not support multihomed IPV4 / IPV6 hosts during failover
-      :closed_check => true,              # check first if closed in each protocol method
-      :hbser => false,                    # raise on heartbeat send exception
-      :stompconn => false,                # Use STOMP instead of CONNECT
-      :usecrlf => false,                  # Use CRLF command and header line ends (1.2+)
-      :max_hbread_fails => 0,             # Max HB read fails before retry.  0 => never retry
-      :max_hbrlck_fails => 0,             # Max HB read lock obtain fails before retry.  0 => never retry
-      :fast_hbs_adjust => 0.0,            # Fast heartbeat senders sleep adjustment, seconds, needed ...
-                                          # For fast heartbeat senders.  'fast' == YMMV.  If not
-                                          # correct for your environment, expect unnecessary fail overs
-      :connread_timeout => 0,             # Timeout during CONNECT for read of CONNECTED/ERROR, secs
-      :tcp_nodelay => true,               # Turns on the TCP_NODELAY socket option; disables Nagle's algorithm
-      :start_timeout => 0,                # Timeout around Stomp::Client initialization
-      :sslctx_newparm => nil,             # Param for SSLContext.new
-    }
+      # for a client
+      client = Stomp::Client.new(hash)
 
-    # for a client
-    client = Stomp::Client.new(hash)
-
-    # for a connection
-    connection = Stomp::Connection.new(hash)
+      # for a connection
+      connection = Stomp::Connection.new(hash)
 ```
 
 ### Positional Parameter Usage:
 
-```ruby
+```
     client = Stomp::Client.new("user", "pass", "localhost", 61613)
     client.publish("/queue/mine", "hello world!")
     client.subscribe("/queue/mine") do |msg|
-      p msg
+        p msg
     end
 ```
 
@@ -68,26 +67,24 @@ An implementation of the Stomp protocol for Ruby. See:
 
 A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
-```ruby
+```
     stomp://host:port
     stomp://host.domain.tld:port
     stomp://login:passcode@host:port
     stomp://login:passcode@host.domain.tld:port
-
+    
     # e.g. c = Stomp::Client.new(urlstring)
 ```
 
 ### Failover + SSL Example URL Usage:
 
-```ruby
+```
     options = "initialReconnectDelay=5000&randomize=false&useExponentialBackOff=false"
-
     # remotehost1 uses SSL, remotehost2 doesn't
     client = Stomp::Client.new("failover:(stomp+ssl://login1:passcode1@remotehost1:61612,stomp://login2:passcode2@remotehost2:61613)?#{options}")
-
     client.publish("/queue/mine", "hello world!")
     client.subscribe("/queue/mine") do |msg|
-      p msg
+        p msg
     end
 ```
 
@@ -95,29 +92,15 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.0. Change sementics of :parse_timeout, see CHANGELOG.rdoc for details.
 * Gem version 1.3.5. Miscellaneous fixes, see CHANGELOG.rdoc for details.
 * Gem version 1.3.4. Miscellaneous fixes, see CHANGELOG.rdoc for details.
 * Gem version 1.3.3. Miscellaneous fixes, see CHANGELOG.rdoc for details.
 * Gem version 1.3.2. Miscellaneous fixes, see changelog for details.
 * Gem version 1.3.1. Bugfix for logging.
 * Gem version 1.3.0. Added ERROR frame raising as exception, added anonymous connections, miscellaneous other fixes.
-* Gem version 1.2.16. Fixed Stomp::Client to expose its connection's host parameters.
-* Gem version 1.2.15. Timeout cleanup, added license info to gemspec.
-* Gem version 1.2.14. Cleanup.
-* Gem version 1.2.13. Stomp::Client#unreceive max_redeliveries fix.
-* Gem version 1.2.12. Miscellaneous issue fixes and cleanup.
-* Gem version 1.2.11. JRuby and AMQ support fixes.
-* Gem version 1.2.10. Support failover from heartbeat threads.
-* Gem version 1.2.9. Miscellaneous fixes and changes.
-* Gem version 1.2.8. Stomp 1.1+ header codec inversion fix, test refactoring.
-* Gem version 1.2.7. Stomp 1.2 support and miscellaneous fixes.
-* Gem version 1.2.6. Miscellaneous fixes and changes.
-* Gem version 1.2.5. Restructure. Forks with modifcations will be affected.
-* Gem version 1.2.4. Stomp 1.1 heartbeat fix, autoflush capability, miscellaneous fixes.
-* Gem version 1.2.3. Miscellaneous fixes, see changelog for details.
-* Gem version 1.2.2. Performance and more SSL enhancements.
-* Gem version 1.2.1. Full support of SSL certificates.
-* Gem version 1.2.0. Support of Stomp protocol level 1.1.
+
+For changes in older versions see CHANGELOG.rdoc for details.
 
 ### Historical Information:
 
@@ -146,7 +129,7 @@ First Author Date
 <th style="border: 1px solid black;padding-left: 10px;" >
 Name / E-mail
 </th>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2005-08-26
@@ -160,7 +143,7 @@ brianm
 </span>
  / brianm@fd4e7336-3dff-0310-b68a-b6615a75f13b
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2006-03-16
@@ -174,7 +157,7 @@ jstrachan
 </span>
  / jstrachan@fd4e7336-3dff-0310-b68a-b6615a75f13b
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2006-04-19
@@ -188,7 +171,7 @@ chirino
 </span>
  / chirino@fd4e7336-3dff-0310-b68a-b6615a75f13b
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2007-05-09
@@ -202,7 +185,7 @@ kookster
 </span>
  / kookster@fd4e7336-3dff-0310-b68a-b6615a75f13b
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2008-05-08
@@ -216,7 +199,7 @@ Glenn Rempe
 </span>
  / glenn@rempe.us
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-02-03
@@ -230,7 +213,7 @@ Tony Garnock-Jones
 </span>
  / tonyg@lshift.net
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-02-09
@@ -244,7 +227,7 @@ Marius Mathiesen
 </span>
  / marius.mathiesen@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-02-13
@@ -258,7 +241,7 @@ Johan Sørensen
 </span>
  / johan@johansorensen.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-11-17
@@ -272,7 +255,7 @@ Thiago Morello
 </span>
  / thiago.morello@locaweb.com.br
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-11-22
@@ -286,7 +269,7 @@ unknown
 </span>
  / katy@.(none)
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-12-18
@@ -300,13 +283,13 @@ Thiago Morello
 </span>
  / morello@queroinfra32.fabrica.locaweb.com.br
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0299)
+(0344)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -314,7 +297,7 @@ gmallard
 </span>
  / allard.guy.m@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2010-01-07
@@ -328,7 +311,7 @@ Rafael Rosa
 </span>
  / rafael.rosa@locaweb.com.br
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2010-03-23
@@ -342,7 +325,7 @@ Guy M. Allard
 </span>
  / allard.guy.m@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2010-04-01
@@ -356,7 +339,7 @@ Dmytro Shteflyuk
 </span>
  / kpumuk@kpumuk.info
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2010-10-22
@@ -370,7 +353,7 @@ Neil Wilson
 </span>
  / neil@aldur.co.uk
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-02-09
@@ -384,7 +367,7 @@ Dinesh Majrekar
 </span>
  / dinesh.majrekar@advantage-interactive.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-04-15
@@ -398,7 +381,7 @@ Kiall Mac Innes
 </span>
  / kiall@managedit.ie
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-04-29
@@ -412,7 +395,7 @@ Rob Skaggs
 </span>
  / rob@pivotal-it.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-08-23
@@ -426,7 +409,7 @@ Tom May
 </span>
  / tom@gist.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-08-24
@@ -440,7 +423,7 @@ Thiago Morello
 </span>
  / morellon@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-09-11
@@ -454,7 +437,7 @@ Lucas Hills
 </span>
  / info@lucashills.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-11-20
@@ -468,7 +451,7 @@ Chris Needham
 </span>
  / chrisn303@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-12-11
@@ -482,7 +465,7 @@ R.I.Pienaar
 </span>
  / rip@devco.net
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2011-12-13
@@ -496,7 +479,7 @@ tworker
 </span>
  / tworker@onyx.ove.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2012-03-16
@@ -510,7 +493,7 @@ James Pearson
 </span>
  / james@fearmediocrity.co.uk
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2012-05-10
@@ -524,7 +507,7 @@ Tommy Bishop
 </span>
  / bishop.thomas@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2012-06-18
@@ -538,7 +521,7 @@ Jeremy Gailor
 </span>
  / jeremy@infinitecube.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-02-20
@@ -552,7 +535,7 @@ JP Hastings-Spital
 </span>
  / jphastings@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-03-14
@@ -566,7 +549,7 @@ glennr
 </span>
  / glenn@siyelo.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-07-29
@@ -580,7 +563,7 @@ Ian Smith
 </span>
  / ian.smith@mylookout.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-08-07
@@ -594,7 +577,7 @@ Hiram Chirino
 </span>
  / hiram@hiramchirino.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-08-15
@@ -608,7 +591,7 @@ Ian Smith
 </span>
  / ian.smith@lookout.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-08-22
@@ -622,7 +605,7 @@ Ian Smith
 </span>
  / ismith@mit.edu
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-09-26
@@ -636,7 +619,7 @@ Orazio Cotroneo
 </span>
  / orazio@we7.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2013-10-22
@@ -650,10 +633,10 @@ OrazioWE7
 </span>
  / orazio@we7.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
-2014-03-14
+2014-03-13
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 (0001)
@@ -664,7 +647,7 @@ Richard Clamp
 </span>
  / richardc@unixbeard.net
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2014-12-08
@@ -678,7 +661,7 @@ m4rCsi
 </span>
  / m4rCsi@gmail.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2015-09-05
@@ -692,7 +675,7 @@ Michael Klishin
 </span>
  / michael@novemberain.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2015-11-10
@@ -706,7 +689,7 @@ Patrick Sharp
 </span>
  / psharp@numerex.com
 </td>
-<tr>
+</tr>
 <tr>
 <td style="border: 1px solid black;padding-left: 10px;" >
 2016-02-03
@@ -720,6 +703,6 @@ Wayne Robinson
 </span>
  / wayne.robinson@gmail.com
 </td>
-<tr>
+</tr>
 </table>
 
