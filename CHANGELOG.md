@@ -1,6 +1,6 @@
 # Stomp Gem Change Log
 
-## 1.4.0 20160603
+## 1.4.0 20160608
 
 * Connection parameter :parse_timeout now means IO:select wait time for socket
     reads.  Consumer clients should see a significantly reduced memory

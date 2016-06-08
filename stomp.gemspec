@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian McCallister", "Marius Mathiesen", "Thiago Morello", "Guy M. Allard"]
-  s.date = %q{2016-06-01}
+  s.date = %q{2016-06-08}
   s.description = %q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
   s.email = ["brianm@apache.org", "marius@stones.com", "morellon@gmail.com", "allard.guy.m@gmail.com"]
   s.executables = ["catstomp", "stompcat"]
@@ -92,6 +92,7 @@ Gem::Specification.new do |s|
     "spec/message_spec.rb",
     "spec/spec_helper.rb",
     "stomp.gemspec",
+    "test/.gitignore",
     "test/test_anonymous.rb",
     "test/test_client.rb",
     "test/test_codec.rb",
