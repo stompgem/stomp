@@ -104,49 +104,49 @@ class TestMessage < Test::Unit::TestCase
 	def test_0040_msg_create
 		#
 		assert_raise(Stomp::Error::InvalidFormat) {
-			aframe = Stomp::Message.new("junk", false)
+			_ = Stomp::Message.new("junk", false)
 		}
 		#
 		assert_raise(Stomp::Error::InvalidFormat) {
-			aframe = Stomp::Message.new("command\njunk", false)
+			_ = Stomp::Message.new("command\njunk", false)
 		}
 		#
 		assert_raise(Stomp::Error::InvalidFormat) {
-			aframe = Stomp::Message.new("command\nheaders\n\njunk", false)
+			_ = Stomp::Message.new("command\nheaders\n\njunk", false)
 		}
 		#
 		assert_raise(Stomp::Error::InvalidServerCommand) {
-			aframe = Stomp::Message.new("junkcommand\nheaders\n\njunk\0\n\n", false)
+			_ = Stomp::Message.new("junkcommand\nheaders\n\njunk\0\n\n", false)
 		}
 		#
 		assert_raise(Stomp::Error::InvalidFormat) {
-			aframe = Stomp::Message.new("ERROR\nbadheaders\n\njunk\0\n\n", false)
+			_ = Stomp::Message.new("ERROR\nbadheaders\n\njunk\0\n\n", false)
 		}
 		#
 		assert_nothing_raised {
-			aframe = Stomp::Message.new("CONNECTED\nh1:val1\n\njunk\0\n", false)
+			_ = Stomp::Message.new("CONNECTED\nh1:val1\n\njunk\0\n", false)
 		}
 		#
 		assert_nothing_raised {
-			aframe = Stomp::Message.new("MESSAGE\nh1:val1\n\njunk\0\n", false)
+			_ = Stomp::Message.new("MESSAGE\nh1:val1\n\njunk\0\n", false)
 		}
 		#
 		assert_nothing_raised {
-			aframe = Stomp::Message.new("MESSAGE\nh2:val2\n\n\0", false)
+			_ = Stomp::Message.new("MESSAGE\nh2:val2\n\n\0", false)
 		}
 		#
 		assert_nothing_raised {
-			aframe = Stomp::Message.new("RECEIPT\nh1:val1\n\njunk\0\n", false)
+			_ = Stomp::Message.new("RECEIPT\nh1:val1\n\njunk\0\n", false)
 		}
 		#
 		assert_nothing_raised {
-			aframe = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
+			_ = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
 		}
 
 	end
 
 	# Test multiple headers with the same key
-	def test_0050_mh_msg_create
+  def test_0050_mh_msg_create
     aframe = bframe = nil
 		assert_nothing_raised {
       amsg = "MESSAGE\n" +
@@ -173,7 +173,7 @@ class TestMessage < Test::Unit::TestCase
   end
 
 	# Test headers with empty key / value
-	def test_0060_hdr_ekv
+  def test_0060_hdr_ekv
     #
     amsg = "MESSAGE\n" +
       "h1:val1\n" +
@@ -183,10 +183,10 @@ class TestMessage < Test::Unit::TestCase
       "payload" +
       "\0\n"
     assert_raise Stomp::Error::ProtocolErrorEmptyHeaderKey do
-      aframe = Stomp::Message.new(amsg, false)
+      _ = Stomp::Message.new(amsg, false)
     end
     assert_raise Stomp::Error::ProtocolErrorEmptyHeaderKey do
-      aframe = Stomp::Message.new(amsg, true)
+      _ = Stomp::Message.new(amsg, true)
     end
     #
     amsg = "MESSAGE\n" +
@@ -197,10 +197,10 @@ class TestMessage < Test::Unit::TestCase
       "payload" +
       "\0\n"
     assert_raise Stomp::Error::ProtocolErrorEmptyHeaderValue do
-      aframe = Stomp::Message.new(amsg, false)
+      _ = Stomp::Message.new(amsg, false)
     end
     assert_nothing_raised {
-      aframe = Stomp::Message.new(amsg, true)
+      _ = Stomp::Message.new(amsg, true)
     }
   end
 

@@ -251,7 +251,7 @@ module Stomp
             $stderr.print "\n"
             $stderr.print "es2_oldrecv: " + errstr
             $stderr.print "\n"
-         end
+          end
 
           # !!! This initiates a re-connect !!!
           _reconn_prep()

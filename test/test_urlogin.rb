@@ -14,12 +14,12 @@ end
 =end
 class TestURLLogins < Test::Unit::TestCase
   include TestBase
-  
+
   def setup
     hostname = host()
     portnum = port()
     sslpn = ssl_port()
-    @tdstomp = [ 
+    @tdstomp = [
           "stomp://guestl:guestp@#{hostname}:#{portnum}",
           "stomp://#{hostname}:#{portnum}",
           "stomp://@#{hostname}:#{portnum}",
@@ -32,10 +32,10 @@ class TestURLLogins < Test::Unit::TestCase
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc&coyote=kaboom",
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc",
       "failover://(stomp://#{hostname}:#{portnum})?whatup=doc&coyote=kaboom&randomize=true",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "localhost" + ":#{portnum}" + ")",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "localhost" + ":#{portnum}" + ")",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "localhost" + ":#{portnum}" + ")?a=b",
-      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "localhost" + ":#{portnum}" + ")?c=d&e=f",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=?:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")?a=b",
+      'failover://(stomp://f@#$$%^&*()_+=o.o::b~!@#$%^&*()+-_=:<>,.@@' + "#{hostname}" + ":#{portnum}" + ")?c=d&e=f",
       "failover://(stomp://usera:passa@#{hostname}:#{portnum})",
       "failover://(stomp://usera:@#{hostname}:#{portnum})",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})",
@@ -43,12 +43,17 @@ class TestURLLogins < Test::Unit::TestCase
       "failover://(stomp://usera:@#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})?a=b&c=d",
       "failover://(stomp://#{hostname}:#{portnum},stomp://#{hostname}:#{portnum})?a=b&c=d&connect_timeout=2020",
+    ]
+
+    @sslfailover = [
       "failover://(stomp+ssl://#{hostname}:#{sslpn})",
       "failover://(stomp+ssl://usera:passa@#{hostname}:#{sslpn})",
       "failover://(stomp://usera:@#{hostname}:#{portnum},stomp+ssl://#{hostname}:#{sslpn})",
     ]
 
     @badparms = "failover://(stomp://#{hostname}:#{portnum})?a=b&noequal"
+
+    @client = nil
   end
 
   def teardown
@@ -65,9 +70,21 @@ class TestURLLogins < Test::Unit::TestCase
     end
   end
 
-  # test failover:// urls
-  def test_0020_failover_urls()
+  # test failover:// urls - tcp
+  def test_0020_failover_urls_tcp()
     @tdfailover.each_with_index do |url, ndx|
+      # p [ "xurl", url, "xndx", ndx ]
+      c = Stomp::Client.new(url)
+      assert !c.nil?, url
+      assert c.open?, url
+      c.close
+    end
+  end
+
+  # test failover:// urls - ssl
+  def test_0020_failover_urls_ssl()
+    @sslfailover.each_with_index do |url, ndx|
+      # p [ "sslxurl", url, "sslxndx", ndx ]
       c = Stomp::Client.new(url)
       assert !c.nil?, url
       assert c.open?, url
@@ -78,9 +95,8 @@ class TestURLLogins < Test::Unit::TestCase
   # test failover:// with bad parameters
   def test_0020_failover_badparms()
     assert_raise(Stomp::Error::MalformedFailoverOptionsError) {
-      c = Stomp::Client.new(@badparms)
+      _ = Stomp::Client.new(@badparms)
     }
   end
 
 end unless ENV['STOMP_RABBIT']
-

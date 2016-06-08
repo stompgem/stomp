@@ -20,8 +20,11 @@ module Stomp
     end
 
     def parse_stomp_url(login)
+      original_verbose, $VERBOSE = $VERBOSE, nil # shut off warnings
       regexp = /^stomp:\/\/#{URL_REPAT}/
-      return false unless url = regexp.match(login)
+      url = regexp.match(login)
+      $VERBOSE = original_verbose
+      return false unless url
 
       @parameters = { :reliable => false,
                       :hosts => [ { :login => url[3] || "",
@@ -34,7 +37,10 @@ module Stomp
     # e.g. failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)?option1=param
     def parse_failover_url(login)
       rval = nil
-      if md = FAILOVER_REGEX.match(login)
+      original_verbose, $VERBOSE = $VERBOSE, nil # shut off warnings
+      md = FAILOVER_REGEX.match(login)
+      $VERBOSE = original_verbose
+      if md
         finhosts = parse_hosts(login)
 
         options = {}
@@ -75,6 +81,7 @@ module Stomp
     # Parse a stomp URL.
     def parse_hosts(url)
       hosts = []
+      original_verbose, $VERBOSE = $VERBOSE, nil # shut off warnings
       host_match = /stomp(\+ssl)?:\/\/#{URL_REPAT}/
       url.scan(host_match).each do |match|
         host = {}
@@ -85,6 +92,7 @@ module Stomp
         host[:port] = match[6].to_i
         hosts << host
       end
+      $VERBOSE = original_verbose
       hosts
     end
 

@@ -175,6 +175,8 @@ module Stomp
     ["SRP-RSA-AES-256-CBC-SHA","TLSv1/SSLv3",256,256],
   ]
 
+  original_verbose, $VERBOSE = $VERBOSE, nil # try to shut off warnings
+  
   # stomp URL regex pattern, for e.g. login:passcode@host:port or host:port
   URL_REPAT = '((([\w~!@#$%^&*()\-+=.?:<>,.]*\w):([\w~!@#$%^&*()\-+=.?:<>,.]*))?@)?([\w\.\-]+):(\d+)'
 
@@ -182,4 +184,6 @@ module Stomp
   #failover:(stomp+ssl://login1:passcode1@remotehost1:61612,stomp://login2:passcode2@remotehost2:61613)
   FAILOVER_REGEX = /^failover:(\/\/)?\(stomp(\+ssl)?:\/\/#{URL_REPAT}(,stomp(\+ssl)?:\/\/#{URL_REPAT})*\)(\?(.*))?$/
 
+  $VERBOSE = original_verbose
+  
 end # Module Stomp

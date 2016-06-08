@@ -1,0 +1,7 @@
+# No html in this directory
+*.html
+*.htm
+# Typical backup files
+*~
+*.bak
+

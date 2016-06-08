@@ -19,10 +19,12 @@ require 'rspec/core/rake_task'
 require "stomp/version"
 
 begin
-  require "hanna/rdoctask"
+  require "hanna-nouveau"
+  have_hanna = true
 rescue LoadError => e
-  require "rdoc/task"
+  have_hanna = false
 end
+require "rdoc/task"
 
 begin
   require 'jeweler'
@@ -30,7 +32,7 @@ begin
     gem.name = "stomp"
     gem.version = Stomp::Version::STRING
     gem.summary = %Q{Ruby client for the Stomp messaging protocol}
-    gem.license = "Apache 2.0"
+    gem.license = "Apache-2.0"
     gem.description = %Q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
     gem.email = ["brianm@apache.org", 'marius@stones.com', 'morellon@gmail.com',
        'allard.guy.m@gmail.com' ]
@@ -38,9 +40,6 @@ begin
     gem.authors = ["Brian McCallister", 'Marius Mathiesen', 'Thiago Morello',
         'Guy M. Allard']
     gem.add_development_dependency "rspec", '>= 2.14.1'
-    gem.extra_rdoc_files = [ "README.rdoc", "CHANGELOG.rdoc", "LICENSE",
-      "lib/**/*.rb", "examples/**/*.rb",
-      "test/**/*.rb" ]
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
@@ -61,12 +60,14 @@ RSpec::Core::RakeTask.new('spec:rcov') do |t|
 end
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.main = "README.rdoc"
+  rdoc.main = "README.md"
   rdoc.rdoc_dir = "doc"
   rdoc.title = "Stomp"
   rdoc.options += %w[ --line-numbers --inline-source --charset utf-8 ]
-  rdoc.rdoc_files.include("README.rdoc", "CHANGELOG.rdoc", "lib/**/*.rb", "examples/**/*.rb",
-    "test/**/*.rb")
+  if have_hanna
+    rdoc.options += %w[ --format hanna  ]
+  end
+  rdoc.rdoc_files.include("README.md", "CHANGELOG.md", "lib/**/*.rb")
 end
 
 Rake::TestTask.new do |t|
@@ -76,6 +77,4 @@ Rake::TestTask.new do |t|
 end
 
 task :default => :spec
-
-
 

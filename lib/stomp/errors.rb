@@ -38,6 +38,15 @@ module Stomp
       end
     end
 
+    # ReceiveTimeout is raised if:
+    # * The read socket shows "not ready" at any time after the timeout
+    #   specified by :parse_timeout in the connection hash.
+    class ReceiveTimeout < RuntimeError
+      def message
+        "Receive status timeout"
+      end
+    end
+
     # SocketOpenTimeout is raised if:
     # * A timeout occurs during a socket open.
     class SocketOpenTimeout < RuntimeError

@@ -39,13 +39,13 @@ class TestSSL < Test::Unit::TestCase
   # Test using correct parameters.
   def test_ssl_0020_noraise
     assert_nothing_raised {
-      ssl_parms = Stomp::SSLParams.new(:cert_file => "dummy1", :key_file => "dummy2")
+      _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_file => "dummy2")
     }
     assert_nothing_raised {
-      ssl_parms = Stomp::SSLParams.new(:ts_files => "dummyts1")
+      _ = Stomp::SSLParams.new(:ts_files => "dummyts1")
     }
     assert_nothing_raised {
-      ssl_parms = Stomp::SSLParams.new(:ts_files => "dummyts1", 
+      _ = Stomp::SSLParams.new(:ts_files => "dummyts1", 
         :cert_file => "dummy1", :key_file => "dummy2")
     }
   end
@@ -53,25 +53,25 @@ class TestSSL < Test::Unit::TestCase
   # Test using incorrect / incomplete parameters.
   def test_ssl_0030_raise
     assert_raise(Stomp::Error::SSLClientParamsError) {
-      ssl_parms = Stomp::SSLParams.new(:cert_file => "dummy1")
+      _ = Stomp::SSLParams.new(:cert_file => "dummy1")
     }
     assert_raise(Stomp::Error::SSLClientParamsError) {
-      ssl_parms = Stomp::SSLParams.new(:key_file => "dummy2")
+      _ = Stomp::SSLParams.new(:key_file => "dummy2")
     }
   end
 
   # Test that :fsck works.
   def test_ssl_0040_fsck
     assert_raise(Stomp::Error::SSLNoCertFileError) {
-      ssl_parms = Stomp::SSLParams.new(:cert_file => "dummy1", 
+      _ = Stomp::SSLParams.new(:cert_file => "dummy1", 
         :key_file => "dummy2", :fsck => true)
     }
     assert_raise(Stomp::Error::SSLNoKeyFileError) {
-      ssl_parms = Stomp::SSLParams.new(:cert_file => __FILE__,
+      _ = Stomp::SSLParams.new(:cert_file => __FILE__,
         :key_file => "dummy2", :fsck => true)
     }
     assert_raise(Stomp::Error::SSLNoTruststoreFileError) {
-      ssl_parms = Stomp::SSLParams.new(:ts_files => "/tmp/not-likely-here.txt", 
+      _ = Stomp::SSLParams.new(:ts_files => "/tmp/not-likely-here.txt", 
         :fsck => true)
     }
   end
