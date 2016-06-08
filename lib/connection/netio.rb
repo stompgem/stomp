@@ -15,6 +15,8 @@ module Stomp
       def _receive(read_socket, connread = false)
         # p [ "ioscheck", @iosto, connread ]
         # _dump_callstack()
+        # drdbg = true
+        drdbg = false
         @read_semaphore.synchronize do
           line = nil
           if connread
@@ -29,41 +31,45 @@ module Stomp
               raise ex
             end
           else
+            p [ "CONR01" ] if drdbg
+            _dump_callstack() if drdbg
             line = _init_line_read(read_socket)
           end
           #
+          p [ "nilcheck", line.nil? ] if drdbg
           return nil if line.nil?
           #An extra \n at the beginning of the frame, possibly not caught by is_ready?
           line = '' if line == "\n"
-          # p [ "wiredatain_01A", line, Time.now ]
+          p [ "wiredatain_01A", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-          # p [ "wiredatain_01B", line, Time.now ]
+          p [ "wiredatain_01B", line, Time.now ] if drdbg
           # Reads the beginning of the message until it runs into a empty line
           message_header = ''
           begin
             message_header += line
-            # p [ "wiredatain_02A", line, Time.now ]
+            p [ "wiredatain_02A", line, Time.now ] if drdbg
             unless connread
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
-            # p [ "wiredatain_02B", line, Time.now ]
+            p [ "wiredatain_02B", line, Time.now ] if drdbg
             line = read_socket.gets
-            # p [ "wiredatain_02C", line ]
+            p [ "wiredatain_02C", line ] if drdbg
             raise  if line.nil?
             line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-            # p [ "wiredatain_02D", line ]
+            p [ "wiredatain_02D", line ] if drdbg
           end until line =~ /^\s?\n$/
-          # p [ "wiredatain_03A" ]
+          p [ "wiredatain_03A" ] if drdbg
           # Checks if it includes content_length header
           content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
           message_body = ''
 
-          # p [ "wiredatain_03B", content_length ]
+          p [ "wiredatain_03B", content_length ] if drdbg
           # If content_length is present, read the specified amount of bytes
           if content_length
             unless connread
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
+            p [ "CL01" ] if drdbg
             message_body = read_socket.read content_length[1].to_i
             unless connread
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
@@ -74,11 +80,12 @@ module Stomp
             unless connread
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
+            p [ "NOCL01" ] if drdbg
             message_body = read_socket.readline("\0")
             message_body.chop!
           end
 
-          # p [ "wiredatain_04" ]
+          p [ "wiredatain_04" ] if drdbg
           # If the buffer isn't empty, reads trailing new lines.
           #
           # Note: experiments with JRuby seem to show that socket.ready? never
@@ -90,10 +97,12 @@ module Stomp
           # is read.  Do _not_ leave them on the wire and attempt to drain them
           # at the start of the next read.  Attempting to do that breaks the
           # asynchronous nature of the 'poll' method.
+          p [ "wiredatain_05_prep", "isr", _is_ready?(read_socket) ] if drdbg
           while _is_ready?(read_socket)
             unless connread
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
+            p [ "WHIR01" ] if drdbg
             last_char = read_socket.getc
             break unless last_char
             if parse_char(last_char) != "\n"
@@ -101,31 +110,41 @@ module Stomp
               break
             end
           end
-          # p [ "wiredatain_05A" ]
+          p [ "wiredatain_05A" ] if drdbg
           if @protocol >= Stomp::SPL_11
             @lr = Time.now.to_f if @hbr
           end
           # Adds the excluded \n and \0 and tries to create a new message with it
-          # p [ "wiredatain_05B" ]
+          p [ "wiredatain_05B" ] if drdbg
           msg = Message.new(message_header + "\n" + message_body + "\0", @protocol >= Stomp::SPL_11)
-          # p [ "wiredatain_06", msg.command, msg.headers ]
+          p [ "wiredatain_06", msg.command, msg.headers ] if drdbg
           #
           if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
             msg.headers = _decodeHeaders(msg.headers)
           end
-          # p [ "wiredatain_99", msg.command, msg.headers ]
+          p [ "wiredatain_99", msg.command, msg.headers ] if drdbg
           msg
         end
       end
 
-      # Check if the socket is ready, i.e. there is data to read.
+      #
+      # This is a total hack, to try and guess how JRuby will behave today.
+      #
       def _is_ready?(s)
         rdy = s.ready?
-        if @jruby
-          rdy = rdy.class == Fixnum ? true : false
+        ### p [ "isr?", rdy ]
+        return rdy unless @jruby
+        ### p [ "jrdychk", rdy.class ]
+        if rdy.class == NilClass
+          # rdy = true
+          rdy = false # A test
+        else
+          rdy = (rdy.class == Fixnum || rdy.class == TrueClass) ? true : false
         end
+        ### p [ "isr?_last", rdy ]
         rdy
       end
+
 
       # Normalize line ends because 1.2+ brokers can send 'mixed mode' headers, i.e.:
       # - Some headers end with '\n'
@@ -405,15 +424,6 @@ module Stomp
           _transmit(used_socket, Stomp::CMD_CONNECT, headers)
         end
         @connection_frame = _receive(used_socket, true)
-=begin
-p [ "connect01" ]
-        begin
-          @connection_frame = _receive(used_socket, true)
-        rescue
-          p [ "exception", Time.now, $! ]
-        end
-p [ "connect02", @connection_frame ]
-=end
         _post_connect
         @disconnect_receipt = nil
         @session = @connection_frame.headers["session"] if @connection_frame
@@ -428,10 +438,21 @@ p [ "connect02", @connection_frame ]
           if @protocol == Stomp::SPL_10 || (@protocol >= Stomp::SPL_11 && !@hbr)
             if @jruby
               # Handle JRuby specific behavior.
-              while true
-                line = read_socket.gets # Data from wire
-                break unless line == "\n"
-                line = ''
+              ### p [ "ilrjr00", _is_ready?(read_socket), RUBY_VERSION ]
+              if RUBY_VERSION <  "2"
+                while true
+                  ### p [ "ilrjr01A1", _is_ready?(read_socket) ]
+                  line = read_socket.gets # Data from wire
+                  break unless line == "\n"
+                  line = ''
+                end
+              else # RUBY_VERSION >= "2"
+                while _is_ready?(read_socket)
+                  ### p [ "ilrjr01B2", _is_ready?(read_socket) ]
+                  line = read_socket.gets # Data from wire
+                  break unless line == "\n"
+                  line = ''
+                end
               end
             else
               line = read_socket.gets # The old way
