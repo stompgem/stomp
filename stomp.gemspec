@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.date = %q{2016-06-08}
   s.description = %q{Ruby client for the Stomp messaging protocol.  Note that this gem is no longer supported on rubyforge.}
   s.email = ["brianm@apache.org", "marius@stones.com", "morellon@gmail.com", "allard.guy.m@gmail.com"]
-  s.executables = ["catstomp", "stompcat"]
+  s.executables = ["stompcat", "catstomp"]
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
