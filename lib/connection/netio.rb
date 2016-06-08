@@ -319,13 +319,15 @@ module Stomp
             end
 
             # Cipher list
+            # As of this writing, there are numerous problems with supplying
+            # cipher lists to jruby.  So we do not attempt to do that here.
             if !@ssl.use_ruby_ciphers # No Ruby ciphers (the default)
               if @ssl.ciphers # User ciphers list?
                 ctx.ciphers = @ssl.ciphers # Accept user supplied ciphers
               else
                 ctx.ciphers = Stomp::DEFAULT_CIPHERS # Just use Stomp defaults
               end
-            end
+            end unless @jruby
 
             # Set SSLContext Options if user asks for it in Stomp::SSLParams
             # and SSL supports it.
@@ -369,6 +371,8 @@ module Stomp
             ssl.close
           end
           #
+          puts ex.backtrace
+          $sdtout.flush
           raise # Reraise
         end
       end
