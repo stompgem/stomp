@@ -449,23 +449,25 @@ class TestClient < Test::Unit::TestCase
 
   # Test basic unsubscribe.
   def test_unsubscribe
+    @client.close if @client && @client.open? # close setup work
+    @client = nil
     message = nil
     dest = make_destination
     to_send = message_text
     client = get_client()
     sid = nil
-    if @client.protocol() == Stomp::SPL_10
+    if client.protocol() == Stomp::SPL_10
       client.subscribe(dest, :ack => 'client') { |m| message = m }
     else
       sid = client.uuid()
       client.subscribe(dest, :ack => 'client', :id => sid) { |m| message = m }
     end
-    @client.publish dest, to_send
+    client.publish dest, to_send
     Timeout::timeout(4) do
       sleep 0.01 until message
     end
     assert_equal to_send, message.body, "first body check"
-    if @client.protocol() == Stomp::SPL_10
+    if client.protocol() == Stomp::SPL_10
       client.unsubscribe dest
     else
       client.unsubscribe dest, :id => sid
@@ -474,7 +476,7 @@ class TestClient < Test::Unit::TestCase
     #  Same message should remain on the queue.  Receive it again with ack=>auto.
     message_copy = nil
     client = get_client()
-    if @client.protocol() == Stomp::SPL_10
+    if client.protocol() == Stomp::SPL_10
       client.subscribe(dest, :ack => 'auto') { |m| message_copy = m }
     else
       sid = client.uuid()
@@ -485,7 +487,8 @@ class TestClient < Test::Unit::TestCase
     end
     assert_equal to_send, message_copy.body, "second body check"
     assert_equal message.headers['message-id'], message_copy.headers['message-id'], "header check" unless ENV['STOMP_RABBIT']
-    checkEmsg(@client)
+    checkEmsg(client)
+    client.close
   end
 
   # Test subscribe from a worker thread.
