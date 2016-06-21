@@ -372,7 +372,7 @@ module Stomp
           end
           #
           puts ex.backtrace
-          $sdtout.flush
+          $stdout.flush
           raise # Reraise
         end
       end
