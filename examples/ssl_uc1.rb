@@ -21,12 +21,15 @@ require "stomp"
 class ExampleSSL1
   # Initialize.
   def initialize
+		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
   def run
+		puts "Connect host: #{@host}, port: #{@port}"
     ssl_opts = Stomp::SSLParams.new
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61612, :ssl => ssl_opts},
+        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }

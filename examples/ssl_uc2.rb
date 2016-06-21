@@ -21,19 +21,25 @@ require "stomp"
 class ExampleSSL2
   # Initialize.
   def initialize
+		# Change the following to the location of the cert file(s).
+		@cert_loc = "/ad3/gma/sslwork/2013"
+		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
   def run
+		puts "Connect host: #{@host}, port: #{@port}"
+
     ts_flist = []
 
-    # Change the following to the location of the server's CA signed certificate.
-    ts_flist << "/home/gmallard/sslwork/2013/TestCA.crt"
+    # Possibly change the cert file(s) name(s) here.
+		ts_flist << "#{@cert_loc}/TestCA.crt"
 
     ssl_opts = Stomp::SSLParams.new(:ts_files => ts_flist.join(","), 
       :fsck => true)
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61612, :ssl => ssl_opts},
+        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }
