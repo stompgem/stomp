@@ -347,7 +347,7 @@ module Stomp
             ssl.hostname = @host if ssl.respond_to? :hostname=
             ssl.sync_close = true # Sync ssl close with underlying TCP socket
             ssl.connect
-            if ssl.context.verify_mode != OpenSSL::SSL::VERIFY_NONE
+            if (ssl.context.verify_mode != OpenSSL::SSL::VERIFY_NONE) && @ssl_post_conn_check
               ssl.post_connection_check(@host)
             end
           end

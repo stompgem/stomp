@@ -93,6 +93,7 @@ module Stomp
     #     :tcp_nodelay => true,               # Turns on the TCP_NODELAY socket option; disables Nagle's algorithm
     #     :start_timeout => 0,                # Timeout around Stomp::Client initialization
     #     :sslctx_newparm => nil,             # Param for SSLContext.new
+    #     :ssl_post_conn_check => true,       # Further verify broker identity
     #   }
     #
     #   e.g. c = Stomp::Connection.new(hash)
@@ -146,6 +147,7 @@ module Stomp
         @tcp_nodelay = true # Disable Nagle
         @start_timeout = 0 # Client only, startup timeout
         @sslctx_newparm = nil # SSLContext.new paramater
+        @ssl_post_conn_check = true # Additional broker verification
         warn "login looks like a URL, do you have the correct parameters?" if @login =~ /:\/\//
       end
 
@@ -183,6 +185,7 @@ module Stomp
       @fast_hbs_adjust = @parameters[:fast_hbs_adjust]
       @connread_timeout = @parameters[:connread_timeout]
       @sslctx_newparm = @parameters[:sslctx_newparm]
+      @ssl_post_conn_check = @parameters[:ssl_post_conn_check]
       #
       # Try to support Ruby 1.9.x and 2.x ssl.
       unless defined?(RSpec)
