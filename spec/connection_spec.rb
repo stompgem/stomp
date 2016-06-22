@@ -32,6 +32,7 @@ describe Stomp::Connection do
       :tcp_nodelay => true,
       :start_timeout => 0,
       :sslctx_newparm => nil,
+      :ssl_post_conn_check => true,
    }
         
     #POG:
@@ -366,6 +367,7 @@ describe Stomp::Connection do
           :tcp_nodelay => true,
           :start_timeout => 0,
           :sslctx_newparm => nil,
+          :ssl_post_conn_check => true,
         }
         
         used_hash =  {
@@ -409,6 +411,7 @@ describe Stomp::Connection do
           :tcp_nodelay => false,
           :start_timeout => 6,
           :sslctx_newparm=>:TLSv1,
+          :ssl_post_conn_check =>false,
         }
         
         @connection = Stomp::Connection.new(used_hash)
