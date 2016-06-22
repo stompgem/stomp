@@ -180,6 +180,7 @@ module Stomp
         :tcp_nodelay => true,
         :start_timeout => 0,
         :sslctx_newparm => nil,
+        :ssl_post_conn_check => true,
       }
 
       res_params = default_params.merge(params)

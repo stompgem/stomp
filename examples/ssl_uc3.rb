@@ -23,21 +23,25 @@ require "stomp"
 class ExampleSSL3
   # Initialize.
   def initialize
+		# Change the following to the location of the cert file(s).
+		@cert_loc = "/ad3/gma/sslwork/2013"
+		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
   def run
-    # Change the following:
-    # * location of the client's signed certificate
-    # * location of the client's private key.
+		puts "Connect host: #{@host}, port: #{@port}"
+
+    # Possibly change the cert file(s) name(s) here.    
     ssl_opts = Stomp::SSLParams.new(
-      :key_file => "/home/gmallard/sslwork/2013/client.key", # the client's private key
-      :cert_file => "/home/gmallard/sslwork/2013/client.crt", # the client's signed certificate
+      :key_file => "#{@cert_loc}/client.key", # the client's private key
+      :cert_file => "#{@cert_loc}/client.crt", # the client's signed certificate
       :fsck => true # Check that the files exist first
     )
 
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61612, :ssl => ssl_opts},
+        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }

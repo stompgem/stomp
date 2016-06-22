@@ -56,6 +56,7 @@ module Stomp
     #     :tcp_nodelay => true,               # Turns on the TCP_NODELAY socket option; disables Nagle's algorithm
     #     :start_timeout => 0,                # Timeout around Stomp::Client initialization
     #     :sslctx_newparm => nil,             # Param for SSLContext.new
+    #     :ssl_post_conn_check => true,       # Further verify broker identity
     #   }
     #
     #   e.g. c = Stomp::Client.new(hash)

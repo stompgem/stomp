@@ -347,6 +347,9 @@ module Stomp
             ssl.hostname = @host if ssl.respond_to? :hostname=
             ssl.sync_close = true # Sync ssl close with underlying TCP socket
             ssl.connect
+            if (ssl.context.verify_mode != OpenSSL::SSL::VERIFY_NONE) && @ssl_post_conn_check
+              ssl.post_connection_check(@host)
+            end
           end
           def ssl.ready?
             ! @rbuffer.empty? || @io.ready?
@@ -372,7 +375,7 @@ module Stomp
           end
           #
           puts ex.backtrace
-          $sdtout.flush
+          $stdout.flush
           raise # Reraise
         end
       end
