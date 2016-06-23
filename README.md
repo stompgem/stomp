@@ -44,6 +44,7 @@ An implementation of the Stomp protocol for Ruby. See:
         :tcp_nodelay => true,               # Turns on the TCP_NODELAY socket option; disables Nagle's algorithm
         :start_timeout => 0,                # Timeout around Stomp::Client initialization
         :sslctx_newparm => nil,             # Param for SSLContext.new
+        :ssl_post_conn_check => true,       # Further verify broker identity
       }
 
       # for a client
@@ -92,6 +93,7 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.1. Important SSL changes !: see CHANGELOG.md for details.
 * Gem version 1.4.0. Note: Change sementics of :parse_timeout, see CHANGELOG.md for details.
 * Gem version 1.3.5. Miscellaneous fixes, see CHANGELOG.rdoc for details.
 * Gem version 1.3.4. Miscellaneous fixes, see CHANGELOG.rdoc for details.
@@ -289,7 +291,7 @@ Thiago Morello
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0344)
+(0362)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >

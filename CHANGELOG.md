@@ -1,5 +1,14 @@
 # Stomp Gem Change Log
 
+## 1.4.1 20160623
+
+* Add call to #post_connection_check to normal SSL processing.  This change
+  further validates the name of the broker connected to.  This change adds to
+  the current SSL connection processing logic, and is **highly recommended**.  In the
+  case a client cannot tolerate this logic, it can be disabled by adding
+  :ssl_post_conn_check => false to the connection hash.
+* Fix typo in SSL failure recovery processing.
+
 ## 1.4.0 20160608
 
 * Connection parameter :parse_timeout now means IO:select wait time for socket

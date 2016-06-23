@@ -32,6 +32,7 @@ describe Stomp::Connection do
       :tcp_nodelay => true,
       :start_timeout => 0,
       :sslctx_newparm => nil,
+      :ssl_post_conn_check => true,
    }
         
     #POG:
@@ -272,6 +273,7 @@ describe Stomp::Connection do
       module ::OpenSSL
         module SSL
           VERIFY_NONE = 0
+          VERIFY_PEER = 1
           
           class SSLSocket
           end
@@ -283,14 +285,16 @@ describe Stomp::Connection do
       end
       
       before(:each) do
+        ssl_context = double(:verify_mode => OpenSSL::SSL::VERIFY_PEER)
         ssl_parameters = {:hosts => [{:login => "login2", :passcode => "passcode2", :host => "remotehost", :ssl => true}]}
         @ssl_socket = double(:ssl_socket, :puts => nil, :write => nil, 
-          :setsockopt => nil, :flush => true)
+          :setsockopt => nil, :flush => true, :context => ssl_context)
         allow(@ssl_socket).to receive(:sync_close=)
         
         expect(TCPSocket).to receive(:open).and_return @tcp_socket
         expect(OpenSSL::SSL::SSLSocket).to receive(:new).and_return(@ssl_socket)
         expect(@ssl_socket).to receive(:connect)
+        expect(@ssl_socket).to receive(:post_connection_check)
         
         @connection = Stomp::Connection.new ssl_parameters
       end
@@ -363,6 +367,7 @@ describe Stomp::Connection do
           :tcp_nodelay => true,
           :start_timeout => 0,
           :sslctx_newparm => nil,
+          :ssl_post_conn_check => true,
         }
         
         used_hash =  {
@@ -406,6 +411,7 @@ describe Stomp::Connection do
           :tcp_nodelay => false,
           :start_timeout => 6,
           :sslctx_newparm=>:TLSv1,
+          :ssl_post_conn_check =>false,
         }
         
         @connection = Stomp::Connection.new(used_hash)
