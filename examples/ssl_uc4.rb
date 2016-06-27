@@ -3,8 +3,13 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("./ssl_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "ssl_common"
+end
+include SSLCommon
 #
 # == SSL Use Case 4 - server *does* authenticate client, client *does* authenticate server
 #
@@ -23,8 +28,7 @@ require "stomp"
 class ExampleSSL4
   # Initialize.
   def initialize
-		# Change the following to the location of the cert file(s).
-		@cert_loc = "/ad3/gma/sslwork/2013"
+		# Change the following as needed.
 		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
 		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
@@ -34,9 +38,9 @@ class ExampleSSL4
 
     # Possibly change the cert file(s) name(s) here.    
     ssl_opts = Stomp::SSLParams.new(
-      :key_file => "#{@cert_loc}/client.key", # The client's private key
-      :cert_file => "#{@cert_loc}/client.crt", # The client's signed certificate
-      :ts_files => "#{@cert_loc}/TestCA.crt", # The CA's signed sertificate
+      :key_file => "#{cli_loc()}/#{pck()}", # the client's private key, private data
+      :cert_file => "#{cli_loc()}/#{cli_cert()}", # the client's signed certificate
+      :ts_files => "#{ca_loc()}/#{ca_cert()}", # The CA's signed sertificate
       :fsck => true # Check that files exist first
     )
     #
@@ -53,6 +57,13 @@ class ExampleSSL4
     # puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}"
     c.disconnect
   end
+
+	private
+
+	def pck()
+		"client.key"
+	end
+
 end
 #
 e = ExampleSSL4.new

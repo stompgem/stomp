@@ -3,8 +3,14 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+#
+if Kernel.respond_to?(:require_relative)
+  require_relative("./ssl_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "ssl_common"
+end
+include SSLCommon
 #
 # == SSL Use Case 1 - server does *not* authenticate client, client does *not* authenticate server
 #
@@ -20,7 +26,7 @@ require "stomp"
 #
 class ExampleSSL1
   # Initialize.
-  def initialize
+  def initialize		# Change the following as needed.
 		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
 		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end

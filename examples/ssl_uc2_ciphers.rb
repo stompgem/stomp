@@ -3,8 +3,13 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("./ssl_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "ssl_common"
+end
+include SSLCommon
 #
 # == SSL Use Case 2 - User Supplied Ciphers
 #
@@ -15,7 +20,9 @@ require "stomp"
 #
 class ExampleSSL2C
   # Initialize.
-  def initialize
+  def initialize		# Change the following as needed.
+		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
   def run
@@ -25,8 +32,8 @@ class ExampleSSL2C
     #
     ts_flist = []
 
-    # Change the following to the location of your CA's signed certificate.
-    ts_flist << "/home/gmallard/sslwork/2013/TestCA.crt"
+    # Possibly change/override the cert data here.
+    ts_flist << "#{ca_loc()}/#{ca_cert()}"
 
     ssl_opts = Stomp::SSLParams.new(:ts_files => ts_flist.join(","), 
       :ciphers => ciphers_list,
@@ -34,7 +41,7 @@ class ExampleSSL2C
     )
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61612, :ssl => ssl_opts},
+        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }

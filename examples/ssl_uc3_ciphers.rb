@@ -3,8 +3,13 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("./ssl_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "ssl_common"
+end
+include SSLCommon
 #
 # == SSL Use Case 3 - User Supplied Ciphers
 #
@@ -15,7 +20,9 @@ require "stomp"
 #
 class ExampleSSL3C
   # Initialize.
-  def initialize
+  def initialize		# Change the following as needed.
+		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
   def run
@@ -23,18 +30,15 @@ class ExampleSSL3C
     #
     # SSL Use Case 3
     #
-    # Change the following:
-    # * location of your client's signed certificate
-    # * location of tour client's private key.
+    # Possibly change the cert file(s) name(s) here.    
     ssl_opts = Stomp::SSLParams.new(
-      :key_file => "/home/gmallard/sslwork/2013/client.key", # the client's private key
-      :cert_file => "/home/gmallard/sslwork/2013/client.crt", # the client's signed certificate
-      :fsck => true, # Check that the files exist first
-      :ciphers => ciphers_list
+      :key_file => "#{cli_loc()}/#{pck()}", # the client's private key, private data
+      :cert_file => "#{cli_loc()}/#{cli_cert()}", # the client's signed certificate
+      :fsck => true # Check that the files exist first
     )
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61612, :ssl => ssl_opts},
+        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }
@@ -46,6 +50,13 @@ class ExampleSSL3C
     # puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}"
     c.disconnect
   end
+
+	private
+
+	def pck()
+		"client.key"
+	end
+
 end
 #
 e = ExampleSSL3C.new

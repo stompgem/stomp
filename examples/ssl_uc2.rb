@@ -3,8 +3,13 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("./ssl_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "ssl_common"
+end
+include SSLCommon
 #
 # == SSL Use Case 2 - server does *not* authenticate client, client *does* authenticate server
 #
@@ -21,8 +26,7 @@ require "stomp"
 class ExampleSSL2
   # Initialize.
   def initialize
-		# Change the following to the location of the cert file(s).
-		@cert_loc = "/ad3/gma/sslwork/2013"
+		# Change the following as needed.
 		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
 		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
@@ -32,8 +36,8 @@ class ExampleSSL2
 
     ts_flist = []
 
-    # Possibly change the cert file(s) name(s) here.
-		ts_flist << "#{@cert_loc}/TestCA.crt"
+    # Possibly change/override the cert data here.
+		ts_flist << "#{ca_loc()}/#{ca_cert()}"
 
     ssl_opts = Stomp::SSLParams.new(:ts_files => ts_flist.join(","), 
       :fsck => true)
