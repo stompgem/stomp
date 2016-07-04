@@ -225,32 +225,51 @@ module Stomp
     end
 
     # Acknowledge a message, used when a subscription has specified
-    # client acknowledgement i.e. connection.subscribe("/queue/a", :ack => 'client').
-    # Accepts an optional transaction header ( :transaction => 'some_transaction_id' )
-    # Behavior is protocol level dependent, see the specifications or comments below.
-    def ack(message_id, headers = {})
+    # client acknowledgement e.g.:
+    #
+    #     connection.subscribe("/queue/a", :ack => 'client')
+    #
+    #     connection.subscribe("/queue/a", :ack => 'client-individual')
+    #
+    # as appropriate for the protocol level.
+    #
+    # Accepts an optional transaction header ( :transaction => 'some_transaction_id' ).
+    #
+    # When the connection protocol level is 1.0 or 1.1  the message_or_ack_id parameter
+    # should match the message-id header of the MESSAGE being acknowledged e.g.:
+    #
+    #     connection.ack(message.headers['message-id'])
+    #
+    # When the connection protocol level is 1.2 the message_or_ack_id parameter
+    # should match the ack header of the MESSAGE being acknowledged e.g.:
+    #
+    #     connection.ack(message.headers['ack'])
+    #
+    # In summary, the behavior is protocol level dependent, see the specifications
+    # and comments in the code.
+    def ack(message_or_ack_id, headers = {})
       raise Stomp::Error::NoCurrentConnection if @closed_check && closed?
       raise Stomp::Error::ProtocolErrorEmptyHeaderKey if headers.has_key?("")
       raise Stomp::Error::ProtocolErrorEmptyHeaderValue if @protocol == Stomp::SPL_10 && headers.has_value?("")
-      raise Stomp::Error::MessageIDRequiredError if message_id.nil? || message_id == ""
+      raise Stomp::Error::MessageIDRequiredError if message_or_ack_id.nil? || message_or_ack_id == ""
       headers = headers.symbolize_keys
 
       case @protocol
         when Stomp::SPL_12
-          # The ACK frame MUST include an id header matching the ack header 
+          # The ACK frame MUST include an "id" header matching the "ack" header 
           # of the MESSAGE being acknowledged.
-          headers[:id] = message_id
+          headers[:id] = message_or_ack_id
         when Stomp::SPL_11
-          # ACK has two REQUIRED headers: message-id, which MUST contain a value 
-          # matching the message-id for the MESSAGE being acknowledged and 
-          # subscription, which MUST be set to match the value of the subscription's 
+          # ACK has two REQUIRED headers: "message-id", which MUST contain a value 
+          # matching the message-id header of the MESSAGE being acknowledged and 
+          # "subscription", which MUST be set to match the value of SUBSCRIBE's 
           # id header.
-          headers[:'message-id'] = message_id
+          headers[:'message-id'] = message_or_ack_id
           raise Stomp::Error::SubscriptionRequiredError unless headers[:subscription]
         else # Stomp::SPL_10
-          # ACK has one required header, message-id, which must contain a value 
+          # ACK has one required header, "message-id", which must contain a value 
           # matching the message-id for the MESSAGE being acknowledged.
-          headers[:'message-id'] = message_id
+          headers[:'message-id'] = message_or_ack_id
       end
       _headerCheck(headers)
       slog(:on_ack, log_params, headers)
@@ -258,23 +277,31 @@ module Stomp
     end
 
     # STOMP 1.1+ NACK.
-    def nack(message_id, headers = {})
+    #
+    # When the connection protocol level is 1.1  the message_or_ack_id parameter
+    # should match the message-id header of the MESSAGE being acknowledged.
+    #
+    # When the connection protocol level is 1.2 the message_or_ack_id parameter
+    # should match the ack header of the MESSAGE being acknowledged.
+    #
+    # Behavior is protocol level dependent, see the specifications and comments below.
+    def nack(message_or_ack_id, headers = {})
       raise Stomp::Error::NoCurrentConnection if @closed_check && closed?
       raise Stomp::Error::UnsupportedProtocolError if @protocol == Stomp::SPL_10
       raise Stomp::Error::ProtocolErrorEmptyHeaderKey if headers.has_key?("")
-      raise Stomp::Error::MessageIDRequiredError if message_id.nil? || message_id == ""
+      raise Stomp::Error::MessageIDRequiredError if message_or_ack_id.nil? || message_or_ack_id == ""
       headers = headers.symbolize_keys
       case @protocol
         when Stomp::SPL_12
           # The NACK frame MUST include an id header matching the ack header 
           # of the MESSAGE being acknowledged.
-          headers[:id] = message_id
+          headers[:id] = message_or_ack_id
         else # Stomp::SPL_11 only
           # NACK has two REQUIRED headers: message-id, which MUST contain a value 
           # matching the message-id for the MESSAGE being acknowledged and 
           # subscription, which MUST be set to match the value of the subscription's 
           # id header.
-          headers[:'message-id'] = message_id
+          headers[:'message-id'] = message_or_ack_id
           raise Stomp::Error::SubscriptionRequiredError unless headers[:subscription]
       end
       _headerCheck(headers)
