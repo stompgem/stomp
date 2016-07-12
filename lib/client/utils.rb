@@ -72,10 +72,13 @@ module Stomp
     # setting an id in the SUBSCRIPTION header is described in the stomp protocol docs:
     # http://stomp.github.com/
     def set_subscription_id_if_missing(destination, headers)
-      headers[:id] = headers[:id] ? headers[:id] : headers['id']
-      if headers[:id] == nil
-        headers[:id] = Digest::SHA1.hexdigest(destination)
-      end
+      headers[:id] = build_subscription_id(destination, headers)
+    end
+
+    def build_subscription_id(destination, headers)
+      return headers[:id] until headers[:id].nil?
+      return headers['id'] until headers[:id].nil?
+      Digest::SHA1.hexdigest(destination)
     end
 
     # Parse a stomp URL.
