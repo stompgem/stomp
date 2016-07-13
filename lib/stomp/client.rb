@@ -192,7 +192,6 @@ module Stomp
     # client acknowledgement ( connection.subscribe("/queue/a",{:ack => 'client'}).
     # Accepts a transaction header ( :transaction => 'some_transaction_id' ).
     def ack(message, headers = {})
-      # headers[:a] = 'b'
       txn_id = headers[:transaction]
       if txn_id
         # lets keep around messages ack'd in this transaction in case we rollback
@@ -225,7 +224,7 @@ module Stomp
         when Stomp::SPL_12
          'ack'
         when Stomp::SPL_11
-          headers = headers.merge(:subscription => message.headers['subscription'])
+         headers = headers.merge(:subscription => message.headers['subscription'])
          'message-id'
         else
          'message-id'
