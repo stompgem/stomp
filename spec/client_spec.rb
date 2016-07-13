@@ -403,7 +403,7 @@ describe Stomp::Client do
     end
   end
 
-  describe 'when custom headers are given' do
+  describe '(used with custom headers)' do
     before :each do
       @client = Stomp::Client.new
     end
@@ -416,9 +416,9 @@ describe Stomp::Client do
     let(:headers) { original_headers }
 
     shared_examples_for 'argument-safe method' do
-      describe 'headers hash' do
+      describe 'given headers hash' do
         subject { headers }
-        it 'has not been changed' do
+        it 'is immutable' do
           is_expected.to match(original_headers)
         end
       end
