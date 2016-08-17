@@ -159,7 +159,10 @@ module Stomp
 
     def find_receipt_listener(message)
       listener = @receipt_listeners[message.headers['receipt-id']]
-      listener.call(message) if listener
+      if listener
+         listener.call(message)
+         @receipt_listeners.delete(message.headers['receipt-id'])
+      end
     end
 
     def create_listener_maps
