@@ -118,6 +118,7 @@ module Stomp
                         Stomp::Error::BrokerException.new(error)
                     end
 
+        @receipt_listeners.delete(error.headers['receipt-id']) if error.headers['receipt-id']
         client_thread.raise exception
       end
     end
