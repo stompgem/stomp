@@ -90,7 +90,7 @@ class TestURLLogins < Test::Unit::TestCase
       assert c.open?, url
       c.close
     end
-  end
+  end if ENV['STOMP_TESTSSL']
 
   # test failover:// with bad parameters
   def test_0020_failover_badparms()

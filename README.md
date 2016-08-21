@@ -93,6 +93,7 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.2. Fix memory leak, and others !: see CHANGELOG.md for details.
 * Gem version 1.4.1. Important SSL changes !: see CHANGELOG.md for details.
 * Gem version 1.4.0. Note: Change sementics of :parse_timeout, see CHANGELOG.md for details.
 * Gem version 1.3.5. Miscellaneous fixes, see CHANGELOG.rdoc for details.
@@ -291,7 +292,7 @@ Thiago Morello
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0362)
+(0369)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -706,5 +707,60 @@ Wayne Robinson
  / wayne.robinson@gmail.com
 </td>
 </tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2016-07-12
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0006)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Nikolay Khasanov
+</span>
+ / nkhasanov@groupon.com
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2016-07-16
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0004)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+GitHub
+</span>
+ / noreply@github.com
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2016-06-02
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Ryan Rosenblum
+</span>
+ / ryan.rosenblum@gmail.com
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2016-08-17
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0002)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Alexandre Moutot
+</span>
+ / a.moutot@alphalink.fr
+</td>
+</tr>
 </table>
-

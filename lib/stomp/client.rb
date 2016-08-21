@@ -118,6 +118,7 @@ module Stomp
                         Stomp::Error::BrokerException.new(error)
                     end
 
+        @receipt_listeners.delete(error.headers['receipt-id']) if error.headers['receipt-id']
         client_thread.raise exception
       end
     end
@@ -173,7 +174,7 @@ module Stomp
       # use subscription id to correlate messages to subscription. As described in
       # the SUBSCRIPTION section of the protocol: http://stomp.github.com/.
       # If no subscription id is provided, generate one.
-      set_subscription_id_if_missing(destination, headers)
+      headers = headers.merge(:id => build_subscription_id(destination, headers))
       if @listeners[headers[:id]]
         raise "attempting to subscribe to a queue with a previous subscription"
       end
@@ -183,7 +184,7 @@ module Stomp
 
     # Unsubscribe from a subscription by name.
     def unsubscribe(name, headers = {})
-      set_subscription_id_if_missing(name, headers)
+      headers = headers.merge(:id => build_subscription_id(name, headers))
       @connection.unsubscribe(name, headers)
       @listeners[headers[:id]] = nil
     end
@@ -203,7 +204,7 @@ module Stomp
         replay_list << message
       end
       if block_given?
-        headers['receipt'] = register_receipt_listener lambda {|r| yield r}
+        headers = headers.merge(:receipt => register_receipt_listener(lambda {|r| yield r}))
       end
       context = ack_context_for(message, headers)
       @connection.ack context[:message_id], context[:headers]
@@ -224,7 +225,7 @@ module Stomp
         when Stomp::SPL_12
          'ack'
         when Stomp::SPL_11
-         headers.merge!(:subscription => message.headers['subscription'])
+         headers = headers.merge(:subscription => message.headers['subscription'])
          'message-id'
         else
          'message-id'
@@ -243,7 +244,7 @@ module Stomp
     # Accepts a transaction header ( :transaction => 'some_transaction_id' ).
     def publish(destination, message, headers = {})
       if block_given?
-        headers['receipt'] = register_receipt_listener lambda {|r| yield r}
+        headers = headers.merge(:receipt => register_receipt_listener(lambda {|r| yield r}))
       end
       @connection.publish(destination, message, headers)
     end

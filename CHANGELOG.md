@@ -1,5 +1,19 @@
 # Stomp Gem Change Log
 
+## 1.4.2 20160820
+
+* Refine SSL examples.
+* Address issue #124 with additional RDOC.
+* spec for Stomp::Client - check that headers passed to connection contain 
+  required values as well as given custom and that given hash is not modified.
+* Stomp::Client now does not modify given headers hash
+* spec description enhancement.
+* fix build_subscription_id - symbol and string were mixed up.
+* STOMP_TESTSSL flag should enable all SSL tests.
+* Add a basic Gemfile.
+* Fix a memory leak in receipt implementation.
+* Add unit test helper script.
+
 ## 1.4.1 20160623
 
 * Add call to #post_connection_check to normal SSL processing.  This change

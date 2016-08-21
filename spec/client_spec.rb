@@ -402,4 +402,152 @@ describe Stomp::Client do
       end
     end
   end
+
+  describe '(used with custom headers)' do
+    before :each do
+      @client = Stomp::Client.new
+    end
+
+    def original_headers
+      {:custom_header => 'value'}
+    end
+
+    let(:connection_headers) { original_headers }
+    let(:headers) { original_headers }
+
+    shared_examples_for 'argument-safe method' do
+      describe 'given headers hash' do
+        subject { headers }
+        it 'is immutable' do
+          is_expected.to match(original_headers)
+        end
+      end
+    end
+
+    describe '#begin' do
+      before {
+        expect(@mock_connection).to receive(:begin).with('name', connection_headers)
+        @client.begin('name', headers)
+      }
+      it_behaves_like 'argument-safe method'
+    end
+
+    describe '#abort' do
+      before {
+        expect(@mock_connection).to receive(:abort).with('name', connection_headers)
+        @client.abort('name', headers)
+      }
+      it_behaves_like 'argument-safe method'
+    end
+
+    describe '#commit' do
+      before {
+        expect(@mock_connection).to receive(:commit).with('name', connection_headers)
+        @client.commit('name', headers)
+      }
+      it_behaves_like 'argument-safe method'
+    end
+
+    describe '#subscribe' do
+      let(:connection_headers) { original_headers.merge({:id => Digest::SHA1.hexdigest('destination')}) }
+      before {
+        expect(@mock_connection).to receive(:subscribe).with('destination', connection_headers)
+        @client.subscribe('destination', headers) {|dummy_subscriber| }
+      }
+      it_behaves_like 'argument-safe method'
+    end
+
+    describe '#unsubscribe' do
+      let(:connection_headers) { original_headers.merge({:id => Digest::SHA1.hexdigest('destination')}) }
+      before {
+        expect(@mock_connection).to receive(:unsubscribe).with('destination', connection_headers)
+        @client.unsubscribe('destination', headers) {|dummy_subscriber| }
+      }
+      it_behaves_like 'argument-safe method'
+    end
+
+    describe '#ack' do
+      describe 'with STOMP 1.0' do
+        let(:message) { double('message', :headers => {'message-id' => 'id'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_10)
+          expect(@mock_connection).to receive(:ack).with('id', connection_headers)
+          @client.ack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+      describe 'with STOMP 1.1' do
+        let(:message) { double('message', :headers => {'message-id' => 'id', 'subscription' => 'subscription_name'}) }
+        let(:connection_headers) { original_headers.merge({:subscription => 'subscription_name'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_11)
+          expect(@mock_connection).to receive(:ack).with('id', connection_headers)
+          @client.ack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+      describe 'with STOMP 1.2' do
+        let(:message) { double('message', :headers => {'ack' => 'id'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_12)
+          expect(@mock_connection).to receive(:ack).with('id', connection_headers)
+          @client.ack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+    end
+
+    describe '#nack' do
+      describe 'with STOMP 1.0' do
+        let(:message) { double('message', :headers => {'message-id' => 'id'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_10)
+          expect(@mock_connection).to receive(:nack).with('id', connection_headers)
+          @client.nack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+      describe 'with STOMP 1.1' do
+        let(:message) { double('message', :headers => {'message-id' => 'id', 'subscription' => 'subscription_name'}) }
+        let(:connection_headers) { original_headers.merge({:subscription => 'subscription_name'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_11)
+          expect(@mock_connection).to receive(:nack).with('id', connection_headers)
+          @client.nack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+      describe 'with STOMP 1.2' do
+        let(:message) { double('message', :headers => {'ack' => 'id'}) }
+        before {
+          allow(@client).to receive(:protocol).and_return(Stomp::SPL_12)
+          expect(@mock_connection).to receive(:nack).with('id', connection_headers)
+          @client.nack(message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+    end
+
+    describe '#publish' do
+      describe 'without listener' do
+        let(:message) { double('message') }
+        before {
+          expect(@mock_connection).to receive(:publish).with('destination', message, connection_headers)
+          @client.publish('destination', message, headers)
+        }
+        it_behaves_like 'argument-safe method'
+      end
+      describe 'with listener' do
+        let(:message) { double('message') }
+        let(:connection_headers) { original_headers.merge({:receipt => 'receipt-uuid'}) }
+        before {
+          allow(@client).to receive(:uuid).and_return('receipt-uuid')
+          expect(@mock_connection).to receive(:publish).with('destination', message, connection_headers)
+          @client.publish('destination', message, headers) {|dummy_listener| }
+        }
+        it_behaves_like 'argument-safe method'
+      end
+    end
+
+  end
 end
