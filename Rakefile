@@ -39,7 +39,7 @@ begin
     gem.homepage = "https://github.com/stompgem/stomp"
     gem.authors = ["Brian McCallister", 'Marius Mathiesen', 'Thiago Morello',
         'Guy M. Allard']
-    gem.add_development_dependency "rspec", '>= 2.14.1'
+    gem.add_development_dependency 'rspec', '~> 2.14', '>= 2.14.1'
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

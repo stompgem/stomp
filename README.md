@@ -93,6 +93,7 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.3. Fix broken install.  Do not try to install 1.4.2.
 * Gem version 1.4.2. Fix memory leak, and others !: see CHANGELOG.md for details.
 * Gem version 1.4.1. Important SSL changes !: see CHANGELOG.md for details.
 * Gem version 1.4.0. Note: Change sementics of :parse_timeout, see CHANGELOG.md for details.
