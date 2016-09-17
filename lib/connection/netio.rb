@@ -219,7 +219,17 @@ module Stomp
             end
           end
           _wire_write(used_socket,"")
-          used_socket.write body unless body == ''
+          if body != ''
+            if headers[:suppress_content_length]
+              if tz = body.index("\00")
+                used_socket.write body[0..tz-1]
+              else
+                used_socket.write body
+              end
+            else
+              used_socket.write body
+            end
+          end
           used_socket.write "\0"
           used_socket.flush if autoflush
 
@@ -332,7 +342,7 @@ module Stomp
             # Set SSLContext Options if user asks for it in Stomp::SSLParams
             # and SSL supports it.
             if @ssl.ssl_ctxopts && ctx.respond_to?(:options=)
-	            ctx.options = @ssl.ssl_ctxopts
+              ctx.options = @ssl.ssl_ctxopts
             end
 
           end
