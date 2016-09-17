@@ -33,7 +33,9 @@ class TestAnonymous < Test::Unit::TestCase
 
   # Test asynchronous polling.
   def test_poll_async
-    @conn.subscribe("/queue/do.not.put.messages.on.this.queue", :id => "a.no.messages.queue")
+	sq = ENV['STOMP_ARTEMIS'] ? "jms.queue.queue.do.not.put.messages.on.this.queue" :
+		"/queue/do.not.put.messages.on.this.queue"
+    @conn.subscribe(sq, :id => "a.no.messages.queue")
     # If the test 'hangs' here, Connection#poll is broken.
     m = @conn.poll
     assert m.nil?
@@ -412,7 +414,7 @@ class TestAnonymous < Test::Unit::TestCase
     msg = @conn.receive
     assert_equal "txn message", msg.body
     checkEmsg(@conn)
-  end
+  end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test duplicate subscriptions.
   def test_duplicate_subscription

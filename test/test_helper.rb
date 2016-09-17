@@ -168,15 +168,28 @@ module TestBase
   # Get a dynamic destination name.
   def make_destination
     name = caller_method_name unless name
-    qname = ENV['STOMP_DOTQUEUE'] ? "/queue/test.ruby.stomp." + name : "/queue/test/ruby/stomp/" + name
+    case
+      when ENV['STOMP_DOTQUEUE']
+        qname = "/queue/test.ruby.stomp." + name
+      when ENV['STOMP_ARTEMIS']
+        qname = "jms.queue.queue.test.ruby.stomp." + name
+      else
+        qname = "/queue/test/ruby/stomp/" + name
+    end
     return qname
+  end
+
+  # get DLQ name
+  def make_dlq
+    return "jms.queue.DLQ" if ENV['STOMP_ARTEMIS']
+    "/queue/DLQ"
   end
 
   #
   def checkEmsg(cc)
     m = cc.poll
     if m
-      assert m.command != Stomp::CMD_ERROR
+      assert m.command != Stomp::CMD_ERROR, "checkEmsg"
     end
   end
 

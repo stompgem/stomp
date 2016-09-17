@@ -228,7 +228,7 @@ class TestClient < Test::Unit::TestCase
     }
     checkEmsg(@client)
     @client.close
-  end
+  end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test transaction publish and abort, receive with new client.
   # New client uses ack => auto.
@@ -287,7 +287,7 @@ class TestClient < Test::Unit::TestCase
     @client.commit 'tx2'
     checkEmsg(@client)
     @client.close
-  end
+  end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test that subscription destinations must be unique for a Client.
   def test_raise_on_multiple_subscriptions_to_same_make_destination
@@ -630,7 +630,8 @@ class TestClient < Test::Unit::TestCase
       sh = @client.protocol() == Stomp::SPL_10 ?  {} : {:id => sid}
       @client.subscribe(dest, sh) {|msg|
         rm_actual += 1
-        @client.unreceive(msg, :max_redeliveries => max_re)
+        @client.unreceive(msg, :max_redeliveries => max_re,
+			:dead_letter_queue => make_dlq())
         received = msg if rm_actual - 1 == max_re
       }
       @client.publish(dest, rdmsg)
