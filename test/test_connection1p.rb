@@ -271,11 +271,8 @@ class TestConnection1P < Test::Unit::TestCase
     conn.disconnect
   end
 
-  # Repeated headers test. Currently:
-  # - Apollo emits repeated headers for a 1.1 connection only
-  # - RabbitMQ does not emit repeated headers under any circumstances
-  # - AMQ 5.6 does not emit repeated headers under any circumstances
-  # Pure luck that this runs against AMQ at present.
+  # Repeated headers test. Brokers have a lot of freedom given the verbiage
+  # in the specs.
   def test_conn_1p_0124
     dest = make_destination
     msg = "payload: #{Time.now.to_f}"
@@ -291,7 +288,7 @@ class TestConnection1P < Test::Unit::TestCase
     received = @conn.receive
     assert_equal msg, received.body
     if @conn.protocol != Stomp::SPL_10
-      assert_equal shdrs["key3"], received.headers["key3"] unless ENV['STOMP_RABBIT'] || ENV['STOMP_AMQ11']
+      assert_equal shdrs["key3"], received.headers["key3"] unless ENV['STOMP_RABBIT'] || ENV['STOMP_AMQ11'] || ENV['STOMP_ARTEMIS']
     else
       assert_equal "kv3", received.headers["key3"]
     end

@@ -478,7 +478,7 @@ class TestAnonymous < Test::Unit::TestCase
       assert_equal smsg, msg2.body
       checkEmsg(@conn)
     end
-  end unless ENV['STOMP_AMQ11'] # AMQ sends NACK'd messages to a DLQ
+  end unless (ENV['STOMP_AMQ11'] || ENV['STOMP_ARTEMIS'])
 
   # Test to illustrate Issue #44.  Prior to a fix for #44, these tests would
   # fail only when connecting to a pure STOMP 1.0 server that does not 
