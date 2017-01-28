@@ -162,7 +162,7 @@ module Stomp
       # transmit logically puts a Message on the wire.
       def transmit(command, headers = {}, body = '')
         # The transmit may fail so we may need to retry.
-        while TRUE
+        while true
           begin
             used_socket = socket()
             _transmit(used_socket, command, headers, body)

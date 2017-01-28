@@ -236,7 +236,7 @@ module Stomp
     # __old_receive receives a frame, blocks until the frame is received.
     def __old_receive()
       # The receive may fail so we may need to retry.
-      while TRUE
+      while true
         begin
           used_socket = socket()
           return _receive(used_socket)
