@@ -77,10 +77,8 @@ class TestConnection1P < Test::Unit::TestCase
     cha = {:host => "localhost", "accept-version" => "1.0"}
     cha[:host] = "/" if ENV['STOMP_RABBIT']
     conn = nil
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
-      conn.disconnect
-    end
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn.disconnect
     assert_equal conn.protocol, Stomp::SPL_10
   end
 
@@ -90,10 +88,8 @@ class TestConnection1P < Test::Unit::TestCase
     #
     cha = get_conn_headers()
     conn = nil
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
-      conn.disconnect
-    end
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn.disconnect
     assert conn.protocol >= Stomp::SPL_11
   end
 
@@ -104,10 +100,8 @@ class TestConnection1P < Test::Unit::TestCase
     cha = get_conn_headers()    
     cha["heart-beat"] = "0,0" # No heartbeats
     conn = nil
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
-      conn.disconnect
-    end
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn.disconnect
     assert conn.protocol >= Stomp::SPL_11
   end
 
@@ -142,10 +136,8 @@ class TestConnection1P < Test::Unit::TestCase
     cha = get_conn_headers()    
     cha["heart-beat"] = "500,1000" # Valid heart beat headers
     conn = nil
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
-      conn.disconnect
-    end
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn.disconnect
     assert conn.hbsend_interval > 0
     assert conn.hbrecv_interval > 0
   end
@@ -158,13 +150,11 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "10000,0" # Valid heart beat headers, send only
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_send(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -176,14 +166,12 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "0,6000" # Valid heart beat headers, receive only
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
 #      m = conn.receive # This will hang forever .....
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_recv(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -195,14 +183,12 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "5000,10000" # Valid heart beat headers, send and receive
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
 #      m = conn.receive # This will hang forever .....
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_both(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -278,9 +264,7 @@ class TestConnection1P < Test::Unit::TestCase
     msg = "payload: #{Time.now.to_f}"
     shdrs = { "key1" => "val1", "key2" => "val2",
       "key3" => ["kv3", "kv2", "kv1"] }
-    assert_nothing_raised {
-      @conn.publish dest, msg, shdrs
-    }
+    @conn.publish dest, msg, shdrs
     #
     sid = @conn.uuid()
     @conn.subscribe dest, :id => sid
@@ -301,9 +285,7 @@ class TestConnection1P < Test::Unit::TestCase
     dest = make_destination
     sid = @conn.uuid()
     sid.freeze
-    assert_nothing_raised {
-      @conn.subscribe dest, :id => sid
-    }
+    @conn.subscribe dest, :id => sid
   end
 
   # Test heartbeats with send and receive.
@@ -314,14 +296,12 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "10000,6000" # Valid heart beat headers, send and receive
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
 #      m = conn.receive # This will hang forever .....
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_both(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -333,14 +313,12 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "10000,1000" # Valid heart beat headers, send and receive
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
 #      m = conn.receive # This will hang forever .....
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_both(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -352,14 +330,12 @@ class TestConnection1P < Test::Unit::TestCase
     cha["heart-beat"] = "1000,10000" # Valid heart beat headers, send and receive
     conn = nil
     logger = Tlogger.new
-    assert_nothing_raised do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+    conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
 #      m = conn.receive # This will hang forever .....
-      conn.set_logger(logger)
-      sleep 65
-      conn.set_logger(nil)
-      conn.disconnect
-    end
+    conn.set_logger(logger)
+    sleep 65
+    conn.set_logger(nil)
+    conn.disconnect
     hb_asserts_both(conn)
   end if ENV['STOMP_HB11LONG']
 
@@ -375,9 +351,7 @@ class TestConnection1P < Test::Unit::TestCase
     if conn.protocol >= Stomp::SPL_12
       shdrs["bb\rcc"] = "dd\ree"
     end
-    assert_nothing_raised {
-      conn.publish dest, msg, shdrs
-    }
+    conn.publish dest, msg, shdrs
     #
     sid = conn.uuid()
     conn.subscribe dest, :id => sid
@@ -399,9 +373,7 @@ class TestConnection1P < Test::Unit::TestCase
     msg = "payload: #{Time.now.to_f}"
     dest = make_destination
     shdrs = { :suppress_content_length => true }
-    assert_nothing_raised {
-      @conn.publish dest, msg, shdrs
-    }
+    @conn.publish dest, msg, shdrs
     #
     sid = @conn.uuid()
     @conn.subscribe dest, :id => sid

@@ -76,11 +76,9 @@ class TestAnonymous < Test::Unit::TestCase
   # Test asking for a receipt on disconnect.
   def test_disconnect_receipt
     @conn.disconnect :receipt => "abc123"
-    assert_nothing_raised {
-      assert_not_nil(@conn.disconnect_receipt, "should have a receipt")
-      assert_equal(@conn.disconnect_receipt.headers['receipt-id'],
-                   "abc123", "receipt sent and received should match")
-    }
+    assert_not_nil(@conn.disconnect_receipt, "should have a receipt")
+    assert_equal(@conn.disconnect_receipt.headers['receipt-id'],
+                  "abc123", "receipt sent and received should match")
   end
 
   # Test ACKs for Stomp 1.0
@@ -93,11 +91,9 @@ class TestAnonymous < Test::Unit::TestCase
     @conn.subscribe queue, :ack => :client
     @conn.publish queue, "test_stomp#test_client_ack_with_symbol_10"
     msg = @conn.receive
-    assert_nothing_raised {
-      # ACK has one required header, message-id, which must contain a value 
-      # matching the message-id for the MESSAGE being acknowledged.
-      @conn.ack msg.headers['message-id']
-    }
+    # ACK has one required header, message-id, which must contain a value 
+    # matching the message-id for the MESSAGE being acknowledged.
+    @conn.ack msg.headers['message-id']
     checkEmsg(@conn)
   end
 
@@ -112,13 +108,11 @@ class TestAnonymous < Test::Unit::TestCase
     @conn.subscribe queue, :ack => :client, :id => sid
     @conn.publish queue, "test_stomp#test_client_ack_with_symbol_11"
     msg = @conn.receive
-    assert_nothing_raised {
-      # ACK has two REQUIRED headers: message-id, which MUST contain a value 
-      # matching the message-id for the MESSAGE being acknowledged and 
-      # subscription, which MUST be set to match the value of the subscription's 
-      # id header.
-      @conn.ack msg.headers['message-id'], :subscription => msg.headers['subscription']
-    }
+    # ACK has two REQUIRED headers: message-id, which MUST contain a value 
+    # matching the message-id for the MESSAGE being acknowledged and 
+    # subscription, which MUST be set to match the value of the subscription's 
+    # id header.
+    @conn.ack msg.headers['message-id'], :subscription => msg.headers['subscription']
     checkEmsg(@conn)
   end
 
@@ -133,11 +127,9 @@ class TestAnonymous < Test::Unit::TestCase
     @conn.subscribe queue, :ack => :client, :id => sid
     @conn.publish queue, "test_stomp#test_client_ack_with_symbol_11"
     msg = @conn.receive
-    assert_nothing_raised {
-      # The ACK frame MUST include an id header matching the ack header 
-      # of the MESSAGE being acknowledged.
-      @conn.ack msg.headers['ack']
-    }
+    # The ACK frame MUST include an id header matching the ack header 
+    # of the MESSAGE being acknowledged.
+    @conn.ack msg.headers['ack']
     checkEmsg(@conn)
   end
 
@@ -389,9 +381,7 @@ class TestAnonymous < Test::Unit::TestCase
   # Test using a nil body.
   def test_nil_body
     dest = make_destination
-    assert_nothing_raised {
-      @conn.publish dest, nil
-    }
+    @conn.publish dest, nil
     conn_subscribe dest
     msg = @conn.receive
     assert_equal "", msg.body
@@ -433,9 +423,7 @@ class TestAnonymous < Test::Unit::TestCase
   def test_nil_connparms
     @conn.disconnect
     #
-    assert_nothing_raised do
-      @conn = Stomp::Connection.open(nil, nil, host, port, false, 5, nil)
-    end
+    @conn = Stomp::Connection.open(nil, nil, host, port, false, 5, nil)
     checkEmsg(@conn)
   end
 
@@ -456,17 +444,13 @@ class TestAnonymous < Test::Unit::TestCase
       assert_equal smsg, msg.body
       case @conn.protocol
         when Stomp::SPL_12
-          assert_nothing_raised {
-            @conn.nack msg.headers["ack"]
-            sleep 0.05 # Give racy brokers a chance to handle the last nack before unsubscribe
-            @conn.unsubscribe dest, :id => sid
-          }
+          @conn.nack msg.headers["ack"]
+          sleep 0.05 # Give racy brokers a chance to handle the last nack before unsubscribe
+          @conn.unsubscribe dest, :id => sid
         else # Stomp::SPL_11
-          assert_nothing_raised {
-            @conn.nack msg.headers["message-id"], :subscription => sid
-            sleep 0.05 # Give racy brokers a chance to handle the last nack before unsubscribe
-            @conn.unsubscribe dest, :id => sid
-          }
+          @conn.nack msg.headers["message-id"], :subscription => sid
+          sleep 0.05 # Give racy brokers a chance to handle the last nack before unsubscribe
+          @conn.unsubscribe dest, :id => sid
       end
 
       # phase 2
@@ -494,9 +478,7 @@ class TestAnonymous < Test::Unit::TestCase
              :reliable => false,
     }
     c = nil
-    assert_nothing_raised {
-      c = Stomp::Connection.new(hash)
-    }
+    c = Stomp::Connection.new(hash)
     c.disconnect if c
     #
     hash = { :hosts => [
@@ -506,9 +488,7 @@ class TestAnonymous < Test::Unit::TestCase
              :reliable => false,
     }
     c = nil
-    assert_nothing_raised {
-      c = Stomp::Connection.new(hash)
-    }
+    c = Stomp::Connection.new(hash)
     c.disconnect if c
   end
 

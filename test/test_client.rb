@@ -102,11 +102,9 @@ class TestClient < Test::Unit::TestCase
   # Test requesting a receipt on disconnect.
   def test_disconnect_receipt
     @client.close :receipt => "xyz789"
-    assert_nothing_raised {
-      assert_not_nil(@client.disconnect_receipt, "should have a receipt")
-      assert_equal(@client.disconnect_receipt.headers['receipt-id'],
-        "xyz789", "receipt sent and received should match")
-    }
+    assert_not_nil(@client.disconnect_receipt, "should have a receipt")
+    assert_equal(@client.disconnect_receipt.headers['receipt-id'],
+      "xyz789", "receipt sent and received should match")
   end
 
   # Test publish and immediate subscribe.
@@ -179,21 +177,19 @@ class TestClient < Test::Unit::TestCase
     end
     sleep 0.01 until message
     assert_equal data, message.body
-    assert_nothing_raised {
-      case @client.protocol()
-        when Stomp::SPL_10
-          @client.acknowledge message, :transaction => 'tx1'
-          checkEmsg(@client)
-        when Stomp::SPL_11
-          @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
-          checkEmsg(@client)
-        else # 1.2+
-          @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
-          checkEmsg(@client)
-      end
-      message = nil # reset
-      @client.abort 'tx1' # now abort
-    }
+    case @client.protocol()
+      when Stomp::SPL_10
+        @client.acknowledge message, :transaction => 'tx1'
+        checkEmsg(@client)
+      when Stomp::SPL_11
+        @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
+        checkEmsg(@client)
+      else # 1.2+
+        @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
+        checkEmsg(@client)
+    end
+    message = nil # reset
+    @client.abort 'tx1' # now abort
     checkEmsg(@client)
     # lets recreate the connection
     @client.close
@@ -201,31 +197,27 @@ class TestClient < Test::Unit::TestCase
     sid = nil
     message2 = nil
     @client.begin 'tx2'
-    assert_nothing_raised {
-      if @client.protocol() == Stomp::SPL_10
-        @client.subscribe(q, :ack => 'client') {|m| message2 = m}
-      else # 1.1 and 1.2 are the same for this
-        sid = @client.uuid()
-        @client.subscribe(q, :ack => 'client', :id => sid) {|m| message2 = m}
-      end
-    }
+    if @client.protocol() == Stomp::SPL_10
+      @client.subscribe(q, :ack => 'client') {|m| message2 = m}
+    else # 1.1 and 1.2 are the same for this
+      sid = @client.uuid()
+      @client.subscribe(q, :ack => 'client', :id => sid) {|m| message2 = m}
+    end
     sleep 0.01 until message2
     assert_not_nil message
     assert_equal data, message2.body
-    assert_nothing_raised {
-      case @client.protocol()
-        when Stomp::SPL_10
-          @client.acknowledge message2, :transaction => 'tx2'
-          checkEmsg(@client)
-        when Stomp::SPL_11
-          @client.acknowledge message2, :transaction => 'tx2', :subscription => message2.headers['subscription']
-          checkEmsg(@client)
-        else # 1.2+
-          @client.acknowledge message2, :transaction => 'tx2', :id => message2.headers['ack']
-          checkEmsg(@client)
-      end
-      @client.commit 'tx2'
-    }
+    case @client.protocol()
+      when Stomp::SPL_10
+        @client.acknowledge message2, :transaction => 'tx2'
+        checkEmsg(@client)
+      when Stomp::SPL_11
+        @client.acknowledge message2, :transaction => 'tx2', :subscription => message2.headers['subscription']
+        checkEmsg(@client)
+      else # 1.2+
+        @client.acknowledge message2, :transaction => 'tx2', :id => message2.headers['ack']
+        checkEmsg(@client)
+    end
+    @client.commit 'tx2'
     checkEmsg(@client)
     @client.close
   end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
@@ -250,21 +242,19 @@ class TestClient < Test::Unit::TestCase
     end
     sleep 0.01 until message
     assert_equal data, message.body
-    assert_nothing_raised {
-      case @client.protocol()
-        when Stomp::SPL_10
-          @client.acknowledge message, :transaction => 'tx1'
-          checkEmsg(@client)
-        when Stomp::SPL_11
-          @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
-          checkEmsg(@client)
-        else # 1.2+
-          @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
-          checkEmsg(@client)
-      end
-      message = nil # reset
-      @client.abort 'tx1' # now abort
-    }
+    case @client.protocol()
+      when Stomp::SPL_10
+        @client.acknowledge message, :transaction => 'tx1'
+        checkEmsg(@client)
+      when Stomp::SPL_11
+        @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
+        checkEmsg(@client)
+      else # 1.2+
+        @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
+        checkEmsg(@client)
+    end
+    message = nil # reset
+    @client.abort 'tx1' # now abort
     checkEmsg(@client)
     # lets recreate the connection
     @client.close
@@ -273,14 +263,12 @@ class TestClient < Test::Unit::TestCase
     sid = nil
     message2 = nil
     @client.begin 'tx2'
-    assert_nothing_raised {
-      if @client.protocol() == Stomp::SPL_10
-        @client.subscribe(q, :ack => 'auto') {|m| message2 = m}
-      else # 1.1 and 1.2 are the same for this
-        sid = @client.uuid()
-        @client.subscribe(q, :ack => 'auto', :id => sid) {|m| message2 = m}
-      end
-    }
+    if @client.protocol() == Stomp::SPL_10
+      @client.subscribe(q, :ack => 'auto') {|m| message2 = m}
+    else # 1.1 and 1.2 are the same for this
+      sid = @client.uuid()
+      @client.subscribe(q, :ack => 'auto', :id => sid) {|m| message2 = m}
+    end
     sleep 0.01 until message2
     assert_not_nil message2
     assert_equal data, message2.body
@@ -421,21 +409,19 @@ class TestClient < Test::Unit::TestCase
     sleep 0.1 while message.nil?
     assert_not_nil message
     assert_equal data, message.body
-    assert_nothing_raised {
-      @client.begin 'tx2'
-      case @client.protocol()
-        when Stomp::SPL_10
-          @client.acknowledge message, :transaction => 'tx2'
-          checkEmsg(@client)
-        when Stomp::SPL_11
-          @client.acknowledge message, :transaction => 'tx2', :subscription => message.headers['subscription']
-          checkEmsg(@client)
-        else # 1.2+
-          @client.acknowledge message, :transaction => 'tx2', :id => message.headers['ack']
-          checkEmsg(@client)
-      end
-      @client.commit 'tx2'
-    }
+    @client.begin 'tx2'
+    case @client.protocol()
+      when Stomp::SPL_10
+        @client.acknowledge message, :transaction => 'tx2'
+        checkEmsg(@client)
+      when Stomp::SPL_11
+        @client.acknowledge message, :transaction => 'tx2', :subscription => message.headers['subscription']
+        checkEmsg(@client)
+      else # 1.2+
+        @client.acknowledge message, :transaction => 'tx2', :id => message.headers['ack']
+        checkEmsg(@client)
+    end
+    @client.commit 'tx2'
     checkEmsg(@client)
     @client.close
     @client = nil
@@ -496,16 +482,14 @@ class TestClient < Test::Unit::TestCase
     msg = nil
     dest = make_destination
     Thread.new(@client) do |acli|
-      assert_nothing_raised {
-        if acli.protocol() == Stomp::SPL_10
-          acli.subscribe(dest) { |m| msg = m }
-        else
-          acli.subscribe(dest, :id => acli.uuid()) { |m| msg = m }
-        end
-        Timeout::timeout(4) do
-          sleep 0.01 until msg
-        end
-      }
+      if acli.protocol() == Stomp::SPL_10
+        acli.subscribe(dest) { |m| msg = m }
+      else
+        acli.subscribe(dest, :id => acli.uuid()) { |m| msg = m }
+      end
+      Timeout::timeout(4) do
+        sleep 0.01 until msg
+      end
     end
     #
     @client.publish(dest, message_text)
@@ -523,28 +507,26 @@ class TestClient < Test::Unit::TestCase
     1.upto(@max_threads) do |tnum|
       # Threads within threads .....
       Thread.new(@client) do |acli|
-        assert_nothing_raised {
-          # this is ugly .....
-          if acli.protocol() == Stomp::SPL_10
-            acli.subscribe(dest) { |m| 
-              _ = m
-              lock.synchronize do
-                msg_ctr += 1
-              end
-              # Simulate message processing
-              sleep 0.05
-            }
-          else
-            acli.subscribe(dest, :id => acli.uuid()) { |m| 
-              _ = m
-              lock.synchronize do
-                msg_ctr += 1
-              end
-              # Simulate message processing
-              sleep 0.05
-            }
-          end
-        }
+        # this is ugly .....
+        if acli.protocol() == Stomp::SPL_10
+          acli.subscribe(dest) { |m| 
+            _ = m
+            lock.synchronize do
+              msg_ctr += 1
+            end
+            # Simulate message processing
+            sleep 0.05
+          }
+        else
+          acli.subscribe(dest, :id => acli.uuid()) { |m| 
+            _ = m
+            lock.synchronize do
+              msg_ctr += 1
+            end
+            # Simulate message processing
+            sleep 0.05
+          }
+        end
       end
     end
     #
@@ -652,10 +634,8 @@ class TestClient < Test::Unit::TestCase
     #
     ok_vals = dflt_data_ok()
     ok_vals.each do |hsv|
-      assert_nothing_raised {
-        cli = Stomp::Client.open(hsv)
-        cli.close
-      }
+      cli = Stomp::Client.open(hsv)
+      cli.close
     end
   end
 

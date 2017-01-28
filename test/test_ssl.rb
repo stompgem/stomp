@@ -38,16 +38,10 @@ class TestSSL < Test::Unit::TestCase
 
   # Test using correct parameters.
   def test_ssl_0020_noraise
-    assert_nothing_raised {
-      _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_file => "dummy2")
-    }
-    assert_nothing_raised {
-      _ = Stomp::SSLParams.new(:ts_files => "dummyts1")
-    }
-    assert_nothing_raised {
-      _ = Stomp::SSLParams.new(:ts_files => "dummyts1", 
-        :cert_file => "dummy1", :key_file => "dummy2")
-    }
+    _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_file => "dummy2")
+    _ = Stomp::SSLParams.new(:ts_files => "dummyts1")
+    _ = Stomp::SSLParams.new(:ts_files => "dummyts1", 
+      :cert_file => "dummy1", :key_file => "dummy2")
   end
 
   # Test using incorrect / incomplete parameters.

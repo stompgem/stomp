@@ -123,44 +123,29 @@ class TestMessage < Test::Unit::TestCase
 			_ = Stomp::Message.new("ERROR\nbadheaders\n\njunk\0\n\n", false)
 		}
 		#
-		assert_nothing_raised {
-			_ = Stomp::Message.new("CONNECTED\nh1:val1\n\njunk\0\n", false)
-		}
-		#
-		assert_nothing_raised {
-			_ = Stomp::Message.new("MESSAGE\nh1:val1\n\njunk\0\n", false)
-		}
-		#
-		assert_nothing_raised {
-			_ = Stomp::Message.new("MESSAGE\nh2:val2\n\n\0", false)
-		}
-		#
-		assert_nothing_raised {
-			_ = Stomp::Message.new("RECEIPT\nh1:val1\n\njunk\0\n", false)
-		}
-		#
-		assert_nothing_raised {
-			_ = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
-		}
+
+    _ = Stomp::Message.new("CONNECTED\nh1:val1\n\njunk\0\n", false)
+    _ = Stomp::Message.new("MESSAGE\nh1:val1\n\njunk\0\n", false)
+    _ = Stomp::Message.new("MESSAGE\nh2:val2\n\n\0", false)
+    _ = Stomp::Message.new("RECEIPT\nh1:val1\n\njunk\0\n", false)
+    _ = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
 
 	end
 
 	# Test multiple headers with the same key
   def test_0050_mh_msg_create
     aframe = bframe = nil
-		assert_nothing_raised {
-      amsg = "MESSAGE\n" +
-        "h1:val1\n" + 
-        "h2:val3\n" + 
-        "h2:val2\n" + 
-        "h2:val1\n" + 
-        "h3:val1\n" + 
-        "\n" +
-        "payload" +
-        "\0\n"
-			aframe = Stomp::Message.new(amsg, false)
-			bframe = Stomp::Message.new(amsg, true)
-		}
+    amsg = "MESSAGE\n" +
+      "h1:val1\n" + 
+      "h2:val3\n" + 
+      "h2:val2\n" + 
+      "h2:val1\n" + 
+      "h3:val1\n" + 
+      "\n" +
+      "payload" +
+      "\0\n"
+    aframe = Stomp::Message.new(amsg, false)
+    bframe = Stomp::Message.new(amsg, true)
     #
     assert aframe.headers["h2"].is_a?(String), "Expected a String"
     assert_equal "val3", aframe.headers["h2"], "Expected 1st value"
@@ -199,9 +184,7 @@ class TestMessage < Test::Unit::TestCase
     assert_raise Stomp::Error::ProtocolErrorEmptyHeaderValue do
       _ = Stomp::Message.new(amsg, false)
     end
-    assert_nothing_raised {
-      _ = Stomp::Message.new(amsg, true)
-    }
+    _ = Stomp::Message.new(amsg, true)
   end
 
 end
