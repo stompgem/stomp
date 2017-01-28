@@ -33,8 +33,8 @@ class TestConnection < Test::Unit::TestCase
 
   # Test asynchronous polling.
   def test_poll_async
-	sq = ENV['STOMP_ARTEMIS'] ? "jms.queue.queue.do.not.put.messages.on.this.queue" :
-		"/queue/do.not.put.messages.on.this.queue"
+	  sq = ENV['STOMP_ARTEMIS'] ? "jms.queue.queue.do.not.put.messages.on.this.queue" :
+		  "/queue/do.not.put.messages.on.this.queue"
     @conn.subscribe(sq, :id => "a.no.messages.queue")
     # If the test 'hangs' here, Connection#poll is broken.
     m = @conn.poll
@@ -598,6 +598,24 @@ class TestConnection < Test::Unit::TestCase
     ok_vals.each do |hsv|
       conn = Stomp::Connection.new(hsv)
       conn.disconnect
+    end
+  end
+
+  def test_conn_nodest_sub
+    assert_raise Stomp::Error::DestinationRequired do
+      @conn.subscribe(nil)
+    end
+  end
+
+  def test_conn_nodest_unsub
+    assert_raise Stomp::Error::DestinationRequired do
+      @conn.unsubscribe(nil)
+    end
+  end
+
+  def test_conn_nodest_pub
+    assert_raise Stomp::Error::DestinationRequired do
+      @conn.publish(nil, "msg")
     end
   end
 

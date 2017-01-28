@@ -78,6 +78,7 @@ module Stomp
     def build_subscription_id(destination, headers)
       return headers[:id] until headers[:id].nil?
       return headers['id'] until headers['id'].nil?
+      # p [ "DBBSID1", destination, headers ]
       Digest::SHA1.hexdigest(destination)
     end
 

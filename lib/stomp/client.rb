@@ -170,7 +170,9 @@ module Stomp
     # which will be used as a callback listener.
     # Accepts a transaction header ( :transaction => 'some_transaction_id' ).
     def subscribe(destination, headers = {})
-      raise "No listener given" unless block_given?
+      raise Stomp::Error::NoListenerGiven unless block_given?
+      headers = headers.symbolize_keys
+      raise Stomp::Error::DestinationRequired unless destination
       # use subscription id to correlate messages to subscription. As described in
       # the SUBSCRIPTION section of the protocol: http://stomp.github.com/.
       # If no subscription id is provided, generate one.
@@ -183,9 +185,11 @@ module Stomp
     end
 
     # Unsubscribe from a subscription by name.
-    def unsubscribe(name, headers = {})
-      headers = headers.merge(:id => build_subscription_id(name, headers))
-      @connection.unsubscribe(name, headers)
+    def unsubscribe(destination, headers = {})
+      headers = headers.symbolize_keys
+      raise Stomp::Error::DestinationRequired unless destination
+      headers = headers.merge(:id => build_subscription_id(destination, headers))
+      @connection.unsubscribe(destination, headers)
       @listeners[headers[:id]] = nil
     end
 
@@ -243,6 +247,8 @@ module Stomp
     # block on receipt.
     # Accepts a transaction header ( :transaction => 'some_transaction_id' ).
     def publish(destination, message, headers = {})
+      headers = headers.symbolize_keys
+      raise Stomp::Error::DestinationRequired unless destination
       if block_given?
         headers = headers.merge(:receipt => register_receipt_listener(lambda {|r| yield r}))
       end

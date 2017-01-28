@@ -335,12 +335,13 @@ module Stomp
 
     # Subscribe subscribes to a destination.  A subscription name is required.
     # For Stomp 1.1+ a session unique subscription ID is also required.
-    def subscribe(name, headers = {}, subId = nil)
+    def subscribe(destination, headers = {}, subId = nil)
       raise Stomp::Error::NoCurrentConnection if @closed_check && closed?
       raise Stomp::Error::ProtocolErrorEmptyHeaderKey if headers.has_key?("")
       raise Stomp::Error::ProtocolErrorEmptyHeaderValue if @protocol == Stomp::SPL_10 && headers.has_value?("")
       headers = headers.symbolize_keys
-      headers[:destination] = name
+      raise Stomp::Error::DestinationRequired unless destination
+      headers[:destination] = destination
       if @protocol >= Stomp::SPL_11
         raise Stomp::Error::SubscriptionRequiredError if (headers[:id].nil? && subId.nil?)
         headers[:id] = subId if headers[:id].nil?
@@ -350,7 +351,7 @@ module Stomp
 
       # Store the subscription so that we can replay if we reconnect.
       if @reliable
-        subId = name if subId.nil?
+        subId = destination if subId.nil?
         raise Stomp::Error::DuplicateSubscription if @subscriptions[subId]
         @subscriptions[subId] = headers
       end
@@ -360,12 +361,13 @@ module Stomp
 
     # Unsubscribe from a destination.   A subscription name is required.
     # For Stomp 1.1+ a session unique subscription ID is also required.
-    def unsubscribe(dest, headers = {}, subId = nil)
+    def unsubscribe(destination, headers = {}, subId = nil)
       raise Stomp::Error::NoCurrentConnection if @closed_check && closed?
       raise Stomp::Error::ProtocolErrorEmptyHeaderKey if headers.has_key?("")
       raise Stomp::Error::ProtocolErrorEmptyHeaderValue if @protocol == Stomp::SPL_10 && headers.has_value?("")
       headers = headers.symbolize_keys
-      headers[:destination] = dest
+      raise Stomp::Error::DestinationRequired unless destination
+      headers[:destination] = destination
       if @protocol >= Stomp::SPL_11
         raise Stomp::Error::SubscriptionRequiredError if (headers[:id].nil? && subId.nil?)
         headers[:id] = subId unless headers[:id]
@@ -374,7 +376,7 @@ module Stomp
       slog(:on_unsubscribe, log_params, headers)
       transmit(Stomp::CMD_UNSUBSCRIBE, headers)
       if @reliable
-        subId = dest if subId.nil?
+        subId = destination if subId.nil?
         @subscriptions.delete(subId)
       end
     end
@@ -387,6 +389,7 @@ module Stomp
       raise Stomp::Error::ProtocolErrorEmptyHeaderKey if headers.has_key?("")
       raise Stomp::Error::ProtocolErrorEmptyHeaderValue if @protocol == Stomp::SPL_10 && headers.has_value?("")
       headers = headers.symbolize_keys
+      raise Stomp::Error::DestinationRequired unless destination
       headers[:destination] = destination
       _headerCheck(headers)
       slog(:on_publish, log_params, message, headers)

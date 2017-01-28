@@ -120,7 +120,7 @@ class TestClient < Test::Unit::TestCase
 
   # Test that Client subscribe requires a block.
   def test_subscribe_requires_block
-    assert_raise(RuntimeError) do
+    assert_raise(Stomp::Error::NoListenerGiven) do
       @client.subscribe make_destination
     end
     checkEmsg(@client)
@@ -649,6 +649,24 @@ class TestClient < Test::Unit::TestCase
       assert_raise ArgumentError do
         _ = Stomp::Client.open(hsv)
       end
+    end
+  end
+
+  def test_cli_nodest_sub
+    assert_raise Stomp::Error::DestinationRequired do
+      @client.subscribe(nil) {|msg| puts msg}
+    end
+  end
+
+  def test_cli_nodest_unsub
+    assert_raise Stomp::Error::DestinationRequired do
+      @client.unsubscribe(nil)
+    end
+  end
+
+  def test_cli_nodest_pub
+    assert_raise Stomp::Error::DestinationRequired do
+      @client.publish(nil, "msg")
     end
   end
 

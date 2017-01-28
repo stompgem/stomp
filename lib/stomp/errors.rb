@@ -5,6 +5,22 @@ module Stomp
   # Module level container for Stomp gem error classes.
   module Error
 
+    # NoListenerGiven is raised if:
+    # * No listener block is passed to Client#subscribe
+    class NoListenerGiven < RuntimeError
+      def message
+        "No listener given"
+      end
+    end
+
+    # DestinationRequired is raised if:
+    # * No destination is passed to subscribe, unsubscribe, publish
+    class DestinationRequired < RuntimeError
+      def message
+        "Destination required"
+      end
+    end
+
     # InvalidFormat is raised if:
     # * During frame parsing if a malformed frame is detected.
     class InvalidFormat < RuntimeError
