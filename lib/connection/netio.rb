@@ -207,7 +207,7 @@ module Stomp
           # For more information refer to http://juretta.com/log/2009/05/24/activemq-jms-stomp/
           # Lets send this header in the message, so it can maintain state when using unreceive
           headers[:'content-length'] = "#{body_length_bytes}" unless headers[:suppress_content_length]
-          headers[:'content-type'] = "text/plain; charset=UTF-8" unless headers[:'content-type']
+          headers[:'content-type'] = "text/plain; charset=UTF-8" unless headers[:'content-type'] || headers[:suppress_content_type]
           _wire_write(used_socket,command)
           headers.each do |k,v|
             if v.is_a?(Array)
