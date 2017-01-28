@@ -102,9 +102,11 @@ class Slogger
       @log.debug "Connect Fail oops"
     end
 =begin
-    # An example LoggerConnectionError raise
-    @log.debug "Connect Fail, will raise"
-    raise Stomp::Error::LoggerConnectionError.new("quit from connect fail")
+    rescue
+      # An example LoggerConnectionError raise
+      @log.debug "Connect Fail, will raise"
+      raise Stomp::Error::LoggerConnectionError.new("quit from connect fail")
+    end
 =end
   end
 
