@@ -178,7 +178,7 @@ module Stomp
       # If no subscription id is provided, generate one.
       headers = headers.merge(:id => build_subscription_id(destination, headers))
       if @listeners[headers[:id]]
-        raise "attempting to subscribe to a queue with a previous subscription"
+        raise Stomp::Error::DuplicateSubscription
       end
       @listeners[headers[:id]] = lambda {|msg| yield msg}
       @connection.subscribe(destination, headers)
@@ -357,4 +357,3 @@ module Stomp
   end # Class
 
 end # Module
-
