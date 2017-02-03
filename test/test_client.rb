@@ -14,7 +14,7 @@ end
 =end
 class TestClient < Test::Unit::TestCase
   include TestBase
-  
+
   def setup
     @client = get_client()
     # Multi_thread test data
@@ -281,7 +281,7 @@ class TestClient < Test::Unit::TestCase
   def test_raise_on_multiple_subscriptions_to_same_make_destination
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest) {|m| nil }
-    assert_raise(RuntimeError) do
+    assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest) {|m| nil }
     end
     checkEmsg(@client)
@@ -291,7 +291,7 @@ class TestClient < Test::Unit::TestCase
   def test_raise_on_multiple_subscriptions_to_same_id
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
-    assert_raise(RuntimeError) do
+    assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
     end
     checkEmsg(@client)
@@ -301,7 +301,7 @@ class TestClient < Test::Unit::TestCase
   def test_raise_on_multiple_subscriptions_to_same_id_mixed
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
-    assert_raise(RuntimeError) do
+    assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest, {:id => 'myid'}) {|m| nil }
     end
     checkEmsg(@client)
@@ -329,7 +329,7 @@ class TestClient < Test::Unit::TestCase
       assert_equal send_message, message.body
     end
     results = [queue1, queue2].collect do |queue|
-      messages.any? do |message| 
+      messages.any? do |message|
         message_source = message.headers['destination']
         message_source == queue
       end
@@ -364,7 +364,7 @@ class TestClient < Test::Unit::TestCase
     end
     # make sure that the messages received came from the expected queues
     results = [queue1, queue2, queue3].collect do |queue|
-      messages.any? do |message| 
+      messages.any? do |message|
         message_source = message.headers['destination']
         message_source == queue
       end
@@ -509,7 +509,7 @@ class TestClient < Test::Unit::TestCase
       Thread.new(@client) do |acli|
         # this is ugly .....
         if acli.protocol() == Stomp::SPL_10
-          acli.subscribe(dest) { |m| 
+          acli.subscribe(dest) { |m|
             _ = m
             lock.synchronize do
               msg_ctr += 1
@@ -518,7 +518,7 @@ class TestClient < Test::Unit::TestCase
             sleep 0.05
           }
         else
-          acli.subscribe(dest, :id => acli.uuid()) { |m| 
+          acli.subscribe(dest, :id => acli.uuid()) { |m|
             _ = m
             lock.synchronize do
               msg_ctr += 1
