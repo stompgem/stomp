@@ -26,10 +26,10 @@ module Stomp
   SPL_11 = "1.1"
   SPL_12 = "1.2"
 
-  # Stomp 1.0 and 1.1
+  # Stomp 1.0 and 1.1 and 1.2
   SUPPORTED = [SPL_10, SPL_11, SPL_12]
 
-  # 1.9 Encoding Name
+  # UTF-8 Encoding Name
   UTF8 = "UTF-8"
   #
   # Octet 0
@@ -176,7 +176,7 @@ module Stomp
   ]
 
   original_verbose, $VERBOSE = $VERBOSE, nil # try to shut off warnings
-  
+
   # stomp URL regex pattern, for e.g. login:passcode@host:port or host:port
   URL_REPAT = '((([\w~!@#$%^&*()\-+=.?:<>,.]*\w):([\w~!@#$%^&*()\-+=.?:<>,.]*))?@)?([\w\.\-]+):(\d+)'
 
@@ -185,5 +185,5 @@ module Stomp
   FAILOVER_REGEX = /^failover:(\/\/)?\(stomp(\+ssl)?:\/\/#{URL_REPAT}(,stomp(\+ssl)?:\/\/#{URL_REPAT})*\)(\?(.*))?$/
 
   $VERBOSE = original_verbose
-  
+
 end # Module Stomp
