@@ -602,11 +602,11 @@ class TestClient < Test::Unit::TestCase
   # test max redeliveries is not broken (6c2c1c1)
   def test_max_redeliveries
     @client.close
-    rdmsg = "To Be Redelivered"
-    dest = make_destination
-    [1, 2, 3].each do |max_re|
+    2.upto(2) do |max_re|
+      rdmsg = "To Be Redelivered: #{max_re.to_s}"
+      dest = make_destination + ".#{max_re.to_s}"
       @client = get_client()
-      sid = @client.uuid()
+      sid = "sid_max_redeliveries_#{max_re.to_s}"
       received = nil
       rm_actual = 0
       sh = @client.protocol() == Stomp::SPL_10 ?  {} : {:id => sid}
