@@ -25,12 +25,15 @@ module Stomp
       url = regexp.match(login)
       $VERBOSE = original_verbose
       return false unless url
-
+      @login =  url[3] || ""
+      @passcode = url[4] || ""
+      @host = url[5]
+      @port = url[6].to_i
       @parameters = { :reliable => false,
-                      :hosts => [ { :login => url[3] || "",
-                                    :passcode => url[4] || "",
-                                    :host => url[5],
-                                    :port => url[6].to_i} ] }
+                      :hosts => [ { :login => @login,
+                                    :passcode => @passcode,
+                                    :host => @host,
+                                    :port => @port} ] }
       true
     end
 
@@ -107,7 +110,7 @@ module Stomp
       @parameters[:hosts].each do |hv|
         # Validate port requested
         raise ArgumentError.new("empty :port value in #{hv.inspect}") if hv[:port] == ''
-        unless hv[:port].nil? 
+        unless hv[:port].nil?
           tpv = hv[:port].to_i
           raise ArgumentError.new("invalid :port value=#{tpv} from #{hv.inspect}") if tpv < 1 || tpv > 65535
         end
@@ -205,4 +208,3 @@ module Stomp
   end # class Client
 
 end # module Stomp
-
