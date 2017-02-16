@@ -175,6 +175,8 @@ module Stomp
     ["SRP-RSA-AES-256-CBC-SHA","TLSv1/SSLv3",256,256],
   ]
 
+  HAND_SHAKE_DATA = "\x15\x03\x03\x00\x02\x02\n"
+
   original_verbose, $VERBOSE = $VERBOSE, nil # try to shut off warnings
 
   # stomp URL regex pattern, for e.g. login:passcode@host:port or host:port

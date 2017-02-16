@@ -232,7 +232,7 @@ module Stomp
       end
     end
 
-    # LoggerConnectionError is not raised by the gem.  It may be 
+    # LoggerConnectionError is not raised by the gem.  It may be
     # raised by client logic in callback logger methods to signal
     # that a connection should not proceed.
     class LoggerConnectionError < RuntimeError
@@ -314,7 +314,14 @@ module Stomp
       end
     end
 
+    # HandShakeDetectedError is raised if:
+    # * A normal read detects inbound handskake data
+    class HandShakeDetectedError < RuntimeError
+      def message
+        "Handshake data found, possible mismatched port and sslparams"
+      end
+    end
+
   end # module Error
 
 end # module Stomp
-

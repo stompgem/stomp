@@ -40,6 +40,9 @@ module Stomp
           return nil if line.nil?
           #An extra \n at the beginning of the frame, possibly not caught by is_ready?
           line = '' if line == "\n"
+          if line == HAND_SHAKE_DATA
+            raise Stomp::Error::HandShakeDetectedError
+          end
           p [ "wiredatain_01A", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
           p [ "wiredatain_01B", line, Time.now ] if drdbg

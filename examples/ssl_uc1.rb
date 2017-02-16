@@ -33,7 +33,10 @@ class ExampleSSL1
   # Run example.
   def run
 		puts "Connect host: #{@host}, port: #{@port}"
-    ssl_opts = Stomp::SSLParams.new
+
+    ssl_opts = Stomp::SSLParams.new # or ssl_opts = true (for this use case)
+    #### ssl_opts = false # for testing HandShakeDetectedError exception
+    
     hash = { :hosts => [
         {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
       ],
@@ -52,4 +55,3 @@ end
 #
 e = ExampleSSL1.new
 e.run
-
