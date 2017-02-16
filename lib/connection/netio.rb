@@ -48,7 +48,7 @@ module Stomp
           begin
             message_header += line
             p [ "wiredatain_02A", line, Time.now ] if drdbg
-            unless connread
+            unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "wiredatain_02B", line, Time.now ] if drdbg
@@ -66,18 +66,18 @@ module Stomp
           p [ "wiredatain_03B", content_length ] if drdbg
           # If content_length is present, read the specified amount of bytes
           if content_length
-            unless connread
+            unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "CL01" ] if drdbg
             message_body = read_socket.read content_length[1].to_i
-            unless connread
+            unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             raise Stomp::Error::InvalidMessageLength unless parse_char(read_socket.getc) == "\0"
             # Else read the rest of the message until the first \0
           else
-            unless connread
+            unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "NOCL01" ] if drdbg
@@ -99,7 +99,7 @@ module Stomp
           # asynchronous nature of the 'poll' method.
           p [ "wiredatain_05_prep", "isr", _is_ready?(read_socket) ] if drdbg
           while _is_ready?(read_socket)
-            unless connread
+            unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "WHIR01" ] if drdbg
