@@ -503,6 +503,15 @@ module Stomp
         end
       end # _dump_callstack
 
+      # used for debugging
+      def _dump_threads()
+        tl = Thread::list
+        tl.each do |at|
+          p [ "THDMPN", at ]
+        end
+        p [ "THDMPMain", @parameters[:client_main] ]
+      end
+
   end # class Connection
 
 end # module Stomp

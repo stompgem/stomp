@@ -11,7 +11,7 @@ module Stomp
 
     private
 
-    # Support multi-homed servers.  
+    # Support multi-homed servers.
     def _expand_hosts(hash)
       new_hash = hash.clone
       new_hash[:hosts_cloned] = hash[:hosts].clone
@@ -137,8 +137,16 @@ module Stomp
             rescue Exception => aex
               raise if aex.is_a?(Stomp::Error::LoggerConnectionError)
             end
-
-            raise Stomp::Error::MaxReconnectAttempts if max_reconnect_attempts?
+            if max_reconnect_attempts?
+              $stderr.print "In socket() Reached MaxReconnectAttempts"
+              ### _dump_threads()
+              mt = @parameters[:client_main]
+              if !mt.nil?
+                mt.raise Stomp::Error::MaxReconnectAttempts
+                Thread::exit
+              end
+              raise Stomp::Error::MaxReconnectAttempts
+            end
             sleep(@reconnect_delay)
             @connection_attempts += 1
 
@@ -241,6 +249,9 @@ module Stomp
           used_socket = socket()
           return _receive(used_socket)
         rescue Stomp::Error::MaxReconnectAttempts
+          unless slog(:on_miscerr, log_params, "Reached MaxReconnectAttempts")
+            $stderr.print "Reached MaxReconnectAttempts\n"
+          end
           raise
         rescue
           @failure = $!
@@ -274,4 +285,3 @@ module Stomp
   end # class Connection
 
 end # module Stomp
-

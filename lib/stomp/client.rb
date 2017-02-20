@@ -88,6 +88,8 @@ module Stomp
 
       @logger = @parameters[:logger] ||= Stomp::NullLogger.new
       @start_timeout = @parameters[:start_timeout] || 0
+      @parameters[:client_main] = Thread::current
+      ## p [ "CLINDBG", @parameters[:client_main] ]
       check_arguments!()
 
       # p [ "cldbg01", @parameters ]
