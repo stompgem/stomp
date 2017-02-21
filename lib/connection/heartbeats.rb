@@ -107,9 +107,9 @@ module Stomp
           compval = (@hbsend_interval - (@hbsend_interval/5.0)) / 1000000.0
           if delta > compval || first_time
             first_time = false
-            slog(:on_hbfire, log_params, "send_heartbeat", :last_sleep => slt,
+            slog(:on_hbfire, log_params, "send_heartbeat", {:last_sleep => slt,
                     :curt => curt, :last_send => @ls, :delta => delta,
-                    :compval => compval)
+                    :compval => compval})
             # Send a heartbeat
             @transmit_semaphore.synchronize do
               begin
@@ -194,7 +194,8 @@ module Stomp
                   slog(:on_hbread_fail, log_params, {"ticker_interval" => sleeptime,
                     "read_fail_count" => read_fail_count,
                     "lock_fail" => false,
-                    "lock_fail_count" => lock_fail_count})
+                    "lock_fail_count" => lock_fail_count,
+                    "fail_point" => "not_ready"})
                 end
               else  # try_lock failed
                 # Shrug.  Could not get lock.  Client must be actually be reading.
@@ -204,7 +205,8 @@ module Stomp
                 slog(:on_hbread_fail, log_params, {"ticker_interval" => sleeptime,
                   "read_fail_count" => read_fail_count,
                   "lock_fail" => true,
-                  "lock_fail_count" => lock_fail_count})
+                  "lock_fail_count" => lock_fail_count,
+                  "fail_point" => "try_lock_fail"})
               end # of the try_lock
 
             else # delta <= sleeptime
@@ -216,7 +218,8 @@ module Stomp
             slog(:on_hbread_fail, log_params, {"ticker_interval" => sleeptime,
               "exception" => recvex,
               "read_fail_count" => read_fail_count,
-              "lock_fail_count" => lock_fail_count})
+              "lock_fail_count" => lock_fail_count,
+              "fail_point" => "receive_exception"})
             fail_hard = true
           end
           # Do we want to attempt a retry?
@@ -227,7 +230,7 @@ module Stomp
               # This is an attempt at a connection retry.
               @st.kill if @st   # Kill the sender thread if one exists
               _reconn_prep_hb() # Drive reconnection logic
-              Thread.exit       # This receiver thread is done            
+              Thread.exit       # This receiver thread is done
             end
             # Retry on max lock fails.  Different logic in order to avoid a deadlock.
             if (@max_hbrlck_fails > 0 && lock_fail_count >= @max_hbrlck_fails)
@@ -237,7 +240,7 @@ module Stomp
               rescue
               end
               @st.kill if @st   # Kill the sender thread if one exists
-              Thread.exit       # This receiver thread is done            
+              Thread.exit       # This receiver thread is done
             end
           end
           Thread.pass         # Prior to next receive loop
@@ -259,4 +262,3 @@ module Stomp
   end # class Connection
 
 end # module Stomp
-
