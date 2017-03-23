@@ -419,7 +419,7 @@ describe Stomp::Client do
       describe 'given headers hash' do
         subject { headers }
         it 'is immutable' do
-          is_expected.to match(original_headers)
+          expect match(original_headers)
         end
       end
     end
