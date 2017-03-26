@@ -132,6 +132,7 @@ describe Stomp::Client do
   describe "(created with positional params)" do
     before(:each) do
       @client = Stomp::Client.new('testlogin', 'testpassword', 'localhost', '12345', false)
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -140,7 +141,8 @@ describe Stomp::Client do
                                                               :host => 'localhost',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('testlogin', 'testpassword', 'localhost', '12345', false)
     end
 
@@ -151,6 +153,7 @@ describe Stomp::Client do
   describe "(created with non-authenticating stomp:// URL and non-TLD host)" do
     before(:each) do
       @client = Stomp::Client.new('stomp://foobar:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -159,7 +162,8 @@ describe Stomp::Client do
                                                               :host => 'foobar',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://foobar:12345')
     end
 
@@ -171,6 +175,7 @@ describe Stomp::Client do
 
     before(:each) do
       @client = Stomp::Client.new('stomp://foo-bar:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -179,7 +184,8 @@ describe Stomp::Client do
                                                               :host => 'foo-bar',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://foo-bar:12345')
     end
 
@@ -191,6 +197,7 @@ describe Stomp::Client do
 
     before(:each) do
       @client = Stomp::Client.new('stomp://test-login:testpasscode@foobar:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -199,7 +206,8 @@ describe Stomp::Client do
                                                               :host => 'foobar',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://test-login:testpasscode@foobar:12345')
     end
 
@@ -211,6 +219,7 @@ describe Stomp::Client do
 
     before(:each) do
       @client = Stomp::Client.new('stomp://test-login:testpasscode@foo-bar:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -219,7 +228,8 @@ describe Stomp::Client do
                                                               :host => 'foo-bar',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://test-login:testpasscode@foo-bar:12345')
     end
 
@@ -231,6 +241,7 @@ describe Stomp::Client do
 
     before(:each) do
       @client = Stomp::Client.new('stomp://host.foobar.com:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     after(:each) do
@@ -242,7 +253,8 @@ describe Stomp::Client do
                                                               :host => 'host.foobar.com',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://host.foobar.com:12345')
     end
 
@@ -254,6 +266,7 @@ describe Stomp::Client do
 
     before(:each) do
       @client = Stomp::Client.new('stomp://testlogin:testpasscode@host.foobar.com:12345')
+	  @cli_thread = @client.parameters[:client_main]
     end
 
     it "should properly parse the URL provided" do
@@ -262,7 +275,8 @@ describe Stomp::Client do
                                                               :host => 'host.foobar.com',
                                                               :port => 12345}],
                                                   :logger => null_logger,
-                                                  :reliable => false)
+                                                  :reliable => false,
+												:client_main => @cli_thread)
       Stomp::Client.new('stomp://testlogin:testpasscode@host.foobar.com:12345')
     end
 
@@ -272,6 +286,8 @@ describe Stomp::Client do
   
   describe "(created with failover URL)" do
     before(:each) do
+	  @client = Stomp::Client.new('failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)')
+	  @cli_thread = @client.parameters[:client_main]
       #default options
       @parameters = {
         :initial_reconnect_delay => 0.01,
@@ -286,17 +302,14 @@ describe Stomp::Client do
     end
     it "should properly parse a URL with failover://" do
       url = "failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)"
-
       @parameters[:hosts] = [
         {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
       ]
-
       @parameters.merge!({:logger => null_logger})
-      
       expect(Stomp::Connection).to receive(:new).with(@parameters)
-      
-      client = Stomp::Client.new(url)
+	  @parameters[:client_main] = @cli_thread
+	  client = Stomp::Client.new(url)
       expect(client.parameters).to eq(@parameters)
     end
     
@@ -310,9 +323,8 @@ describe Stomp::Client do
       ]
       
       @parameters.merge!({:logger => null_logger})
-      
+	  @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
-      
       client = Stomp::Client.new(url)
       expect(client.parameters).to eq(@parameters)
     end
@@ -326,10 +338,11 @@ describe Stomp::Client do
       ]
       
       @parameters.merge!({:logger => null_logger})
-      
+      @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
+	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
     
@@ -342,10 +355,11 @@ describe Stomp::Client do
       ]
       
       @parameters.merge!({:logger => null_logger})
-      
+      @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
+	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
     
@@ -373,10 +387,11 @@ describe Stomp::Client do
       ]
       
       @parameters.merge!({:logger => null_logger})
-      
+      @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
       
       client = Stomp::Client.new(url)
+	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
     

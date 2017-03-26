@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+require 'rubygems' if RUBY_VERSION < "1.9"
 require 'rspec'
 dir = File.dirname(__FILE__)
 lib_path = File.expand_path("#{dir}/../lib")
