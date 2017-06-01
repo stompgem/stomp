@@ -156,6 +156,7 @@ module Stomp
       @transmit_semaphore = Mutex.new
       @read_semaphore = Mutex.new
       @socket_semaphore = Mutex.new
+      @gets_semaphore = Mutex.new
 
       @subscriptions = {}
       @failure = nil

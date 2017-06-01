@@ -235,9 +235,9 @@ module Stomp
             # Retry on max lock fails.  Different logic in order to avoid a deadlock.
             if (@max_hbrlck_fails > 0 && lock_fail_count >= @max_hbrlck_fails)
               # This is an attempt at a connection retry.
-              begin
-                @socket.close # Attempt a forced close
-              rescue
+              @gets_semaphore.synchronize do
+                @getst.raise(Errno::EBADF.new) if @getst # kill the socket reading thread if exists
+                @socket.close rescue nil # Attempt a forced close
               end
               @st.kill if @st   # Kill the sender thread if one exists
               Thread.exit       # This receiver thread is done

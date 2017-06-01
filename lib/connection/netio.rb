@@ -9,6 +9,17 @@ module Stomp
 
   class Connection
 
+      def _interruptible_gets(read_socket)
+        # The gets thread may be interrupted by the heartbeat thread. Ensure that
+        # if so interrupted, a new gets cannot start until after the heartbeat
+        # thread finishes its work. This is PURELY to avoid a segfault bug
+        # involving OpenSSL::Buffer.
+        @gets_semaphore.synchronize { @getst = Thread.current }
+        read_socket.gets
+      ensure
+        @gets_semaphore.synchronize { @getst = nil }
+      end
+
       private
 
       # Really read from the wire.
@@ -55,7 +66,7 @@ module Stomp
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "wiredatain_02B", line, Time.now ] if drdbg
-            line = read_socket.gets
+            line = _interruptible_gets(read_socket)
             p [ "wiredatain_02C", line ] if drdbg
             raise  if line.nil?
             line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
@@ -462,24 +473,24 @@ module Stomp
               if RUBY_VERSION <  "2"
                 while true
                   ### p [ "ilrjr01A1", _is_ready?(read_socket) ]
-                  line = read_socket.gets # Data from wire
+                  line = _interruptible_gets(read_socket) # Data from wire
                   break unless line == "\n"
                   line = ''
                 end
               else # RUBY_VERSION >= "2"
                 while _is_ready?(read_socket)
                   ### p [ "ilrjr01B2", _is_ready?(read_socket) ]
-                  line = read_socket.gets # Data from wire
+                  line = _interruptible_gets(read_socket) # Data from wire
                   break unless line == "\n"
                   line = ''
                 end
               end
             else
-              line = read_socket.gets # The old way
+              line = _interruptible_gets(read_socket) # The old way
             end
           else # We are >= 1.1 *AND* receiving heartbeats.
             while true
-              line = read_socket.gets # Data from wire
+              line = _interruptible_gets(read_socket) # Data from wire
               break unless line == "\n"
               line = ''
               @lr = Time.now.to_f
