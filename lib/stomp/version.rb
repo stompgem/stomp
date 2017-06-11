@@ -4,10 +4,10 @@ module Stomp
 
   # Define the gem version.
   module Version  #:nodoc: all
-    MAJOR =  1
-    MINOR =  4
-    # PATCH = "3"
-    PATCH = "3.plvl.004"
+    MAJOR = 1
+    MINOR = 4
+    PATCH = 4
+    # PATCH = "4.plvl.001"
     STRING = "#{MAJOR}.#{MINOR}.#{PATCH}"
   end
 end
