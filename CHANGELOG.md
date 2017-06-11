@@ -1,5 +1,15 @@
 # Stomp Gem Change Log
 
+## 1.4.4 20170611
+
+* Merge fix for issue 141.
+* Fix broken MatReconnectAttempts
+* Attempt to detect mismatched SSL port and params.
+* Issue 139, add ssl checks to receive timeout logic.
+* Eliminate assert_nothing_raised from tests.
+* Add Artemis suport to standard test bed.
+* Run JRuby tests more easily.
+
 ## 1.4.3 20160821
 
 * Quick fix of install failures.  Do not try to use install 1.4.2.

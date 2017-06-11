@@ -93,6 +93,7 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.4. Miscellaneous fixes, see CHANGELOG.rdoc for details.
 * Gem version 1.4.3. Fix broken install.  Do not try to install 1.4.2.
 * Gem version 1.4.2. Fix memory leak, and others !: see CHANGELOG.md for details.
 * Gem version 1.4.1. Important SSL changes !: see CHANGELOG.md for details.
@@ -293,7 +294,7 @@ Thiago Morello
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0369)
+(0387)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -321,7 +322,7 @@ Rafael Rosa
 2010-03-23
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0024)
+(0042)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -727,7 +728,7 @@ Nikolay Khasanov
 2016-07-16
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0004)
+(0006)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -762,6 +763,48 @@ Ryan Rosenblum
 Alexandre Moutot
 </span>
  / a.moutot@alphalink.fr
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2016-10-25
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Raducu Deaconu
+</span>
+ / raducu.deaconu@visma.com
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2017-03-23
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Steve Traylen
+</span>
+ / steve.traylen@cern.ch
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2017-06-01
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Michael Smith
+</span>
+ / michael.smith@puppet.com
 </td>
 </tr>
 </table>
