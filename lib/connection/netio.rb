@@ -377,8 +377,12 @@ module Stomp
             end
           end
           def ssl.ready?
-            ! @rbuffer.empty? || @io.ready?
+            @ssl_ready_lock ||= Mutex.new
+            @ssl_ready_lock.synchronize do
+              ! @rbuffer.empty? || @io.ready?
+            end
           end
+
           if @ssl != true
             # Pass back results if possible
             if RUBY_VERSION =~ /1\.8\.[56]/
