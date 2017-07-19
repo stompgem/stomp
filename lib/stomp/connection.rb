@@ -94,6 +94,7 @@ module Stomp
     #     :start_timeout => 0,                # Timeout around Stomp::Client initialization
     #     :sslctx_newparm => nil,             # Param for SSLContext.new
     #     :ssl_post_conn_check => true,       # Further verify broker identity
+    #     :nto_cmd_read => true,              # No timeout on COMMAND read
     #   }
     #
     #   e.g. c = Stomp::Connection.new(hash)
@@ -148,6 +149,7 @@ module Stomp
         @start_timeout = 0 # Client only, startup timeout
         @sslctx_newparm = nil # SSLContext.new paramater
         @ssl_post_conn_check = true # Additional broker verification
+        @nto_cmd_read = true # No timeout on COMMAND read
         warn "login looks like a URL, do you have the correct parameters?" if @login =~ /:\/\//
       end
 
@@ -187,6 +189,7 @@ module Stomp
       @connread_timeout = @parameters[:connread_timeout]
       @sslctx_newparm = @parameters[:sslctx_newparm]
       @ssl_post_conn_check = @parameters[:ssl_post_conn_check]
+      @nto_cmd_read = @parameters[:nto_cmd_read]
       #
       # Try to support Ruby 1.9.x and 2.x ssl.
       unless defined?(RSpec)
@@ -257,18 +260,18 @@ module Stomp
 
       case @protocol
         when Stomp::SPL_12
-          # The ACK frame MUST include an "id" header matching the "ack" header 
+          # The ACK frame MUST include an "id" header matching the "ack" header
           # of the MESSAGE being acknowledged.
           headers[:id] = message_or_ack_id
         when Stomp::SPL_11
-          # ACK has two REQUIRED headers: "message-id", which MUST contain a value 
-          # matching the message-id header of the MESSAGE being acknowledged and 
-          # "subscription", which MUST be set to match the value of SUBSCRIBE's 
+          # ACK has two REQUIRED headers: "message-id", which MUST contain a value
+          # matching the message-id header of the MESSAGE being acknowledged and
+          # "subscription", which MUST be set to match the value of SUBSCRIBE's
           # id header.
           headers[:'message-id'] = message_or_ack_id
           raise Stomp::Error::SubscriptionRequiredError unless headers[:subscription]
         else # Stomp::SPL_10
-          # ACK has one required header, "message-id", which must contain a value 
+          # ACK has one required header, "message-id", which must contain a value
           # matching the message-id for the MESSAGE being acknowledged.
           headers[:'message-id'] = message_or_ack_id
       end
@@ -294,13 +297,13 @@ module Stomp
       headers = headers.symbolize_keys
       case @protocol
         when Stomp::SPL_12
-          # The NACK frame MUST include an id header matching the ack header 
+          # The NACK frame MUST include an id header matching the ack header
           # of the MESSAGE being acknowledged.
           headers[:id] = message_or_ack_id
         else # Stomp::SPL_11 only
-          # NACK has two REQUIRED headers: message-id, which MUST contain a value 
-          # matching the message-id for the MESSAGE being acknowledged and 
-          # subscription, which MUST be set to match the value of the subscription's 
+          # NACK has two REQUIRED headers: message-id, which MUST contain a value
+          # matching the message-id for the MESSAGE being acknowledged and
+          # subscription, which MUST be set to match the value of the subscription's
           # id header.
           headers[:'message-id'] = message_or_ack_id
           raise Stomp::Error::SubscriptionRequiredError unless headers[:subscription]
@@ -350,6 +353,8 @@ module Stomp
       _headerCheck(headers)
       slog(:on_subscribe, log_params, headers)
 
+      p [ "subId", subId ]
+      p [ "subscriptions", @subscriptions ]
       # Store the subscription so that we can replay if we reconnect.
       if @reliable
         subId = destination if subId.nil?
@@ -422,13 +427,13 @@ module Stomp
         end
 
         if message.headers[:retry_count] <= options[:max_redeliveries]
-          self.publish(message.headers[:destination], message.body, 
+          self.publish(message.headers[:destination], message.body,
             message.headers.merge(:transaction => transaction_id))
         else
           # Poison ack, sending the message to the DLQ
-          self.publish(options[:dead_letter_queue], message.body, 
-            message.headers.merge(:transaction => transaction_id, 
-            :original_destination => message.headers[:destination], 
+          self.publish(options[:dead_letter_queue], message.body,
+            message.headers.merge(:transaction => transaction_id,
+            :original_destination => message.headers[:destination],
             :persistent => true))
         end
         self.commit transaction_id
@@ -444,7 +449,7 @@ module Stomp
       !headers.nil? && headers[:ack] == "client"
     end
 
-    # disconnect closes this connection.  If requested, a disconnect RECEIPT 
+    # disconnect closes this connection.  If requested, a disconnect RECEIPT
     # will be received.
     def disconnect(headers = {})
       raise Stomp::Error::NoCurrentConnection if @closed_check && closed?
@@ -574,4 +579,3 @@ module Stomp
   end # class
 
 end # module
-

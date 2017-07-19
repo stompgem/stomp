@@ -62,7 +62,7 @@ module Stomp
           begin
             message_header += line
             p [ "wiredatain_02A", line, Time.now ] if drdbg
-            unless connread || @ssl
+            unless connread || @ssl || @nto_cmd_read
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "wiredatain_02B", line, Time.now ] if drdbg
@@ -175,6 +175,7 @@ module Stomp
 
       # transmit logically puts a Message on the wire.
       def transmit(command, headers = {}, body = '')
+        p [ "XMIT01", command, headers ]
         # The transmit may fail so we may need to retry.
         while true
           begin
