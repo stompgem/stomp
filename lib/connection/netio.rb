@@ -175,7 +175,7 @@ module Stomp
 
       # transmit logically puts a Message on the wire.
       def transmit(command, headers = {}, body = '')
-        p [ "XMIT01", command, headers ]
+        # p [ "XMIT01", command, headers ]
         # The transmit may fail so we may need to retry.
         while true
           begin

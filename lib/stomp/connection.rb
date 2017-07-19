@@ -353,8 +353,8 @@ module Stomp
       _headerCheck(headers)
       slog(:on_subscribe, log_params, headers)
 
-      p [ "subId", subId ]
-      p [ "subscriptions", @subscriptions ]
+      ## p [ "subId", subId ]
+      ## p [ "subscriptions", @subscriptions ]
       # Store the subscription so that we can replay if we reconnect.
       if @reliable
         subId = destination if subId.nil?
