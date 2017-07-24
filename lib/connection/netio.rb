@@ -42,48 +42,46 @@ module Stomp
               raise ex
             end
           else
-            p [ "CONR01" ] if drdbg
+            p [ "_receive_COMMAND" ] if drdbg
             _dump_callstack() if drdbg
             line = _init_line_read(read_socket)
           end
           #
-          p [ "nilcheck", line.nil? ] if drdbg
+          p [ "_receive_nilcheck", line.nil? ] if drdbg
           return nil if line.nil?
           #An extra \n at the beginning of the frame, possibly not caught by is_ready?
           line = '' if line == "\n"
           if line == HAND_SHAKE_DATA
             raise Stomp::Error::HandShakeDetectedError
           end
-          p [ "wiredatain_01A", line, Time.now ] if drdbg
+          p [ "_receive_normle", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-          p [ "wiredatain_01B", line, Time.now ] if drdbg
+          p [ "_receive_start_headers", line, Time.now ] if drdbg
           # Reads the beginning of the message until it runs into a empty line
           message_header = ''
           begin
             message_header += line
-            p [ "wiredatain_02A", line, Time.now ] if drdbg
             unless connread || @ssl || @nto_cmd_read
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
-            p [ "wiredatain_02B", line, Time.now ] if drdbg
+            p [ "_receive_next_header", line, Time.now ] if drdbg
             line = _interruptible_gets(read_socket)
-            p [ "wiredatain_02C", line ] if drdbg
+            p [ "_receive_normle_header", line ] if drdbg
             raise  if line.nil?
             line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
-            p [ "wiredatain_02D", line ] if drdbg
           end until line =~ /^\s?\n$/
-          p [ "wiredatain_03A" ] if drdbg
+          p [ "_receive_end_headers" ] if drdbg
           # Checks if it includes content_length header
           content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
           message_body = ''
 
-          p [ "wiredatain_03B", content_length ] if drdbg
+          p [ "_receive_start_body", content_length ] if drdbg
           # If content_length is present, read the specified amount of bytes
           if content_length
             unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
-            p [ "CL01" ] if drdbg
+            p [ "_receive_have_content_length" ] if drdbg
             message_body = read_socket.read content_length[1].to_i
             unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
@@ -94,12 +92,11 @@ module Stomp
             unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
-            p [ "NOCL01" ] if drdbg
+            p [ "no_content_length" ] if drdbg
             message_body = read_socket.readline("\0")
             message_body.chop!
           end
 
-          p [ "wiredatain_04" ] if drdbg
           # If the buffer isn't empty, reads trailing new lines.
           #
           # Note: experiments with JRuby seem to show that socket.ready? never
@@ -111,12 +108,12 @@ module Stomp
           # is read.  Do _not_ leave them on the wire and attempt to drain them
           # at the start of the next read.  Attempting to do that breaks the
           # asynchronous nature of the 'poll' method.
-          p [ "wiredatain_05_prep", "isr", _is_ready?(read_socket) ] if drdbg
+          p [ "_receive_start_drain_loop", "isr", _is_ready?(read_socket) ] if drdbg
           while _is_ready?(read_socket)
             unless connread || @ssl
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
-            p [ "WHIR01" ] if drdbg
+            p [ "_receive_next_drain" ] if drdbg
             last_char = read_socket.getc
             break unless last_char
             if parse_char(last_char) != "\n"
@@ -124,19 +121,19 @@ module Stomp
               break
             end
           end
-          p [ "wiredatain_05A" ] if drdbg
+          p [ "_receive_hb_update" ] if drdbg
           if @protocol >= Stomp::SPL_11
             @lr = Time.now.to_f if @hbr
           end
           # Adds the excluded \n and \0 and tries to create a new message with it
-          p [ "wiredatain_05B" ] if drdbg
+          p [ "_receive_new_message" ] if drdbg
           msg = Message.new(message_header + "\n" + message_body + "\0", @protocol >= Stomp::SPL_11)
-          p [ "wiredatain_06", msg.command, msg.headers ] if drdbg
+          p [ "_receive_decode_headers", msg.command, msg.headers ] if drdbg
           #
           if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
             msg.headers = _decodeHeaders(msg.headers)
           end
-          p [ "wiredatain_99", msg.command, msg.headers ] if drdbg
+          p [ "_receive_ends", msg.command, msg.headers ] if drdbg
           msg
         end
       end
