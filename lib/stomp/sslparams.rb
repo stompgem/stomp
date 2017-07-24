@@ -64,17 +64,17 @@ module Stomp
    #
    if opts[:fsck]
     if @cert_file
-     raise Stomp::Error::SSLNoCertFileError if !File::exists?(@cert_file)
+     raise Stomp::Error::SSLNoCertFileError if !File::exist?(@cert_file)
      raise Stomp::Error::SSLUnreadableCertFileError if !File::readable?(@cert_file)
     end
     if @key_file
-     raise Stomp::Error::SSLNoKeyFileError if !File::exists?(@key_file)
+     raise Stomp::Error::SSLNoKeyFileError if !File::exist?(@key_file)
      raise Stomp::Error::SSLUnreadableKeyFileError if !File::readable?(@key_file)
     end
     if @ts_files
      tsa = @ts_files.split(",")
      tsa.each do |fn|
-      raise Stomp::Error::SSLNoTruststoreFileError if !File::exists?(fn)
+      raise Stomp::Error::SSLNoTruststoreFileError if !File::exist?(fn)
       raise Stomp::Error::SSLUnreadableTruststoreFileError if !File::readable?(fn)
      end
     end
@@ -86,4 +86,3 @@ module Stomp
  end # of class SSLParams
 
 end # of module Stomp
-
