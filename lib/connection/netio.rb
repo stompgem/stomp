@@ -23,13 +23,19 @@ module Stomp
       private
 
       # Really read from the wire.
-      def _receive(read_socket, connread = false)
-        # p [ "ioscheck", @iosto, connread ]
+      def _receive(read_socket, connread = false, noiosel = false)
+
+        # p [ "ioscheck", @iosto, connread, noiosel, @nto_cmd_read ]
         # _dump_callstack()
         # drdbg = true
         drdbg = false
+
         @read_semaphore.synchronize do
           line = nil
+
+          # =====
+          # Read COMMAND
+          # =====
           if connread
             begin
               Timeout::timeout(@connread_timeout, Stomp::Error::ConnectReadTimeout) do
@@ -54,14 +60,18 @@ module Stomp
           if line == HAND_SHAKE_DATA
             raise Stomp::Error::HandShakeDetectedError
           end
-          p [ "_receive_normle", line, Time.now ] if drdbg
+          p [ "_receive_norm_lend", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
+
+          # =====
+          # Read Headers (if any)
+          # =====
+          # Reads the headers until it runs into a empty line
           p [ "_receive_start_headers", line, Time.now ] if drdbg
-          # Reads the beginning of the message until it runs into a empty line
           message_header = ''
           begin
             message_header += line
-            unless connread || @ssl || @nto_cmd_read
+            unless connread || noiosel || @nto_cmd_read
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "_receive_next_header", line, Time.now ] if drdbg
@@ -75,21 +85,24 @@ module Stomp
           content_length = message_header.match(/content-length\s?:\s?(\d+)\s?\n/)
           message_body = ''
 
+          # =====
+          # Read message body (if any)
+          # =====
           p [ "_receive_start_body", content_length ] if drdbg
           # If content_length is present, read the specified amount of bytes
           if content_length
-            unless connread || @ssl
+            unless connread || noiosel
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "_receive_have_content_length" ] if drdbg
             message_body = read_socket.read content_length[1].to_i
-            unless connread || @ssl
+            unless connread || noiosel
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             raise Stomp::Error::InvalidMessageLength unless parse_char(read_socket.getc) == "\0"
             # Else read the rest of the message until the first \0
           else
-            unless connread || @ssl
+            unless connread || noiosel
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "no_content_length" ] if drdbg
@@ -97,7 +110,8 @@ module Stomp
             message_body.chop!
           end
 
-          # If the buffer isn't empty, reads trailing new lines.
+          # =====
+          # If the buffer isn't empty, reads/drains trailing new lines.
           #
           # Note: experiments with JRuby seem to show that socket.ready? never
           # returns true.  It appears that in cases where Ruby returns true
@@ -108,9 +122,10 @@ module Stomp
           # is read.  Do _not_ leave them on the wire and attempt to drain them
           # at the start of the next read.  Attempting to do that breaks the
           # asynchronous nature of the 'poll' method.
+          # =====
           p [ "_receive_start_drain_loop", "isr", _is_ready?(read_socket) ] if drdbg
           while _is_ready?(read_socket)
-            unless connread || @ssl
+            unless connread || noiosel
               raise Stomp::Error::ReceiveTimeout unless IO.select([read_socket], nil, nil, @iosto)
             end
             p [ "_receive_next_drain" ] if drdbg
@@ -121,6 +136,10 @@ module Stomp
               break
             end
           end
+
+          # =====
+          # Complete receive processing
+          # =====
           p [ "_receive_hb_update" ] if drdbg
           if @protocol >= Stomp::SPL_11
             @lr = Time.now.to_f if @hbr
@@ -456,7 +475,11 @@ module Stomp
         else
           _transmit(used_socket, Stomp::CMD_CONNECT, headers)
         end
-        @connection_frame = _receive(used_socket, true)
+
+        connread = true
+        noiosel = false
+        @connection_frame = _receive(used_socket, connread, noiosel)
+
         _post_connect
         @disconnect_receipt = nil
         @session = @connection_frame.headers["session"] if @connection_frame

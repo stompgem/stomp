@@ -247,7 +247,10 @@ module Stomp
       while true
         begin
           used_socket = socket()
-          return _receive(used_socket)
+
+          connread = false
+          noiosel = (@ssl || @jruby) ? true : false
+          return _receive(used_socket, connread, noiosel)
         rescue Stomp::Error::MaxReconnectAttempts
           unless slog(:on_miscerr, log_params, "Reached MaxReconnectAttempts")
             $stderr.print "Reached MaxReconnectAttempts\n"
