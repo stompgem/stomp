@@ -31,6 +31,7 @@ module Stomp
         drdbg = false
 
         @read_semaphore.synchronize do
+          p [ "_receive_lock", Thread::current() ] if drdbg
           line = nil
 
           # =====
@@ -153,6 +154,7 @@ module Stomp
             msg.headers = _decodeHeaders(msg.headers)
           end
           p [ "_receive_ends", msg.command, msg.headers ] if drdbg
+          p [ "_receive_UNlock", Thread::current() ] if drdbg
           msg
         end
       end
@@ -216,7 +218,8 @@ module Stomp
 
       # _transmit is the real wire write logic.
       def _transmit(used_socket, command, headers = {}, body = '')
-
+        #dtrdbg = true
+        dtrdbg = false
         # p [ "wirewrite" ]
         # _dump_callstack()
 
@@ -224,6 +227,7 @@ module Stomp
           headers = _encodeHeaders(headers)
         end
         @transmit_semaphore.synchronize do
+          p [ "_transmit_lock", Thread::current() ] if dtrdbg
           # Handle nil body
           body = '' if body.nil?
           # The content-length should be expressed in bytes.
@@ -267,20 +271,33 @@ module Stomp
           if @protocol >= Stomp::SPL_11
             @ls = Time.now.to_f if @hbs
           end
-
+          p [ "_transmit_UNlock", Thread::current() ] if dtrdbg
         end
       end
 
       # Use CRLF if protocol is >= 1.2, and the client requested CRLF
       def _wire_write(sock, data)
         # p [ "debug_01", @protocol, @usecrlf ]
+        #dwrdbg = true
+        dwrdbg = false
         if @protocol >= Stomp::SPL_12 && @usecrlf
           wiredata = "#{data}#{Stomp::CR}#{Stomp::LF}"
           # p [ "wiredataout_01:", wiredata ]
           sock.write(wiredata)
         else
-          # p [ "wiredataout_02:", "#{data}\n" ]
-          sock.puts data
+          p [ "_wire_write_begin:", "#{data}" ] if dwrdbg
+          if @jruby && @ssl
+            p [ "_wire_write_jrbeg:" ] if dwrdbg
+            # Same results for all of these write methods.
+            # sock.puts data
+            # sock.print "#{data}\n"
+            # sock.syswrite "#{data}\n"
+            sock.write "#{data}\n"
+            p [ "_wire_write_jrend:" ] if dwrdbg
+          else
+            sock.puts data
+          end
+          p [ "_wire_write_end:" ] if dwrdbg
         end
       end
 
@@ -475,11 +492,9 @@ module Stomp
         else
           _transmit(used_socket, Stomp::CMD_CONNECT, headers)
         end
-
         connread = true
         noiosel = false
         @connection_frame = _receive(used_socket, connread, noiosel)
-
         _post_connect
         @disconnect_receipt = nil
         @session = @connection_frame.headers["session"] if @connection_frame
