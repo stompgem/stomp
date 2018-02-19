@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# git log --reverse --all --date=short --pretty --format='%aI;%cI;%cn;%ce' | \
-git log --reverse --all --date=short --pretty --format='%ad;%cd;%cn;%ce' | \
+git log --all --no-merges --date=short --reverse --pretty | egrep "(^Author|^Date)" | \
+    sed 's/^Author://;s/Date://' | sed 'N;s/\n/ /' | \
     ruby $HOME/bin/contributors.rb
- 

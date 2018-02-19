@@ -4,14 +4,14 @@ class UserData
 
   public
   attr_accessor :count
-  attr_reader   :ad, :cd
+  attr_reader   :ad
   #
-  def initialize(ad = nil, cd = nil)
-    @count, @ad, @cd = 1, ad, cd
+  def initialize(ad = nil)
+    @count, @ad = 1, ad
   end
   #  
   def to_s
-    "UserData: AuthorDate=>#{@ad}, CommitDate=>#{@cd}, CommitCount =>#{@count}"
+    "UserData: AuthorDate=>#{@ad}, AuthorDate=>#{@ad}, CommitCount =>#{@count}"
   end
 end
 # tABLE Data
@@ -31,26 +31,34 @@ th_e = "</th>\n"
 td_s = "<td style=\"border: 1px solid black;padding-left: 10px;\" >\n"
 td_e = "</td>\n"
 #
-puts ttab_s # table start
 #
 userList = {}
 while s = gets do
   s.chomp!
-  ad, cd, n, e = s.split(";")
+  ##puts
+  ##puts s
+  sa = s.split(" ")
+  ## puts sa
+  ad = sa[-1]
+  ##puts ad
+  e = sa[-2]
+  ##puts e
+  na = sa[0..-3]
+  n = na.join(" ")
+  ##puts n
+  #
   hk = "#{n}|#{e}"
+  ##puts hk
   if userList.has_key?(hk)
     userList[hk].count += 1
+    ##puts "BUMP"
   else
-    userList[hk] = UserData.new(ad, cd)
-=begin
-    if ad != cd
-      puts "NE: #{ad}, #{cd}, #{n}, #{e}"
-    end
-=end
-  end
+    userList[hk] = UserData.new(ad)
+    ##puts "ADD"
+ end
 
 end
-#
+puts ttab_s # table start
 puts trow_s
 #
 puts th_s
@@ -74,7 +82,11 @@ puts th_e
 puts trow_e
 #
 userList.each do |k, v|
+  ##puts "K: #{k}"
   n, e = k.split("|")
+  ##puts "N: #{n}"
+  e = "&lt;" + e[1..-2] + "&gt;"
+  ##puts "E: #{e}"
   oc = "(" + sprintf("%04d", v.count) + ")"
   # puts "# #{v.time} (#{oc}) #{n} #{e}"
   puts trow_s
