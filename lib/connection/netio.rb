@@ -27,8 +27,7 @@ module Stomp
 
         # p [ "ioscheck", @iosto, connread, noiosel, @nto_cmd_read ]
         # _dump_callstack()
-        # drdbg = true
-        drdbg = false
+        drdbg = ENV['DRDBG'] ? true : false
 
         @read_semaphore.synchronize do
           p [ "_receive_lock", Thread::current() ] if drdbg
@@ -218,8 +217,7 @@ module Stomp
 
       # _transmit is the real wire write logic.
       def _transmit(used_socket, command, headers = {}, body = '')
-        #dtrdbg = true
-        dtrdbg = false
+        dtrdbg = ENV['DTRDBG'] ? true : false
         # p [ "wirewrite" ]
         # _dump_callstack()
 
@@ -278,8 +276,7 @@ module Stomp
       # Use CRLF if protocol is >= 1.2, and the client requested CRLF
       def _wire_write(sock, data)
         # p [ "debug_01", @protocol, @usecrlf ]
-        #dwrdbg = true
-        dwrdbg = false
+        dwrdbg = ENV['DWRDBG'] ? true : false
         if @protocol >= Stomp::SPL_12 && @usecrlf
           wiredata = "#{data}#{Stomp::CR}#{Stomp::LF}"
           # p [ "wiredataout_01:", wiredata ]
