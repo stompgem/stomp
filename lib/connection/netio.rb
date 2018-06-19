@@ -78,7 +78,7 @@ module Stomp
             p [ "_receive_next_header", line, Time.now ] if drdbg
             line = _interruptible_gets(read_socket)
             p [ "_receive_normle_header", line ] if drdbg
-            raise  if line.nil?
+            raise  Stomp::Error::StompServerError if line.nil?
             line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
           end until line =~ /^\s?\n$/
           p [ "_receive_end_headers" ] if drdbg
