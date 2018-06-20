@@ -184,6 +184,17 @@ module Stomp
       end
     end
 
+    # ServerFrameNameError is raised if:
+    # * Invalid frame is received from the Stomp server.
+    class ServerFrameNameError < RuntimeError
+      def initialize(bf)
+        @bf = bf
+      end
+      def message
+        "Connected, server frame name error: #{@bf.inspect}"
+      end
+    end
+
     # SSLNoKeyFileError is raised if:
     # * A supplied key file does not exist.
     class SSLNoKeyFileError < RuntimeError

@@ -21,6 +21,10 @@ module Stomp
   CMD_RECEIPT   = "RECEIPT"
   CMD_ERROR     = "ERROR"
 
+  # Server Frames
+  SERVER_FRAMES = {CMD_CONNECTED => true, CMD_MESSAGE => true,
+    CMD_RECEIPT => true, CMD_ERROR => true}
+
   # Protocols
   SPL_10 = "1.0"
   SPL_11 = "1.1"

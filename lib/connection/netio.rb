@@ -34,7 +34,7 @@ module Stomp
           line = nil
 
           # =====
-          # Read COMMAND
+          # Read COMMAND (frame name)
           # =====
           if connread
             begin
@@ -60,6 +60,15 @@ module Stomp
           if line == HAND_SHAKE_DATA
             raise Stomp::Error::HandShakeDetectedError
           end
+
+          # Check for a valid frame name from the server.
+          frname = line.chomp
+          p [ "_receive_frame_name_check", frname ] if drdbg
+          unless  SERVER_FRAMES[frname]
+            sfex = Stomp::Error::ServerFrameNameError.new(frname)
+            raise sfex
+          end
+
           p [ "_receive_norm_lend", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
 
