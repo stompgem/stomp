@@ -100,7 +100,7 @@ class Receive12Example1
       puts "Received headers: #{received.headers}"
       received.headers.each_pair do |k, v|
         vs = v.unpack("H2" * v.length)
-        puts "#{k}:#{v}-#{vs}"
+        puts "Key #{k}:\n\tValue #{v}-\n\tValueHex #{vs}"
       end
     end
     #
