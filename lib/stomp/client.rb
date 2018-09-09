@@ -110,6 +110,9 @@ module Stomp
 
     def create_error_handler
       client_thread = Thread.current
+      if client_thread.respond_to?(:report_on_exception=)
+        client_thread.report_on_exception=false
+      end
 
       @error_listener = lambda do |error|
         exception = case error.body

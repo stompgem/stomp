@@ -121,6 +121,12 @@ module Stomp
       if defined?(RUBY_ENGINE) && RUBY_ENGINE =~ /jruby/
         @jruby = true
       end
+
+      ct = Thread.current
+      if ct.respond_to?(:report_on_exception=)
+        ct.report_on_exception=false
+      end
+
       if login.is_a?(Hash)
         hashed_initialize(login)
       else
