@@ -258,6 +258,7 @@ class TestAnonymous < Test::Unit::TestCase
   def test_thread_hang_one
     received = nil
     Thread.new(@conn) do |amq|
+      no_rep_error()
       while true
         received = amq.receive
       end
@@ -277,6 +278,7 @@ class TestAnonymous < Test::Unit::TestCase
     received = nil
     max_sleep = (RUBY_VERSION =~ /1\.8/) ? 10 : 1
     Thread.new(@conn) do |amq|
+      no_rep_error()
       while true
         received = amq.poll
         # One message is needed
@@ -302,6 +304,7 @@ class TestAnonymous < Test::Unit::TestCase
     #
     1.upto(@max_threads) do |tnum|
       Thread.new(@conn) do |amq|
+        no_rep_error()
         while true
           _ = amq.receive
           lock.synchronize do
@@ -342,6 +345,7 @@ class TestAnonymous < Test::Unit::TestCase
     #
     1.upto(@max_threads) do |tnum|
       Thread.new(@conn) do |amq|
+        no_rep_error()
         while true
           received = amq.poll
           if received

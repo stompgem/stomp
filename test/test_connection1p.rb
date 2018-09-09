@@ -111,9 +111,8 @@ class TestConnection1P < Test::Unit::TestCase
     #
     cha = get_conn_headers()    
     cha["heart-beat"] = "10,10,20" # Bad header Heartbeats
-    conn = nil
     assert_raise Stomp::Error::InvalidHeartBeatHeaderError do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+      _ = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     end
   end
 
@@ -123,9 +122,8 @@ class TestConnection1P < Test::Unit::TestCase
     #
     cha = get_conn_headers()
     cha["heart-beat"] = "a,10" # Bad header Heartbeats
-    conn = nil
     assert_raise Stomp::Error::InvalidHeartBeatHeaderError do
-      conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
+      _ = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     end
   end
 

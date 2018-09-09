@@ -482,6 +482,7 @@ class TestClient < Test::Unit::TestCase
     msg = nil
     dest = make_destination
     Thread.new(@client) do |acli|
+      no_rep_error()
       if acli.protocol() == Stomp::SPL_10
         acli.subscribe(dest) { |m| msg = m }
       else
@@ -507,6 +508,7 @@ class TestClient < Test::Unit::TestCase
     1.upto(@max_threads) do |tnum|
       # Threads within threads .....
       Thread.new(@client) do |acli|
+        no_rep_error()
         # this is ugly .....
         if acli.protocol() == Stomp::SPL_10
           acli.subscribe(dest) { |m|

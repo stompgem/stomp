@@ -31,17 +31,10 @@ module Stomp
       #
       valid = true
       index = -1
-      nb_hex = nil
-      ni_hex = nil
       state = "start"
-      next_byte_save = nil
       #
       bytes.each do |next_byte|
         index += 1
-        next_byte_save = next_byte
-        ni_hex = sprintf "%x", index
-        nb_hex = sprintf "%x", next_byte
-        # puts "Top: #{next_byte}(0x#{nb_hex}), index: #{index}(0x#{ni_hex})" if DEBUG
         case state
 
           # State: 'start'

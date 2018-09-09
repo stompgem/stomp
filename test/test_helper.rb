@@ -78,6 +78,7 @@ module TestBase
       :usecrlf => get_crlf(),
     }
     conn = Stomp::Connection.open(hash)
+    no_rep_error()
     conn
   end
 
@@ -93,6 +94,7 @@ module TestBase
              :usecrlf => get_crlf(),
     }
     conn = Stomp::Connection.open(hash)
+    no_rep_error()
     conn
   end
 
@@ -108,7 +110,16 @@ module TestBase
       :usecrlf => get_crlf(),
     }
     conn = Stomp::Connection.new(hash)
+    no_rep_error()
     conn
+  end
+
+  #
+  def no_rep_error()
+    ct = Thread::current
+    if ct.respond_to?(:report_on_exception=)
+      ct.report_on_exception=false
+    end
   end
 
   # Get a Stomp Client.
