@@ -5,67 +5,86 @@
 # Change this to suit your requirements.
 #
 if Kernel.respond_to?(:require_relative)
-  require_relative("./stomp11_common")
+  require_relative("./stomp_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
-  require "stomp11_common"
+  require "stomp_common"
 end
-include Stomp11Common
+include Stomp1xCommon
 
 #
-# == Stomp 1.1 Client Putter/Getter Example 1
+# == Stomp Client Example
 #
-# This is much like sending and receiving with a Stomp::Connection.
+# Purpose: to demonstrate using a Stomp 1.x client to put and get messages.
 #
-class Client11PutGet1
+class ClientPutGetExample
   # Initialize.
   def initialize
   end
   # Run example.
   def run
     #
-    client_hdrs = {"accept-version" => "1.1",    # Demand a 1.1 connection (use a CSV list if you will consider multiple versions)
-      "host" => virt_host,                 # The 1.1 vhost (could be different than connection host)
-    }                                      # No heartbeats here:  there will be none for this connection
+    # Get a client
+    # ============
     #
-    client_hash = { :hosts => [
-        {:login => login, :passcode => passcode, :host => host, :port => port},
-      ],
-      :connect_headers => client_hdrs,
-    }
+    client = get_client()
     #
-    client = Stomp::Client.new(client_hash)
+    # Let's just do some sanity checks, and look around.
+    #
+    raise "Connection failed!!" unless client.open?()
+    #
+    # The broker _could_ have returned an ERROR frame (unlikely).
+    #
+    raise "Connect error: #{client.connection_frame().body}" if client.connection_frame().command == Stomp::CMD_ERROR
+    #
     puts "Client Connect complete"
     #
-    raise "Unexpected protocol level" if client.protocol() != Stomp::SPL_11
+    # Get Destination
     #
-    qname = "/queue/client.nodea.nodeb.nodec"
-    data = "message payload: #{Time.now.to_f}"
-    headers = {}
-    # Send it
-    client.publish qname, data
-    puts "Publish complete"
-    # Receive
+    qname = dest()
+    #
+    # Publish/put messages
+    #
+    puts "Client start puts"
+    nm = nmsgs()
+    1.upto(nm) do |n|
+      data = "message payload: #{n} #{Time.now.to_f}"
+      client.publish(qname, data)
+      puts "Sent: #{data}"
+    end
+    #
+    # Receives
+    #
     uuid = client.uuid() # uuid for Stomp::Client is a public method
-    message = nil
-    # Clients must pass a receive block.  This is business as usual, required for 1.0.
-    # For 1.1, a unique subscription id is required.
-    client.subscribe(qname, {'id' => uuid}) {|m|
-    message = m
-    }
-    sleep 0.1 until message # Wait for completion
-    puts "Subscribe and receive complete"
-    # Unsubscribe, with the unique id
-    client.unsubscribe qname,  {'id' => uuid}
-    # Sanity checks for this example ....
-    raise "Unexpected data" if data != message.body
-    raise "Bad subscription header" if uuid != message.headers['subscription']
+    done = false         # done flag
+    mc = 0               # running message count
     #
-    client.close   # Business as usual, just like 1.0
-    puts "Client close complete"
+    # Clients must pass a receive block.  This is business as usual, required for 1.0.
+    # For 1.1+, a unique subscription id is required.
+    #
+    puts "\nClient start receives"
+    client.subscribe(qname, {'id' => uuid}) {|m|
+      message = m
+      puts "Received: #{message.body}"
+      mc += 1
+      if mc >= nm
+        done = true
+        Thread::exit
+      end
+    }
+    #
+    # Wait for done flag
+    #
+    sleep 0.1 until done
+    #
+    # Finally close
+    # =============
+    #
+    client.close()   # Business as usual
+    puts "\nClient close complete"
   end
 end
 #
-e = Client11PutGet1.new
+e = ClientPutGetExample.new
 e.run
 

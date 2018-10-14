@@ -35,6 +35,10 @@ module Stomp1xCommon
   def heartbeats()
     ENV['STOMP_HEARTBEATS'] || nil
   end
+  # Destination
+  def dest()
+    ENV['STOMP_DEST'] || "/queue/#{Time.now.to_f}"
+  end
 
   # Create a 1.x commection
   def get_connection()
