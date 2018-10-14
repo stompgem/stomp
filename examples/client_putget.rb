@@ -77,6 +77,10 @@ class ClientPutGetExample
     #
     sleep 0.1 until done
     #
+    # And to be polite to the broker, we unsubscribe.
+    #
+    client.unsubscribe(qname, {'id' => uuid})
+    #
     # Finally close
     # =============
     #
