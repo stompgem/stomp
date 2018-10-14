@@ -1,15 +1,15 @@
 # -*- encoding: utf-8 -*-
 
 #
-# Common Stomp 1.1 code.
+# Common Stomp 1.x code.
 #
 require "rubygems" if RUBY_VERSION < "1.9"
 require "stomp"
 #
-module Stomp11Common
+module Stomp1xCommon
   # User id
   def login()
-    ENV['STOMP_USER'] || 'guest'
+    ENV['STOMP_LOGIN'] || 'guest'
   end
   # Password
   def passcode()
@@ -27,13 +27,26 @@ module Stomp11Common
   def virt_host()
     ENV['STOMP_VHOST'] || "localhost" # The 1.1 virtual host name
   end
-  # Create a 1.1 commection
+  # Protocol level
+  def protocol()
+    ENV['STOMP_PROTOCOL'] || "1.2" # The default protocol level
+  end
+  # Heartbeats
+  def heartbeats()
+    ENV['STOMP_HEARTBEATS'] || nil
+  end
+
+  # Create a 1.x commection
   def get_connection()
-    conn_hdrs = {"accept-version" => "1.1",    # 1.1 only
-      "host" => virt_host,                     # the vhost
+    conn_hdrs = {"accept-version" => protocol(),
+      "host" => virt_host(),                     # the vhost
     }
+    if heartbeats()
+      conn_hdrs['heart-beat'] = heartbeats()
+    end
+
     conn_hash = { :hosts => [
-      {:login => login, :passcode => passcode, :host => host, :port => port},
+      {:login => login(), :passcode => passcode(), :host => host(), :port => port()},
       ],
       :connect_headers => conn_hdrs,
     }
