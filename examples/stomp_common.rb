@@ -53,6 +53,23 @@ module Stomp1xCommon
     conn = Stomp::Connection.new(conn_hash)
   end
 
+  # Create a 1.x client
+  def get_client()
+    conn_hdrs = {"accept-version" => protocol(),
+      "host" => virt_host(),                     # the vhost
+    }
+    if heartbeats()
+      conn_hdrs['heart-beat'] = heartbeats()
+    end
+
+    conn_hash = { :hosts => [
+      {:login => login(), :passcode => passcode(), :host => host(), :port => port()},
+      ],
+      :connect_headers => conn_hdrs,
+    }
+    conn = Stomp::Client.new(conn_hash)
+  end
+
   # Number of messages
   def nmsgs()
     (ENV['STOMP_NMSGS'] || 1).to_i # Number of messages
