@@ -10,30 +10,30 @@ module SSLCommon
 
 	# CA Data.
 
-  # CA file location/directory.  Change or specify.
+  # CA cert file location/directory.  Change or specify.
 	# This is the author's default.
   def ca_loc()
-		ENV['CA_FLOC'] || "/ad3/gma/sslwork/2013-extended-02" # The CA cert location
+		ENV['CA_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The CA cert location
   end
-  # CA file.  Change or specify.
+  # CA cert file.  Change or specify.
 	# This is the author's default.
   def ca_cert()
-		ENV['CA_FILE'] || "TestCA.crt" # The CA cert File
+		ENV['CA_FILE'] || "ca.crt" # The CA cert File
   end
   # CA private key file.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
-	# Not currently used in stomp examples.
+	# Not currently used/needed in stomp examples.
   def ca_key()
 		ENV['CA_KEY'] || nil # The CA private key File
   end
 
 	# Client Data.
 
-  # Client file location/directory.  Change or specify.
+  # Client cert file location/directory.  Change or specify.
 	# This is the author's default.
   def cli_loc()
-		ENV['CLI_FLOC'] || "/ad3/gma/sslwork/2013-extended-02" # The client cert location
+		ENV['CLI_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The client cert location
   end
   # Client cert file.  Change or specify.
 	# This is the author's default.
@@ -53,7 +53,7 @@ module SSLCommon
 	# This is the author's default.
 	# Not currently used in stomp examples.
   def svr_loc()
-		ENV['SVR_FLOC'] || "/ad3/gma/sslwork/2013-extended-02" # The server cert location
+		ENV['SVR_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The server cert location
   end
   # Server cert file.  Change or specify.
 	# This is the author's default.

@@ -4,10 +4,10 @@
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
 if Kernel.respond_to?(:require_relative)
-  require_relative("./ssl_common")
+  require_relative("../ssl_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
-  require "ssl_common"
+  require "../ssl_common"
 end
 include SSLCommon
 #
@@ -29,7 +29,9 @@ class ExampleSSL4
   # Initialize.
   def initialize
 		# Change the following as needed.
-		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+    @host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+    # It is very likely that you will have to specify your specific port number.
+    # 61612 is currently my AMQ local port number for ssl client auth is required.        
 		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
   end
   # Run example.
@@ -43,6 +45,7 @@ class ExampleSSL4
       :ts_files => "#{ca_loc()}/#{ca_cert()}", # The CA's signed sertificate
       :fsck => true # Check that files exist first
     )
+    puts "SSLOPTS: #{ssl_opts.inspect}"
     #
     hash = { :hosts => [
         {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},

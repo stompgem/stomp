@@ -4,10 +4,10 @@
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
 if Kernel.respond_to?(:require_relative)
-  require_relative("./ssl_common")
+  require_relative("../ssl_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
-  require "ssl_common"
+  require "../ssl_common"
 end
 include SSLCommon
 #
@@ -21,8 +21,10 @@ include SSLCommon
 class ExampleSSL2C
   # Initialize.
   def initialize		# Change the following as needed.
-		@host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
-		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61612
+    @host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+   # It is very likely that you will have to specify your specific port number.
+  # 61611 is currently my AMQ local port number for ssl client auth is not required.        
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61611
   end
   # Run example.
   def run
@@ -34,11 +36,13 @@ class ExampleSSL2C
 
     # Possibly change/override the cert data here.
     ts_flist << "#{ca_loc()}/#{ca_cert()}"
+    puts "TSFLIST: #{ts_flist.inspect}"    
 
     ssl_opts = Stomp::SSLParams.new(:ts_files => ts_flist.join(","), 
       :ciphers => ciphers_list,
       :fsck => true
     )
+    puts "SSLOPTS: #{ssl_opts.inspect}"    
     #
     hash = { :hosts => [
         {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
