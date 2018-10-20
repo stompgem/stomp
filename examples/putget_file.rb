@@ -5,11 +5,9 @@ require 'stomp'
 
 if Kernel.respond_to?(:require_relative)
   require_relative("./stomp_common")
-  require_relative("./lflogger")
 else
   $LOAD_PATH << File.dirname(__FILE__)
   require "stomp_common"
-  require "./lflogger"
 end
 include Stomp1xCommon
 #
