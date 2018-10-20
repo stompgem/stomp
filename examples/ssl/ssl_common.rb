@@ -68,6 +68,9 @@ module SSLCommon
   def svr_key()
 		ENV['SVR_KEY'] || nil # The server private key File
   end
-
+	# Show peer cert or not
+	def showPeerCert()
+		ENV['SHOWPEERCERT'] || false
+	end
 end
 
