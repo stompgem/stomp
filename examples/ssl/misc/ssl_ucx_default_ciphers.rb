@@ -3,8 +3,16 @@
 #
 # Reference: https://github.com/stompgem/stomp/wiki/extended-ssl-overview
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("../ssl_common")
+  require_relative("../../stomp_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "../ssl_common"
+  require "../../stomp_common"
+end
+include SSLCommon
+include Stomp1xCommon
 #
 # == Example: Use Ruby Supplied Ciphers
 #
@@ -15,16 +23,21 @@ require "stomp"
 class ExampleRubyCiphers
   # Initialize.
   def initialize
+    # It is very likely that you will have to specify your specific port number.
+    # 61611 is currently my AMQ local port number for ssl client auth not required.
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61611
   end
   # Run example.
-  def run
+  def run()
+		puts "SSLUCXRDF Connect host: #{host()}, port: #{@port}"
     ssl_opts = Stomp::SSLParams.new(:use_ruby_ciphers => true) # Plus other parameters as needed
+    puts "SSLOPTS: #{ssl_opts.inspect}"
     #
-    # SSL Use Case: Using default Stomp ciphers
+    # SSL Use Case: Using default Ruby ciphers
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost',
-        :port => 61612, :ssl => ssl_opts},
+        {:login => login(), :passcode => passcode(), :host => host(),
+        :port => @port, :ssl => ssl_opts},
       ]
     }
     #
@@ -32,10 +45,10 @@ class ExampleRubyCiphers
     c = Stomp::Connection.new(hash)
     puts "Connect completed"
     #
-    c.disconnect
+    c.disconnect()
   end
 end
 #
-e = ExampleRubyCiphers.new
-e.run
+e = ExampleRubyCiphers.new()
+e.run()
 
