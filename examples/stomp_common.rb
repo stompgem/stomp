@@ -84,5 +84,12 @@ module Stomp1xCommon
     ENV['STOMP_SUPPRESS_CL']
   end
 
+  # Use SSL or not
+  def usessl()
+    if ENV['STOMP_SSL']
+      return true
+    end
+    return false
+  end
 end
 
