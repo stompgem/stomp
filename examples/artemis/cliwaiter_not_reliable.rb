@@ -2,6 +2,11 @@
 #
 require 'stomp'
 #
+# Artemis will summarily close down connections if there is no traffic for some
+# time.  This code demonstrates running with a gem connetion parameter of
+# :reliable => false (the gem will not retry).  The code demonstrates handling
+# your own retries a certain number of times (3 to be axact).
+#
 class CliWaiter
 
   @@retry_num = 0
@@ -14,7 +19,7 @@ class CliWaiter
 	@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 31613 # Artemis here
 	@slt = 75
 	@ver = ENV['STOMP_PROTOCOL'] ? ENV['STOMP_PROTOCOL'] : "1.2"
-	@hbdata = ENV['STOMP_HEARTBEATS'] ? ENV['STOMP_HEARTBEATS'] : "0,0"
+	@hbdata = "0,0" # Force no heartbeats for this example
 	@conn_hdrs = {"accept-version" => @ver, # version
 		"host" => "localhost",              # vhost
 		"heart-beat" => @hbdata,            # heartbeats
@@ -27,10 +32,10 @@ class CliWaiter
 		:connect_headers => @conn_hdrs,
 	}
 	p [ "DB1", @hash ]
-	@do_retry=true    # Retry ourself, gem code will not because of :reliable =>
+	@do_retry=true    # Retry ourself, gem code will not because of :reliable => false
   end
   # Run example.
-  def run
+  def run()
 	begin
 		@@retry_num += 1
 		puts "Try Number: #{@@retry_num}"
@@ -52,8 +57,10 @@ class CliWaiter
 		puts "The gory details:"
 		print ex.backtrace.join("\n")
 		if @do_retry && @@retry_num < @@max_retries
+			puts "Will retry"
 			retry
 		else
+			puts "Will re-raise"
 			raise
 		end
 	end            
@@ -62,5 +69,5 @@ end
 #
 
 #
-e = CliWaiter.new
-e.run
+e = CliWaiter.new()
+e.run()
