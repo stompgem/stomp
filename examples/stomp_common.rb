@@ -50,7 +50,8 @@ module Stomp1xCommon
     end
 
     conn_hash = { :hosts => [
-      {:login => login(), :passcode => passcode(), :host => host(), :port => port()},
+      {:login => login(), :passcode => passcode(), :host => host(), :port => port(),
+        :ssl => usessl()},
       ],
       :connect_headers => conn_hdrs,
     }
@@ -67,7 +68,8 @@ module Stomp1xCommon
     end
 
     conn_hash = { :hosts => [
-      {:login => login(), :passcode => passcode(), :host => host(), :port => port()},
+      {:login => login(), :passcode => passcode(), :host => host(), :port => port(),
+        :ssl => usessl()},
       ],
       :connect_headers => conn_hdrs,
     }

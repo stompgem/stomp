@@ -5,12 +5,12 @@
 # Change this to suit your requirements.
 #
 if Kernel.respond_to?(:require_relative)
-  require_relative("./stomp11_common")
+  require_relative("./stomp_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
-  require "stomp11_common"
+  require "stomp_common"
 end
-
+include Stomp1xCommon
 =begin
 
   A recent experience suggested that we might provide an example of how
@@ -34,18 +34,19 @@ end
     subscription(s).
     Done by providing a "cilent-id" CONNECT header.
 
-  2) On SUBSCRIBE, indicate an AMQ specific (uniqie) subscription ID.  Done
+  2) On SUBSCRIBE, indicate an AMQ specific (unique) subscription ID.  Done
     by providing a "activemq.subscriptionName" header to SUBSCRIBE.
 
 =end
 
 # login hash
 hash = { :hosts => [ 
-       {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => 61613, :ssl => false}, # AMQ
+       {:login => login(), :passcode => passcode(), :host => host(), :port => port(),
+          :ssl => usessl()}, #
       ],
       :reliable => true,
 			:closed_check => false, 
-      :connect_headers => {:host => "localhost", :"accept-version" => "1.0",
+      :connect_headers => {:host => "localhost", :"accept-version" => "1.2",
         # Requirement 1, name should be unique.
         :"client-id" => "dursubcli01",  # REF the 1st AMQ link above
 			} 
@@ -61,21 +62,17 @@ sh = { "activemq.subscriptionName" => "subname01" } # REF the 1st AMQ link above
 cli.subscribe(topic, sh) do |msg|
   puts "msg: #{msg}"
 end
-# Wait for a very long time, usually exit via ^C
-puts "Press ^C to exit"
-sleep 1000000
-puts "Done yet?"
-
 =begin
   At this point open your AMQ admin console (port 8161 usually), and examine 
   the 'subscribers' section.  You should see an instance of this client 
   displayed in the "Active Durable Topic Subscribers" section.
-
-  When you press ^C to exit this program, return to the AMQ console and
+=end
+# Wait for a very long time, usually exit via ^C
+puts "Open AMQ console and examing the 'subscribers' section"
+puts "Wne done, press ^C to exit, and reexamine the 'subscribers' section"
+sleep 1000000
+=begin
+  After you press ^C to exit this program, return to the AMQ console and
   refresh the display.  (Do not restart AMQ).  You should see this client in the
   "Offline Durable Topic Subscribers" section.
 =end
-
-
-
-
