@@ -5,11 +5,14 @@
 #
 if Kernel.respond_to?(:require_relative)
   require_relative("../ssl_common")
+  require_relative("../../stomp_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
   require "../ssl_common"
+  require("../../stomp_common")
 end
 include SSLCommon
+include Stomp1xCommon
 #
 # == SSL Use Case 2 - User Supplied Ciphers
 #
@@ -21,14 +24,14 @@ include SSLCommon
 class ExampleSSL2C
   # Initialize.
   def initialize		# Change the following as needed.
-    @host = ENV['STOMP_HOST'] ? ENV['STOMP_HOST'] : "localhost"
+    @host = host()
    # It is very likely that you will have to specify your specific port number.
   # 61611 is currently my AMQ local port number for ssl client auth is not required.        
 		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61611
   end
   # Run example.
   def run
-    ciphers_list = [["DHE-RSA-AES256-SHA", "TLSv1/SSLv3", 256, 256], ["DHE-DSS-AES256-SHA", "TLSv1/SSLv3", 256, 256], ["AES256-SHA", "TLSv1/SSLv3", 256, 256], ["EDH-RSA-DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["EDH-DSS-DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["DHE-RSA-AES128-SHA", "TLSv1/SSLv3", 128, 128], ["DHE-DSS-AES128-SHA", "TLSv1/SSLv3", 128, 128], ["AES128-SHA", "TLSv1/SSLv3", 128, 128], ["RC4-SHA", "TLSv1/SSLv3", 128, 128], ["RC4-MD5", "TLSv1/SSLv3", 128, 128], ["EDH-RSA-DES-CBC-SHA", "TLSv1/SSLv3", 56, 56], ["EDH-DSS-DES-CBC-SHA", "TLSv1/SSLv3", 56, 56],  ["DES-CBC-SHA", "TLSv1/SSLv3", 56, 56], ["EXP-EDH-RSA-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-EDH-DSS-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-RC2-CBC-MD5", "TLSv1/SSLv3", 40, 128], ["EXP-RC4-MD5", "TLSv1/SSLv3", 40, 128]]
+    puts "SSLUC2C Connect host: #{@host}, port: #{@port}"
     #
     # SSL Use Case 2
     #
@@ -39,13 +42,13 @@ class ExampleSSL2C
     puts "TSFLIST: #{ts_flist.inspect}"    
 
     ssl_opts = Stomp::SSLParams.new(:ts_files => ts_flist.join(","), 
-      :ciphers => ciphers_list,
+      :ciphers => ciphers_list(), # The cipher list
       :fsck => true
     )
     puts "SSLOPTS: #{ssl_opts.inspect}"    
     #
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => @host, :port => @port, :ssl => ssl_opts},
+        {:login => login(), :passcode => passcode(), :host => @host, :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }
@@ -54,11 +57,11 @@ class ExampleSSL2C
     c = Stomp::Connection.new(hash)
     puts "Connect completed"
     puts "SSL Verify Result: #{ssl_opts.verify_result}"
-    # puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}"
-    c.disconnect
+    puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}" if showPeerCert()
+    c.disconnect()
   end
 end
 #
-e = ExampleSSL2C.new
+e = ExampleSSL2C.new()
 e.run
 

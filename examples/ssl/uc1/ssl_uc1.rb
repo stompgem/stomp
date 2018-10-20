@@ -37,7 +37,7 @@ class ExampleSSL1
   end
   # Run example.
   def run
-		puts "Connect host: #{@host}, port: #{@port}"
+		puts "SSLUC1 Connect host: #{@host}, port: #{@port}"
 
     ssl_opts = Stomp::SSLParams.new # or ssl_opts = true (for this use case)
     puts "SSLOPTS: #{ssl_opts.inspect}"    

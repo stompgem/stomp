@@ -15,12 +15,14 @@ module SSLCommon
   def ca_loc()
 		ENV['CA_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The CA cert location
   end
-  # CA cert file.  Change or specify.
+
+	# CA cert file.  Change or specify.
 	# This is the author's default.
   def ca_cert()
 		ENV['CA_FILE'] || "ca.crt" # The CA cert File
   end
-  # CA private key file.  Change or specify.
+
+	# CA private key file.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
 	# Not currently used/needed in stomp examples.
@@ -34,17 +36,19 @@ module SSLCommon
 	# This is the author's default.
   def cli_loc()
 		ENV['CLI_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The client cert location
-  end
+	end
+
   # Client cert file.  Change or specify.
 	# This is the author's default.
   def cli_cert()
 		ENV['CLI_FILE'] || "client.crt" # The client cert File
-  end
+	end
+
   # Client private keyfile.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
   def cli_key()
-		ENV['CLI_KEY'] || nil # The client private key File
+		ENV['CLI_KEY'] || pck() # The client private key File
   end
 
 	# Server Data.
@@ -54,13 +58,15 @@ module SSLCommon
 	# Not currently used in stomp examples.
   def svr_loc()
 		ENV['SVR_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The server cert location
-  end
+	end
+
   # Server cert file.  Change or specify.
 	# This is the author's default.
 	# Not currently used in stomp examples.
   def svr_cert()
 		ENV['SVR_FILE'] || "server.crt" # The server cert File
-  end
+	end
+
   # Server private keyfile.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
@@ -72,5 +78,19 @@ module SSLCommon
 	def showPeerCert()
 		ENV['SHOWPEERCERT'] || false
 	end
+
+	# Ciphers list for the ciphers examples
+	def ciphers_list()
+		[["DHE-RSA-AES256-SHA", "TLSv1/SSLv3", 256, 256], ["DHE-DSS-AES256-SHA", "TLSv1/SSLv3", 256, 256], ["AES256-SHA", "TLSv1/SSLv3", 256, 256], ["EDH-RSA-DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["EDH-DSS-DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["DES-CBC3-SHA", "TLSv1/SSLv3", 168, 168], ["DHE-RSA-AES128-SHA", "TLSv1/SSLv3", 128, 128], ["DHE-DSS-AES128-SHA", "TLSv1/SSLv3", 128, 128], ["AES128-SHA", "TLSv1/SSLv3", 128, 128], ["RC4-SHA", "TLSv1/SSLv3", 128, 128], ["RC4-MD5", "TLSv1/SSLv3", 128, 128], ["EDH-RSA-DES-CBC-SHA", "TLSv1/SSLv3", 56, 56], ["EDH-DSS-DES-CBC-SHA", "TLSv1/SSLv3", 56, 56], ["DES-CBC-SHA", "TLSv1/SSLv3", 56, 56], ["EXP-EDH-RSA-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-EDH-DSS-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-DES-CBC-SHA", "TLSv1/SSLv3", 40, 56], ["EXP-RC2-CBC-MD5", "TLSv1/SSLv3", 40, 128], ["EXP-RC4-MD5", "TLSv1/SSLv3", 40, 128]]
+	end
+
+	# Private
+	private
+
+	# Client Key File
+	def pck()
+		"client.key"
+	end
+
 end
 
