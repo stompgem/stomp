@@ -22,7 +22,7 @@ module SSLCommon
 		ENV['CA_FILE'] || "ca.crt" # The CA cert File
   end
 
-	# CA private key file.  Change or specify.
+	# CA private key file name.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
 	# Not currently used/needed in stomp examples.
@@ -38,13 +38,13 @@ module SSLCommon
 		ENV['CLI_FLOC'] || "/ad3/gma/ad3/sslwork/2017-01" # The client cert location
 	end
 
-  # Client cert file.  Change or specify.
+  # Client cert file name.  Change or specify.
 	# This is the author's default.
   def cli_cert()
 		ENV['CLI_FILE'] || "client.crt" # The client cert File
 	end
 
-  # Client private keyfile.  Change or specify.
+  # Client private key file name.  Change or specify.
 	# This is the author's default.
 	# This file should not be exposed to the outside world.
   def cli_key()
