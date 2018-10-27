@@ -5,21 +5,22 @@
 # Change this to suit your requirements.
 #
 if Kernel.respond_to?(:require_relative)
-  require_relative("./stomp11_common")
+  require_relative("./stomp_common")
 else
   $LOAD_PATH << File.dirname(__FILE__)
-  require "stomp11_common"
+  require "stomp_common"
 end
-include Stomp11Common
+include Stomp1xCommon
 #
-# == Stomp 1.1 Send/Receive Example - Repeated Headers
+# == Stomp 1.1+ Send/Receive Example - Repeated Headers
 #
-# Purpose: to demonstrate sending and receiving using Stomp 1.1, and an unusual
+# Purpose: to demonstrate sending and receiving using Stomp 1.1+, and an unusual
 # aspect of the specification.  What is demonstrated here is the use of
 # 'repeated headers'. Note that brokers MAY support repeated headers as
-# demonstrated, but are not required to provide this support. This example
-# should run against the Apollo broker.  It will *not* currently run against
-# RabbitMQ.  YMMV depending on your broker.
+# demonstrated, but are not required to provide this support. 
+#
+# This example should run against the Apollo broker.  It will *not* currently run against
+# ActiveMQ or RabbitMQ.  YMMV depending on your broker.
 #
 # See: http://stomp.github.com/stomp-specification-1.1.html#Repeated_Header_Entries
 #
@@ -30,7 +31,8 @@ class RepeatedHeadersExample
   # Run example.
   def run
     conn = get_connection() # Use helper method to obtain a Stomp#connection
-    raise "Unexpected protocol level" if conn.protocol != Stomp::SPL_11
+    raise "Unexpected protocol level" if conn.protocol == Stomp::SPL_10
+    puts "Repeated headers example, host: #{host()}, port: #{port()}"
     #
     # The gem supports repeated headers by allowing the 'value' part of a header
     # to be an Array instance.
@@ -42,7 +44,7 @@ class RepeatedHeadersExample
     # to hold the repeated values.  This is presented the the calling client to
     # be processed per client requirements.
     #
-    qname = "/queue/nodea.nodeb.nodec"
+    qname = dest()
     data = "message payload: #{Time.now.to_f}"
     key2_repeats = ["key2val3", "key2val2", "key2val1" ]
     headers = {"key1" => "value1",  # A normal header
@@ -52,7 +54,7 @@ class RepeatedHeadersExample
     #
     # Ship it.
     #
-    conn.publish qname, data , headers
+    conn.publish(qname, data , headers)
     puts "Sent data: #{data}"
     #
     # Receive phase.
@@ -84,10 +86,9 @@ class RepeatedHeadersExample
     #
     # And finally, disconnect.
     #
-    conn.disconnect
+    conn.disconnect()
   end
 end
 #
-e = RepeatedHeadersExample.new
-e.run
-
+e = RepeatedHeadersExample.new()
+e.run()

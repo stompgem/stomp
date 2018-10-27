@@ -1,8 +1,16 @@
 # -*- encoding: utf-8 -*-
 
 #
-require "rubygems"
-require "stomp"
+if Kernel.respond_to?(:require_relative)
+  require_relative("../ssl_common")
+  require_relative("../../stomp_common")
+else
+  $LOAD_PATH << File.dirname(__FILE__)
+  require "../ssl_common"
+  require "../../stomp_common"
+end
+include SSLCommon
+include Stomp1xCommon
 #
 # == Demo User Control of SSLContext options contents
 #
@@ -14,12 +22,15 @@ require "stomp"
 class ExampleSSLCtxOptions
   # Initialize.
   def initialize
+    # It is very likely that you will have to specify your specific port number.
+    # 61611 is currently my AMQ local port number for ssl client auth not required.
+		@port = ENV['STOMP_PORT'] ? ENV['STOMP_PORT'].to_i : 61611
   end
 
   # Run example 1
-  def run1
+  def run1()
     require 'openssl' unless defined?(OpenSSL)
-    puts "run method ...."
+    puts "run1 method ...."
 		# Define SSL Options to be used.  This code is copied from the defaults
     # in later versions of Ruby V2.x (which has been backported to 1.9.3).
     #
@@ -43,9 +54,8 @@ class ExampleSSLCtxOptions
     ssl_opts = Stomp::SSLParams.new(:ssl_ctxopts => opts, # SSLContext options to set
       :use_ruby_ciphers => urc,
       :fsck => true)
-    sport = ENV["STOMP_PORT"].to_i
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => sport, :ssl => ssl_opts},
+        {:login => login(), :passcode => passcode(), :host => host(), :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }
@@ -56,11 +66,11 @@ class ExampleSSLCtxOptions
     puts "SSL Verify Result: #{ssl_opts.verify_result}"
     # puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}"
     #
-    c.disconnect
+    c.disconnect()
   end
   
   # Run example 2
-  def run2
+  def run2()
     puts "run2 method ...."
     #
     # Connection / Example 2 of 2, gem supplied options.
@@ -73,9 +83,8 @@ class ExampleSSLCtxOptions
     ssl_opts = Stomp::SSLParams.new(:ssl_ctxopts => Stomp::Connection::ssl_v2xoptions(),
        :use_ruby_ciphers => urc,
        :fsck => true)
-    sport = ENV["STOMP_PORT"].to_i
     hash = { :hosts => [
-        {:login => 'guest', :passcode => 'guest', :host => 'localhost', :port => sport, :ssl => ssl_opts},
+        {:login => login(), :passcode => passcode(), :host => host(), :port => @port, :ssl => ssl_opts},
       ],
       :reliable => false, # YMMV, to test this in a sane manner
     }
@@ -86,11 +95,11 @@ class ExampleSSLCtxOptions
     puts "SSL Verify Result: #{ssl_opts.verify_result}"
     # puts "SSL Peer Certificate:\n#{ssl_opts.peer_cert}"
     #
-    c.disconnect
+    c.disconnect()
   end
 end
 #
-e = ExampleSSLCtxOptions.new
-e.run1
-e.run2
+e = ExampleSSLCtxOptions.new()
+e.run1()
+e.run2()
 

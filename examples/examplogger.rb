@@ -11,7 +11,7 @@ require 'logger'	# use the standard Ruby logger .....
 # *    on_connectfail: unsuccessful connect (will usually be retried)
 # *    on_disconnect: successful disconnect
 #
-# *    on_miscerr: on miscellaneous xmit/recv errors
+# *    on_miscerr: on miscellaneous transmit/receive errors
 #
 # *    on_publish: publish called
 # *    on_subscribe: subscribe called
