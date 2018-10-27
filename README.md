@@ -93,17 +93,13 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
-* Gem version 1.4.4. Miscellaneous fixes, see CHANGELOG.rdoc for details.
+* Gem version 1.4.5. Miscellaneous fixes, see CHANGELOG.md for details.
+* Gem version 1.4.4. Miscellaneous fixes, see CHANGELOG.md for details.
 * Gem version 1.4.3. Fix broken install.  Do not try to install 1.4.2.
 * Gem version 1.4.2. Fix memory leak, and others !: see CHANGELOG.md for details.
 * Gem version 1.4.1. Important SSL changes !: see CHANGELOG.md for details.
 * Gem version 1.4.0. Note: Change sementics of :parse_timeout, see CHANGELOG.md for details.
-* Gem version 1.3.5. Miscellaneous fixes, see CHANGELOG.rdoc for details.
-* Gem version 1.3.4. Miscellaneous fixes, see CHANGELOG.rdoc for details.
-* Gem version 1.3.3. Miscellaneous fixes, see CHANGELOG.rdoc for details.
-* Gem version 1.3.2. Miscellaneous fixes, see changelog for details.
-* Gem version 1.3.1. Bugfix for logging.
-* Gem version 1.3.0. Added ERROR frame raising as exception, added anonymous connections, miscellaneous other fixes.
+* Gem version 1.3.5. Miscellaneous fixes, see CHANGELOG.md for details.
 
 For changes in older versions see CHANGELOG.rdoc for details.
 
@@ -146,7 +142,7 @@ Name / E-mail
 <span style="font-weight: bold;" >
 brianm
 </span>
- / brianm@fd4e7336-3dff-0310-b68a-b6615a75f13b
+ / &lt;brianm@fd4e7336-3dff-0310-b68a-b6615a75f13b&gt;
 </td>
 </tr>
 <tr>
@@ -160,7 +156,7 @@ brianm
 <span style="font-weight: bold;" >
 jstrachan
 </span>
- / jstrachan@fd4e7336-3dff-0310-b68a-b6615a75f13b
+ / &lt;jstrachan@fd4e7336-3dff-0310-b68a-b6615a75f13b&gt;
 </td>
 </tr>
 <tr>
@@ -174,7 +170,7 @@ jstrachan
 <span style="font-weight: bold;" >
 chirino
 </span>
- / chirino@fd4e7336-3dff-0310-b68a-b6615a75f13b
+ / &lt;chirino@fd4e7336-3dff-0310-b68a-b6615a75f13b&gt;
 </td>
 </tr>
 <tr>
@@ -188,7 +184,7 @@ chirino
 <span style="font-weight: bold;" >
 kookster
 </span>
- / kookster@fd4e7336-3dff-0310-b68a-b6615a75f13b
+ / &lt;kookster@fd4e7336-3dff-0310-b68a-b6615a75f13b&gt;
 </td>
 </tr>
 <tr>
@@ -202,7 +198,7 @@ kookster
 <span style="font-weight: bold;" >
 Glenn Rempe
 </span>
- / glenn@rempe.us
+ / &lt;glenn@rempe.us&gt;
 </td>
 </tr>
 <tr>
@@ -216,7 +212,7 @@ Glenn Rempe
 <span style="font-weight: bold;" >
 Tony Garnock-Jones
 </span>
- / tonyg@lshift.net
+ / &lt;tonyg@lshift.net&gt;
 </td>
 </tr>
 <tr>
@@ -230,7 +226,7 @@ Tony Garnock-Jones
 <span style="font-weight: bold;" >
 Marius Mathiesen
 </span>
- / marius.mathiesen@gmail.com
+ / &lt;marius.mathiesen@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -244,7 +240,7 @@ Marius Mathiesen
 <span style="font-weight: bold;" >
 Johan Sørensen
 </span>
- / johan@johansorensen.com
+ / &lt;johan@johansorensen.com&gt;
 </td>
 </tr>
 <tr>
@@ -252,13 +248,13 @@ Johan Sørensen
 2009-11-17
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0022)
+(0019)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
 Thiago Morello
 </span>
- / thiago.morello@locaweb.com.br
+ / &lt;thiago.morello@locaweb.com.br&gt;
 </td>
 </tr>
 <tr>
@@ -272,7 +268,7 @@ Thiago Morello
 <span style="font-weight: bold;" >
 unknown
 </span>
- / katy@.(none)
+ / &lt;katy@.(none)&gt;
 </td>
 </tr>
 <tr>
@@ -280,13 +276,13 @@ unknown
 2009-12-18
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0052)
+(0047)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
 Thiago Morello
 </span>
- / morello@queroinfra32.fabrica.locaweb.com.br
+ / &lt;morello@queroinfra32.fabrica.locaweb.com.br&gt;
 </td>
 </tr>
 <tr>
@@ -294,13 +290,13 @@ Thiago Morello
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0387)
+(0364)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
 gmallard
 </span>
- / allard.guy.m@gmail.com
+ / &lt;allard.guy.m@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -314,7 +310,7 @@ gmallard
 <span style="font-weight: bold;" >
 Rafael Rosa
 </span>
- / rafael.rosa@locaweb.com.br
+ / &lt;rafael.rosa@locaweb.com.br&gt;
 </td>
 </tr>
 <tr>
@@ -322,13 +318,13 @@ Rafael Rosa
 2010-03-23
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0042)
+(0074)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
 Guy M. Allard
 </span>
- / allard.guy.m@gmail.com
+ / &lt;allard.guy.m@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -342,7 +338,7 @@ Guy M. Allard
 <span style="font-weight: bold;" >
 Dmytro Shteflyuk
 </span>
- / kpumuk@kpumuk.info
+ / &lt;kpumuk@kpumuk.info&gt;
 </td>
 </tr>
 <tr>
@@ -356,7 +352,7 @@ Dmytro Shteflyuk
 <span style="font-weight: bold;" >
 Neil Wilson
 </span>
- / neil@aldur.co.uk
+ / &lt;neil@aldur.co.uk&gt;
 </td>
 </tr>
 <tr>
@@ -370,7 +366,7 @@ Neil Wilson
 <span style="font-weight: bold;" >
 Dinesh Majrekar
 </span>
- / dinesh.majrekar@advantage-interactive.com
+ / &lt;dinesh.majrekar@advantage-interactive.com&gt;
 </td>
 </tr>
 <tr>
@@ -384,7 +380,7 @@ Dinesh Majrekar
 <span style="font-weight: bold;" >
 Kiall Mac Innes
 </span>
- / kiall@managedit.ie
+ / &lt;kiall@managedit.ie&gt;
 </td>
 </tr>
 <tr>
@@ -398,7 +394,7 @@ Kiall Mac Innes
 <span style="font-weight: bold;" >
 Rob Skaggs
 </span>
- / rob@pivotal-it.com
+ / &lt;rob@pivotal-it.com&gt;
 </td>
 </tr>
 <tr>
@@ -412,21 +408,7 @@ Rob Skaggs
 <span style="font-weight: bold;" >
 Tom May
 </span>
- / tom@gist.com
-</td>
-</tr>
-<tr>
-<td style="border: 1px solid black;padding-left: 10px;" >
-2011-08-24
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-(0002)
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-<span style="font-weight: bold;" >
-Thiago Morello
-</span>
- / morellon@gmail.com
+ / &lt;tom@tommay.net&gt;
 </td>
 </tr>
 <tr>
@@ -440,7 +422,7 @@ Thiago Morello
 <span style="font-weight: bold;" >
 Lucas Hills
 </span>
- / info@lucashills.com
+ / &lt;info@lucashills.com&gt;
 </td>
 </tr>
 <tr>
@@ -454,7 +436,7 @@ Lucas Hills
 <span style="font-weight: bold;" >
 Chris Needham
 </span>
- / chrisn303@gmail.com
+ / &lt;chrisn303@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -468,7 +450,7 @@ Chris Needham
 <span style="font-weight: bold;" >
 R.I.Pienaar
 </span>
- / rip@devco.net
+ / &lt;rip@devco.net&gt;
 </td>
 </tr>
 <tr>
@@ -482,7 +464,21 @@ R.I.Pienaar
 <span style="font-weight: bold;" >
 tworker
 </span>
- / tworker@onyx.ove.com
+ / &lt;tworker@onyx.ove.com&gt;
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2011-12-13
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Thiago Morello
+</span>
+ / &lt;morellon@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -496,7 +492,21 @@ tworker
 <span style="font-weight: bold;" >
 James Pearson
 </span>
- / james@fearmediocrity.co.uk
+ / &lt;james@fearmediocrity.co.uk&gt;
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2012-05-02
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0003)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+mindscratch
+</span>
+ / &lt;craig@mindscratch.org&gt;
 </td>
 </tr>
 <tr>
@@ -510,7 +520,7 @@ James Pearson
 <span style="font-weight: bold;" >
 Tommy Bishop
 </span>
- / bishop.thomas@gmail.com
+ / &lt;bishop.thomas@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -524,7 +534,7 @@ Tommy Bishop
 <span style="font-weight: bold;" >
 Jeremy Gailor
 </span>
- / jeremy@infinitecube.com
+ / &lt;jeremy@infinitecube.com&gt;
 </td>
 </tr>
 <tr>
@@ -538,7 +548,7 @@ Jeremy Gailor
 <span style="font-weight: bold;" >
 JP Hastings-Spital
 </span>
- / jphastings@gmail.com
+ / &lt;jphastings@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -552,7 +562,7 @@ JP Hastings-Spital
 <span style="font-weight: bold;" >
 glennr
 </span>
- / glenn@siyelo.com
+ / &lt;glenn@siyelo.com&gt;
 </td>
 </tr>
 <tr>
@@ -560,13 +570,13 @@ glennr
 2013-07-29
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0021)
+(0020)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
 Ian Smith
 </span>
- / ian.smith@mylookout.com
+ / &lt;ian.smith@mylookout.com&gt;
 </td>
 </tr>
 <tr>
@@ -580,7 +590,7 @@ Ian Smith
 <span style="font-weight: bold;" >
 Hiram Chirino
 </span>
- / hiram@hiramchirino.com
+ / &lt;hiram@hiramchirino.com&gt;
 </td>
 </tr>
 <tr>
@@ -594,21 +604,7 @@ Hiram Chirino
 <span style="font-weight: bold;" >
 Ian Smith
 </span>
- / ian.smith@lookout.com
-</td>
-</tr>
-<tr>
-<td style="border: 1px solid black;padding-left: 10px;" >
-2013-08-22
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-(0007)
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-<span style="font-weight: bold;" >
-Ian Smith
-</span>
- / ismith@mit.edu
+ / &lt;ian.smith@lookout.com&gt;
 </td>
 </tr>
 <tr>
@@ -622,7 +618,7 @@ Ian Smith
 <span style="font-weight: bold;" >
 Orazio Cotroneo
 </span>
- / orazio@we7.com
+ / &lt;orazio@we7.com&gt;
 </td>
 </tr>
 <tr>
@@ -636,7 +632,7 @@ Orazio Cotroneo
 <span style="font-weight: bold;" >
 OrazioWE7
 </span>
- / orazio@we7.com
+ / &lt;orazio@we7.com&gt;
 </td>
 </tr>
 <tr>
@@ -650,7 +646,7 @@ OrazioWE7
 <span style="font-weight: bold;" >
 Richard Clamp
 </span>
- / richardc@unixbeard.net
+ / &lt;richardc@unixbeard.net&gt;
 </td>
 </tr>
 <tr>
@@ -664,7 +660,7 @@ Richard Clamp
 <span style="font-weight: bold;" >
 m4rCsi
 </span>
- / m4rCsi@gmail.com
+ / &lt;m4rCsi@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -678,7 +674,7 @@ m4rCsi
 <span style="font-weight: bold;" >
 Michael Klishin
 </span>
- / michael@novemberain.com
+ / &lt;michael@novemberain.com&gt;
 </td>
 </tr>
 <tr>
@@ -692,7 +688,7 @@ Michael Klishin
 <span style="font-weight: bold;" >
 Patrick Sharp
 </span>
- / psharp@numerex.com
+ / &lt;psharp@numerex.com&gt;
 </td>
 </tr>
 <tr>
@@ -706,7 +702,7 @@ Patrick Sharp
 <span style="font-weight: bold;" >
 Wayne Robinson
 </span>
- / wayne.robinson@gmail.com
+ / &lt;wayne.robinson@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -720,21 +716,7 @@ Wayne Robinson
 <span style="font-weight: bold;" >
 Nikolay Khasanov
 </span>
- / nkhasanov@groupon.com
-</td>
-</tr>
-<tr>
-<td style="border: 1px solid black;padding-left: 10px;" >
-2016-07-16
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-(0006)
-</td>
-<td style="border: 1px solid black;padding-left: 10px;" >
-<span style="font-weight: bold;" >
-GitHub
-</span>
- / noreply@github.com
+ / &lt;nkhasanov@groupon.com&gt;
 </td>
 </tr>
 <tr>
@@ -748,7 +730,7 @@ GitHub
 <span style="font-weight: bold;" >
 Ryan Rosenblum
 </span>
- / ryan.rosenblum@gmail.com
+ / &lt;ryan.rosenblum@gmail.com&gt;
 </td>
 </tr>
 <tr>
@@ -762,7 +744,7 @@ Ryan Rosenblum
 <span style="font-weight: bold;" >
 Alexandre Moutot
 </span>
- / a.moutot@alphalink.fr
+ / &lt;a.moutot@alphalink.fr&gt;
 </td>
 </tr>
 <tr>
@@ -776,7 +758,7 @@ Alexandre Moutot
 <span style="font-weight: bold;" >
 Raducu Deaconu
 </span>
- / raducu.deaconu@visma.com
+ / &lt;raducu.deaconu@visma.com&gt;
 </td>
 </tr>
 <tr>
@@ -790,7 +772,7 @@ Raducu Deaconu
 <span style="font-weight: bold;" >
 Steve Traylen
 </span>
- / steve.traylen@cern.ch
+ / &lt;steve.traylen@cern.ch&gt;
 </td>
 </tr>
 <tr>
@@ -802,9 +784,23 @@ Steve Traylen
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
-Michael Smith
+Reid Vandewiele
 </span>
- / michael.smith@puppet.com
+ / &lt;reid@puppetlabs.com&gt;
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2017-07-27
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Meg Richards
+</span>
+ / &lt;mouse@cmu.edu&gt;
 </td>
 </tr>
 </table>

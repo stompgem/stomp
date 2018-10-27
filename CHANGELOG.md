@@ -1,5 +1,18 @@
 # Stomp Gem Change Log
 
+## 1.4.5 20181027
+
+* Add option for no timeout on network read
+* Lock check of @io.ready for SSL sockets
+* Squelch some deprecation warnings
+* Address issue #146
+* Reintroduce named excepton on nil header
+* Environmentally control some debug flags
+* Raise named exception on bad server frame
+* Attempt to address issue #152
+* Eliminate Ruby 2.5 warnings in unit tests
+* Major refactor of all gem examples
+
 ## 1.4.4 20170611
 
 * Merge fix for issue 141.
