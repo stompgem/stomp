@@ -109,19 +109,19 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "https://github.com/stompgem/stomp".freeze
   s.licenses = ["Apache-2.0".freeze]
-  s.rubygems_version = "3.0.0.beta1".freeze
+  s.rubygems_version = "2.7.6".freeze
   s.summary = "Ruby client for the Stomp messaging protocol".freeze
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>.freeze, ["~> 2.14", ">= 2.14.1"])
+      s.add_development_dependency(%q<rspec>.freeze, [">= 2.14.1", "~> 2.14"])
     else
-      s.add_dependency(%q<rspec>.freeze, ["~> 2.14", ">= 2.14.1"])
+      s.add_dependency(%q<rspec>.freeze, [">= 2.14.1", "~> 2.14"])
     end
   else
-    s.add_dependency(%q<rspec>.freeze, ["~> 2.14", ">= 2.14.1"])
+    s.add_dependency(%q<rspec>.freeze, [">= 2.14.1", "~> 2.14"])
   end
 end
 
