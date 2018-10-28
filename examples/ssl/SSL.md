@@ -120,7 +120,7 @@ Subcase B - When your broker _does_ require client authentication:
 
 * Expect connection failure (broker must be sent a valid client certificate).
 
-### Use Case 3 - Authentification by broker, no authentification by  broker
+### Use Case 3 - Authentification by broker, no authentification by client
 
 Subcase A - When your broker does _not_ require client authentication:
 
