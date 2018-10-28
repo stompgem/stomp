@@ -45,6 +45,7 @@ An implementation of the Stomp protocol for Ruby. See:
         :start_timeout => 0,                # Timeout around Stomp::Client initialization
         :sslctx_newparm => nil,             # Param for SSLContext.new
         :ssl_post_conn_check => true,       # Further verify broker identity
+        :nto_cmd_read => true,              # No timeout on COMMAND read
       }
 
       # for a client

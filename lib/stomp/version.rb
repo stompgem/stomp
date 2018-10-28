@@ -7,7 +7,7 @@ module Stomp
     MAJOR = 1
     MINOR = 4
     # PATCH = 5
-    PATCH = "5.plvl.002"
+    PATCH = "5.plvl.003"
     STRING = "#{MAJOR}.#{MINOR}.#{PATCH}"
   end
 end
