@@ -261,6 +261,7 @@ class TestAnonymous < Test::Unit::TestCase
       no_rep_error()
       while true
         received = amq.receive
+        Thread::exit if received
       end
     end
     #
