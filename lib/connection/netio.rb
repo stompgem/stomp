@@ -61,14 +61,6 @@ module Stomp
             raise Stomp::Error::HandShakeDetectedError
           end
 
-          # Check for a valid frame name from the server.
-          frname = line.chomp
-          p [ "_receive_frame_name_check", frname ] if drdbg
-          unless  SERVER_FRAMES[frname]
-            sfex = Stomp::Error::ServerFrameNameError.new(frname)
-            raise sfex
-          end
-
           p [ "_receive_norm_lend", line, Time.now ] if drdbg
           line = _normalize_line_end(line) if @protocol >= Stomp::SPL_12
 
@@ -157,6 +149,12 @@ module Stomp
           p [ "_receive_new_message" ] if drdbg
           msg = Message.new(message_header + "\n" + message_body + "\0", @protocol >= Stomp::SPL_11)
           p [ "_receive_decode_headers", msg.command, msg.headers ] if drdbg
+          # Check for a valid frame name from the server.
+          p [ "_receive_frame_name_check", msg.command ] if drdbg
+          unless  SERVER_FRAMES[msg.command]
+            sfex = Stomp::Error::ServerFrameNameError.new(msg.command)
+            raise sfex
+          end
           #
           if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
             msg.headers = _decodeHeaders(msg.headers)
@@ -172,16 +170,16 @@ module Stomp
       #
       def _is_ready?(s)
         rdy = s.ready?
-        ### p [ "isr?", rdy ]
+        #p [ "isr?", rdy ]
         return rdy unless @jruby
-        ### p [ "jrdychk", rdy.class ]
+        #p [ "jrdychk", rdy.class ]
         if rdy.class == NilClass
           # rdy = true
           rdy = false # A test
         else
           rdy = (rdy.class == Fixnum || rdy.class == TrueClass) ? true : false
         end
-        ### p [ "isr?_last", rdy ]
+        #p [ "isr?_last", rdy ]
         rdy
       end
 
@@ -515,17 +513,17 @@ module Stomp
           if @protocol == Stomp::SPL_10 || (@protocol >= Stomp::SPL_11 && !@hbr)
             if @jruby
               # Handle JRuby specific behavior.
-              ### p [ "ilrjr00", _is_ready?(read_socket), RUBY_VERSION ]
+              #p [ "ilrjr00", _is_ready?(read_socket), RUBY_VERSION ]
               if RUBY_VERSION <  "2"
                 while true
-                  ### p [ "ilrjr01A1", _is_ready?(read_socket) ]
+                  #p [ "ilrjr01A1", _is_ready?(read_socket) ]
                   line = _interruptible_gets(read_socket) # Data from wire
                   break unless line == "\n"
                   line = ''
                 end
               else # RUBY_VERSION >= "2"
                 while _is_ready?(read_socket)
-                  ### p [ "ilrjr01B2", _is_ready?(read_socket) ]
+                  #p [ "ilrjr01B2", _is_ready?(read_socket) ]
                   line = _interruptible_gets(read_socket) # Data from wire
                   break unless line == "\n"
                   line = ''
