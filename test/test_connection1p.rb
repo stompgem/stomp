@@ -17,6 +17,7 @@ class TestConnection1P < Test::Unit::TestCase
   
   def setup
     @conn = get_connection()
+    @tc1dbg = ENV['TC1DBG'] ? true : false
   end
 
   def teardown
@@ -25,11 +26,17 @@ class TestConnection1P < Test::Unit::TestCase
 
   # Test basic connection open.
   def test_conn_1p_0000
+    mn = "test_conn_1p_0000" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
     assert @conn.open?
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test missing connect headers - part 1.
   def test_conn_1p_0010
+    mn = "test_conn_1p_0010" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = {:host => "localhost"}
@@ -40,11 +47,15 @@ class TestConnection1P < Test::Unit::TestCase
     chb = {"accept-version" => "1.0"}
     assert_raise Stomp::Error::ProtocolErrorConnect do
       _ = Stomp::Connection.open(user, passcode, host, port, false, 5, chb)
-    end    
+    end
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test missing connect headers - part 2.
   def test_conn_1p_0015
+    mn = "test_conn_1p_0015" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = {:host => "localhost"}
@@ -68,10 +79,14 @@ class TestConnection1P < Test::Unit::TestCase
     assert_raise Stomp::Error::ProtocolErrorConnect do
       _ = Stomp::Connection.open(hash)
     end
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test requesting only a 1.0 connection.
   def test_conn_1p_0020
+    mn = "test_conn_1p_0020" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = {:host => "localhost", "accept-version" => "1.0"}
@@ -80,10 +95,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     conn.disconnect
     assert_equal conn.protocol, Stomp::SPL_10
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test requesting only a 1.1+ connection.
   def test_conn_1p_0030
+    mn = "test_conn_1p_0030" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()
@@ -91,10 +110,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     conn.disconnect
     assert conn.protocol >= Stomp::SPL_11
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test basic request for no heartbeats.
   def test_conn_1p_0040
+    mn = "test_conn_1p_0040" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -103,10 +126,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     conn.disconnect
     assert conn.protocol >= Stomp::SPL_11
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test malformed heartbeat header.
   def test_conn_1p_0050
+    mn = "test_conn_1p_0050" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -114,10 +141,14 @@ class TestConnection1P < Test::Unit::TestCase
     assert_raise Stomp::Error::InvalidHeartBeatHeaderError do
       _ = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     end
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test malformed heartbeat header.
   def test_conn_11h_0060
+    mn = "test_conn_1p_0060" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()
@@ -125,10 +156,14 @@ class TestConnection1P < Test::Unit::TestCase
     assert_raise Stomp::Error::InvalidHeartBeatHeaderError do
       _ = Stomp::Connection.open(user, passcode, host, port, false, 5, cha)
     end
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test a valid heartbeat header.
   def test_conn_1p_0070
+    mn = "test_conn_1p_0070" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -138,10 +173,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.disconnect
     assert conn.hbsend_interval > 0
     assert conn.hbrecv_interval > 0
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test only sending heartbeats.
   def test_conn_1p_0080
+    mn = "test_conn_1p_0080" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -154,10 +193,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_send(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test only receiving heartbeats.
   def test_conn_1p_0090
+    mn = "test_conn_1p_0090" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -171,10 +214,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_recv(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test sending and receiving heartbeats.
   def test_conn_1p_0100
+    mn = "test_conn_1p_0100" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -188,10 +235,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_both(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test valid UTF8 data.
   def test_conn_1p_0110
+    mn = "test_conn_1p_0110" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -219,10 +270,14 @@ class TestConnection1P < Test::Unit::TestCase
       assert conn.valid_utf8?(string), "good unicode specs 01: #{string}"
     end
     conn.disconnect
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test invalid UTF8 data.
   def test_conn_1p_0120
+    mn = "test_conn_1p_0120" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -253,11 +308,15 @@ class TestConnection1P < Test::Unit::TestCase
       assert !conn.valid_utf8?(string), "bad unicode specs 01: #{string}"
     end
     conn.disconnect
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Repeated headers test. Brokers have a lot of freedom given the verbiage
   # in the specs.
   def test_conn_1p_0124
+    mn = "test_conn_1p_0124" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     dest = make_destination
     msg = "payload: #{Time.now.to_f}"
     shdrs = { "key1" => "val1", "key2" => "val2",
@@ -276,18 +335,26 @@ class TestConnection1P < Test::Unit::TestCase
     end
     #
     @conn.unsubscribe dest, :id => sid
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test frozen headers.
   def test_conn_1p_0127
+    mn = "test_conn_1p_0127" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     dest = make_destination
     sid = @conn.uuid()
     sid.freeze
     @conn.subscribe dest, :id => sid
+    p [ "99", mn, "ends" ] if @tc1dbg
   end
 
   # Test heartbeats with send and receive.
   def test_conn_1p_0130
+    mn = "test_conn_1p_0130" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -301,10 +368,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_both(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test heartbeats with send and receive.
   def test_conn_1p_0135
+    mn = "test_conn_1p_0135" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -318,10 +389,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_both(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test heartbeats with send and receive.
   def test_conn_1p_0140
+    mn = "test_conn_1p_0140" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -335,10 +410,14 @@ class TestConnection1P < Test::Unit::TestCase
     conn.set_logger(nil)
     conn.disconnect
     hb_asserts_both(conn)
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_HB11LONG']
 
   # Test very basic encoding / decoding of headers
   def test_conn_1p_0200
+    mn = "test_conn_1p_0200" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     @conn.disconnect
     #
     cha = get_conn_headers()    
@@ -363,11 +442,15 @@ class TestConnection1P < Test::Unit::TestCase
       assert received.headers[k] == v, "Mismatch: #{k},#{v}"
     }
     conn.disconnect
+    p [ "99", mn, "ends" ] if @tc1dbg
   end unless ENV['STOMP_RABBIT']
 
   # Test that 1.1+ connections do not break suppress_content_length
   # (Issue #52)
   def test_conn_1p_0210
+    mn = "test_conn_1p_0210" if @tc1dbg
+    p [ "01", mn, "starts" ] if @tc1dbg
+
     msg = "payload: #{Time.now.to_f}"
     dest = make_destination
     shdrs = { :suppress_content_length => true }
@@ -379,6 +462,7 @@ class TestConnection1P < Test::Unit::TestCase
     received = @conn.receive
     assert_equal msg, received.body
     assert_nil received.headers["content-length"], "No content length expected."
+    p [ "99", mn, "ends" ] if @tc1dbg
   end if ENV['STOMP_AMQ11']
 
 private

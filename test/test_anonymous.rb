@@ -20,6 +20,7 @@ class TestAnonymous < Test::Unit::TestCase
     # Data for multi_thread tests
     @max_threads = 20
     @max_msgs = 100
+    @tandbg = ENV['TANDBG'] ? true : false
   end
 
   def teardown
@@ -28,21 +29,29 @@ class TestAnonymous < Test::Unit::TestCase
 
   # Test basic connection creation.
   def test_connection_exists
+    mn = "test_connection_exists" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     assert_not_nil @conn
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test asynchronous polling.
   def test_poll_async
-	sq = ENV['STOMP_ARTEMIS'] ? "jms.queue.queue.do.not.put.messages.on.this.queue" :
-		"/queue/do.not.put.messages.on.this.queue"
+    mn = "test_poll_async" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
+  	sq = ENV['STOMP_ARTEMIS'] ? "jms.queue.queue.do.not.put.messages.on.this.queue" :
+		  "/queue/do.not.put.messages.on.this.queue"
     @conn.subscribe(sq, :id => "a.no.messages.queue")
     # If the test 'hangs' here, Connection#poll is broken.
     m = @conn.poll
     assert m.nil?
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test suppression of content length header.
   def test_no_length
+    mn = "test_no_length" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     #
     @conn.publish make_destination, "test_stomp#test_no_length",
@@ -55,34 +64,46 @@ class TestAnonymous < Test::Unit::TestCase
     msg2 = @conn.receive
     assert_equal "test_stomp#test_", msg2.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end unless ENV['STOMP_RABBIT']
 
   # Test direct / explicit receive.
   def test_explicit_receive
+    mn = "test_explicit_receive" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "test_stomp#test_explicit_receive"
     msg = @conn.receive
     assert_equal "test_stomp#test_explicit_receive", msg.body
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test asking for a receipt.
   def test_receipt
+    mn = "test_receipt" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination, :receipt => "abc"
     msg = @conn.receive
     assert_equal "abc", msg.headers['receipt-id']
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test asking for a receipt on disconnect.
   def test_disconnect_receipt
+    mn = "test_disconnect_receipt" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     @conn.disconnect :receipt => "abc123"
     assert_not_nil(@conn.disconnect_receipt, "should have a receipt")
     assert_equal(@conn.disconnect_receipt.headers['receipt-id'],
                   "abc123", "receipt sent and received should match")
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test ACKs for Stomp 1.0
   def test_client_ack_with_symbol_10
+    mn = "test_client_ack_with_symbol_10" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     if @conn.protocol != Stomp::SPL_10
       assert true
       return
@@ -95,10 +116,13 @@ class TestAnonymous < Test::Unit::TestCase
     # matching the message-id for the MESSAGE being acknowledged.
     @conn.ack msg.headers['message-id']
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test ACKs for Stomp 1.1
   def test_client_ack_with_symbol_11
+    mn = "test_client_ack_with_symbol_11" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     if @conn.protocol != Stomp::SPL_11
       assert true
       return
@@ -114,10 +138,13 @@ class TestAnonymous < Test::Unit::TestCase
     # id header.
     @conn.ack msg.headers['message-id'], :subscription => msg.headers['subscription']
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test ACKs for Stomp 1.2
   def test_client_ack_with_symbol_12
+    mn = "test_client_ack_with_symbol_12" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     if @conn.protocol != Stomp::SPL_12
       assert true
       return
@@ -131,33 +158,45 @@ class TestAnonymous < Test::Unit::TestCase
     # of the MESSAGE being acknowledged.
     @conn.ack msg.headers['ack']
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test a message with 0x00 embedded in the body.
   def test_embedded_null
+    mn = "test_embedded_null" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "a\0"
     msg = @conn.receive
     assert_equal "a\0" , msg.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test connection open checking.
   def test_connection_open?
+    mn = "test_connection_open?" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     assert_equal true , @conn.open?
     @conn.disconnect
     assert_equal false, @conn.open?
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test connection closed checking.
   def test_connection_closed?
+    mn = "test_connection_closed?" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     assert_equal false, @conn.closed?
     @conn.disconnect
     assert_equal true, @conn.closed?
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test that methods detect a closed connection.
   def test_closed_checks_conn
+    mn = "test_closed_checks_conn" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     @conn.disconnect
     #
     assert_raise Stomp::Error::NoCurrentConnection do
@@ -203,33 +242,45 @@ class TestAnonymous < Test::Unit::TestCase
     assert_raise Stomp::Error::NoCurrentConnection do
       _ = @conn.poll
     end
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test that we receive a Stomp::Message.
   def test_response_is_instance_of_message_class
+    mn = "test_response_is_instance_of_message_class" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "a\0"
     msg = @conn.receive
     assert_instance_of Stomp::Message , msg
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test converting a Message to a string.
   def test_message_to_s
+    mn = "test_message_to_s" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "a\0"
     msg = @conn.receive
     assert_match(/^<Stomp::Message headers=/ , msg.to_s)
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test that a connection frame is present.
   def test_connection_frame
+    mn = "test_connection_frame" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     assert_not_nil @conn.connection_frame
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test messages with multiple line ends.
   def test_messages_with_multipleLine_ends
+    mn = "test_messages_with_multipleLine_ends" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "a\n\n"
     @conn.publish make_destination, "b\n\na\n\n"
@@ -240,10 +291,13 @@ class TestAnonymous < Test::Unit::TestCase
     assert_equal "a\n\n", msg_a.body
     assert_equal "b\n\na\n\n", msg_b.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test publishing multiple messages.
   def test_publish_two_messages
+    mn = "test_publish_two_messages" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
     @conn.publish make_destination, "a\0"
     @conn.publish make_destination, "b\0"
@@ -253,9 +307,12 @@ class TestAnonymous < Test::Unit::TestCase
     assert_equal "a\0", msg_a.body
     assert_equal "b\0", msg_b.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   def test_thread_hang_one
+    mn = "test_thread_hang_one" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     received = nil
     Thread.new(@conn) do |amq|
       no_rep_error()
@@ -272,10 +329,13 @@ class TestAnonymous < Test::Unit::TestCase
     assert_not_nil received
     assert_equal message, received.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test polling with a single thread.
   def test_thread_poll_one
+    mn = "test_thread_poll_one" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     received = nil
     max_sleep = (RUBY_VERSION =~ /1\.8/) ? 10 : 1
     Thread.new(@conn) do |amq|
@@ -295,10 +355,13 @@ class TestAnonymous < Test::Unit::TestCase
     assert_not_nil received
     assert_equal message, received.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test receiving with multiple threads.
   def test_multi_thread_receive
+    mn = "test_multi_thread_receive" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     lock = Mutex.new
     msg_ctr = 0
     dest = make_destination
@@ -335,10 +398,13 @@ class TestAnonymous < Test::Unit::TestCase
     end
     assert_equal @max_msgs, msg_ctr
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end unless RUBY_ENGINE =~ /jruby/
 
   # Test polling with multiple threads.
   def test_multi_thread_poll
+    mn = "test_multi_thread_poll" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     #
     lock = Mutex.new
     msg_ctr = 0
@@ -381,20 +447,26 @@ class TestAnonymous < Test::Unit::TestCase
     end
     assert_equal @max_msgs, msg_ctr
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end unless RUBY_ENGINE =~ /jruby/
 
   # Test using a nil body.
   def test_nil_body
+    mn = "test_nil_body" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     dest = make_destination
     @conn.publish dest, nil
     conn_subscribe dest
     msg = @conn.receive
     assert_equal "", msg.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test transaction message sequencing.
   def test_transaction
+    mn = "test_transaction" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination
 
     @conn.begin "txA"
@@ -409,10 +481,13 @@ class TestAnonymous < Test::Unit::TestCase
     msg = @conn.receive
     assert_equal "txn message", msg.body
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test duplicate subscriptions.
   def test_duplicate_subscription
+    mn = "test_duplicate_subscription" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     @conn.disconnect # not reliable
     @conn = Stomp::Connection.open(nil, nil, host, port, true, nil, nil) # reliable
     dest = make_destination
@@ -422,18 +497,24 @@ class TestAnonymous < Test::Unit::TestCase
       conn_subscribe dest
     end
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Test nil 1.1 connection parameters.
   def test_nil_connparms
+    mn = "test_nil_connparms" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     @conn.disconnect
     #
     @conn = Stomp::Connection.open(nil, nil, host, port, false, 5, nil)
     checkEmsg(@conn)
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # Basic NAK test.
   def test_nack11p_0010
+    mn = "test_nack11p_0010" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     if @conn.protocol == Stomp::SPL_10
       assert_raise Stomp::Error::UnsupportedProtocolError do
         @conn.nack "dummy msg-id"
@@ -466,6 +547,7 @@ class TestAnonymous < Test::Unit::TestCase
       msg2 = @conn.receive
       assert_equal smsg, msg2.body
       checkEmsg(@conn)
+      p [ "99", mn, "ends" ] if @tandbg
     end
   end unless (ENV['STOMP_AMQ11'] || ENV['STOMP_ARTEMIS'])
 
@@ -473,6 +555,8 @@ class TestAnonymous < Test::Unit::TestCase
   # fail only when connecting to a pure STOMP 1.0 server that does not 
   # return a 'version' header at all.
   def test_conn10_simple
+    mn = "test_conn10_simple" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     @conn.disconnect
     #
     vhost = ENV['STOMP_RABBIT'] ? "/" : host
@@ -495,15 +579,19 @@ class TestAnonymous < Test::Unit::TestCase
     c = nil
     c = Stomp::Connection.new(hash)
     c.disconnect if c
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
   # test JRuby detection
   def test_jruby_presence
+    mn = "test_jruby_presence" if @tandbg
+    p [ "01", mn, "starts" ] if @tandbg
     if defined?(RUBY_ENGINE) && RUBY_ENGINE =~ /jruby/
       assert @conn.jruby
     else
       assert !@conn.jruby
     end
+    p [ "99", mn, "ends" ] if @tandbg
   end
 
 end
