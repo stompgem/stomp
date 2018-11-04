@@ -20,6 +20,7 @@ class TestCodec < Test::Unit::TestCase
     # Data for multi_thread tests
     @max_threads = 20
     @max_msgs = 100
+    @tcodbg = ENV['TCODBG'] ? true : false
   end
 
   def teardown
@@ -28,6 +29,9 @@ class TestCodec < Test::Unit::TestCase
 
   # Test that the codec does nothing to strings that do not need encoding.
   def test_1000_check_notneeded
+    mn = "test_1000_check_notneeded" if @tcodbg
+    p [ "01", mn, "starts" ] if @tcodbg
+
     test_data = [
       "a",
       "abcdefghijklmnopqrstuvwxyz",
@@ -46,10 +50,14 @@ class TestCodec < Test::Unit::TestCase
       assert_equal s_decoded_a, s_reencoded, "Sanity check reencode: #{s_decoded_a} | #{s_reencoded}"
       #
     end
+    p [ "99", mn, "ends" ] if @tcodbg
   end
 
   # Test the basic encoding / decoding requirements.
   def test_1010_basic_encode_decode
+    mn = "test_1010_basic_encode_decode" if @tcodbg
+    p [ "01", mn, "starts" ] if @tcodbg
+
     test_data = [
     	[ "\\\\\\\\", "\\\\" ], # [encoded, decoded]
     	[ "\\\\", "\\" ], # [encoded, decoded]
@@ -84,10 +92,14 @@ class TestCodec < Test::Unit::TestCase
       s_encoded_b = Stomp::HeaderCodec::encode(s_decoded_a)
       assert_equal encoded_orig, s_encoded_b, "Sanity check  2 encode: #{encoded_orig} | #{s_encoded_b}"
     end
+    p [ "99", mn, "ends" ] if @tcodbg
   end
 
   # Test more complex strings with the codec.
   def test_1020_fancier
+    mn = "test_1020_fancier" if @tcodbg
+    p [ "01", mn, "starts" ] if @tcodbg
+
     test_data = [
     	[ "a\\\\b", "a\\b" ],  # [encoded, decoded]
       [ "\\\\\\n\\c", "\\\n:" ],
@@ -113,6 +125,7 @@ class TestCodec < Test::Unit::TestCase
       s_encoded_b = Stomp::HeaderCodec::encode(s_decoded_a)
       assert_equal encoded_orig, s_encoded_b, "Sanity check  2 encode: #{encoded_orig} | #{s_encoded_b}"
     end
+    p [ "99", mn, "ends" ] if @tcodbg
   end
 
 end # of class

@@ -37,7 +37,8 @@ class TestMessage < Test::Unit::TestCase
 			"bad byte: \372",
 			"\004\b{\f:\tbody\"\001\207\004\b{\b:\016statusmsg\"\aOK:\017statuscodei\000:\tdata{\t:\voutput\"3Enabled, not running, last run 693 seconds ago:\frunningi\000:\fenabledi\006:\flastrunl+\aE\021\022M:\rsenderid\"\032xx.xx.xx.xx:\016requestid\"%849d647bbe3e421ea19ac9f947bbdde4:\020senderagent\"\fpuppetd:\016msgtarget\"%/topic/mcollective.puppetd.reply:\thash\"\001\257ZdQqtaDmmdD0jZinnEcpN+YbkxQDn8uuCnwsQdvGHau6d+gxnnfPLUddWRSb\nZNMs+sQUXgJNfcV1eVBn1H+Z8QQmzYXVDMqz7J43jmgloz5PsLVbN9K3PmX/\ngszqV/WpvIyAqm98ennWqSzpwMuiCC4q2Jr3s3Gm6bUJ6UkKXnY=\n:\fmsgtimel+\a\372\023\022M"
 		]
-		#
+    #
+    @tmsdbg = ENV['TMSDBG'] ? true : false
   end
 
   def teardown
@@ -46,6 +47,8 @@ class TestMessage < Test::Unit::TestCase
 
 	# Various message bodies, including the failing test case reported
   def test_0010_kcode
+    mn = "test_0010_kcode" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
 		#
 		dest = make_destination
     if @conn.protocol == Stomp::SPL_10
@@ -60,10 +63,14 @@ class TestMessage < Test::Unit::TestCase
 			assert_instance_of Stomp::Message , msg, "type check for #{abody}"
 			assert_equal abody, msg.body, "equal check for #{abody}"
 		end
+    p [ "99", mn, "ends" ] if @tmsdbg
   end
 
 	# All possible byte values
   def test_0020_kcode
+    mn = "test_0020_kcode" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
+
 		#
 		abody = ""
 		"\000".upto("\377") {|abyte| abody << abyte } 
@@ -78,11 +85,15 @@ class TestMessage < Test::Unit::TestCase
 	  @conn.publish dest, abody
 		msg = @conn.receive
 		assert_instance_of Stomp::Message , msg, "type check for #{abody}"
-		assert_equal abody, msg.body, "equal check for #{abody}"
+    assert_equal abody, msg.body, "equal check for #{abody}"
+    p [ "99", mn, "ends" ] if @tmsdbg
   end
 
 	# A single byte at a time
   def test_0030_kcode
+    mn = "test_0030_kcode" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
+
 		#
 		dest = make_destination
     if @conn.protocol == Stomp::SPL_10
@@ -97,11 +108,15 @@ class TestMessage < Test::Unit::TestCase
 			msg = @conn.receive
 			assert_instance_of Stomp::Message , msg, "type check for #{abody}"
 			assert_equal abody, msg.body, "equal check for #{abody}"
-		end
+    end
+    p [ "99", mn, "ends" ] if @tmsdbg
   end
 
 	# Test various valid and invalid frames.
-	def test_0040_msg_create
+  def test_0040_msg_create
+    mn = "test_0040_msg_create" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
+    
 		#
 		assert_raise(Stomp::Error::InvalidFormat) {
 			_ = Stomp::Message.new("junk", false)
@@ -130,10 +145,14 @@ class TestMessage < Test::Unit::TestCase
     _ = Stomp::Message.new("RECEIPT\nh1:val1\n\njunk\0\n", false)
     _ = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
 
+    p [ "99", mn, "ends" ] if @tmsdbg
 	end
 
 	# Test multiple headers with the same key
   def test_0050_mh_msg_create
+    mn = "test_0050_mh_msg_create" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
+
     aframe = bframe = nil
     amsg = "MESSAGE\n" +
       "h1:val1\n" + 
@@ -155,10 +174,14 @@ class TestMessage < Test::Unit::TestCase
     assert_equal "val3", bframe.headers["h2"][0], "Expected val3"
     assert_equal "val2", bframe.headers["h2"][1], "Expected val2"
     assert_equal "val1", bframe.headers["h2"][2], "Expected val1"
+    p [ "99", mn, "ends" ] if @tmsdbg
   end
 
 	# Test headers with empty key / value
   def test_0060_hdr_ekv
+    mn = "test_0060_hdr_ekv" if @tmsdbg
+    p [ "01", mn, "starts" ] if @tmsdbg
+
     #
     amsg = "MESSAGE\n" +
       "h1:val1\n" +
@@ -185,6 +208,7 @@ class TestMessage < Test::Unit::TestCase
       _ = Stomp::Message.new(amsg, false)
     end
     _ = Stomp::Message.new(amsg, true)
+    p [ "99", mn, "ends" ] if @tmsdbg
   end
 
 end
