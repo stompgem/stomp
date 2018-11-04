@@ -20,6 +20,7 @@ class TestClient < Test::Unit::TestCase
     # Multi_thread test data
     @max_threads = 20
     @max_msgs = 50
+    @tcldbg = ENV['TCLDBG'] ? true : false
   end
 
   def teardown
@@ -28,17 +29,26 @@ class TestClient < Test::Unit::TestCase
 
   # Test poll works.
   def test_poll_async
+    mn = "test_poll_async" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
     # If the test 'hangs' here, Connection#poll is broken.
     m = @client.poll
     assert m.nil?
-  end
+    p [ "99", mn, "ends" ] if @tcldbg
+  end  unless RUBY_ENGINE =~ /jruby/
 
   # Test ACKs.
   def test_ack_api_works
+    mn = "test_ack_api_works" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
     @client.publish make_destination, message_text, {:suppress_content_length => true}
 
     received = nil
-    @client.subscribe(make_destination, {:ack => 'client'}) {|msg| received = msg}
+    @client.subscribe(make_destination, {:ack => 'client'}) {|msg|
+      received = msg
+      p [ "02", mn, "have_msg" ] if @tcldbg
+    }
+    p [ "03", mn, "sub_done" ] if @tcldbg
     sleep 0.01 until received
     assert_equal message_text, received.body
     receipt = nil
@@ -46,25 +56,36 @@ class TestClient < Test::Unit::TestCase
     if @client.protocol == Stomp::SPL_11 # 1.1 only
       ack_headers["subscription"] = received.headers["subscription"]
     end
-    @client.acknowledge(received, ack_headers) {|r| receipt = r}
+    @client.acknowledge(received, ack_headers) {|r|
+      receipt = r
+      p [ "04", mn, "have_rcpt" ] if @tcldbg
+    }
+    p [ "05", mn, "ack_sent" ] if @tcldbg
     sleep 0.01 until receipt
     assert_not_nil receipt.headers['receipt-id']
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test Client subscribe
   def test_asynch_subscribe
+    mn = "test_async_subscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
     received = false
     @client.subscribe(make_destination) {|msg| received = msg}
     @client.publish make_destination, message_text
     sleep 0.01 until received
 
     assert_equal message_text, received.body
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test not ACKing messages.
   def test_noack
+    mn = "test_noack" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.publish make_destination, message_text
 
     received = nil
@@ -84,10 +105,14 @@ class TestClient < Test::Unit::TestCase
     assert_equal received.body, received2.body
     assert_equal received.headers['message-id'], received2.headers['message-id'] unless ENV['STOMP_RABBIT']
     checkEmsg(@client)
+    p [ "99", mn, "ends" ] if @tcldbg  
   end unless RUBY_ENGINE =~ /jruby/
 
   # Test obtaining a RECEIPT via a listener.
   def test_receipts
+    mn = "test_receipts" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     receipt = false
     @client.publish(make_destination, message_text) {|r| receipt = r}
     sleep 0.1 until receipt
@@ -96,38 +121,54 @@ class TestClient < Test::Unit::TestCase
     @client.subscribe(make_destination) {|m| message = m}
     sleep 0.1 until message
     assert_equal message_text, message.body
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test requesting a receipt on disconnect.
   def test_disconnect_receipt
+    mn = "test_disconnect_receipt" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close :receipt => "xyz789"
     assert_not_nil(@client.disconnect_receipt, "should have a receipt")
     assert_equal(@client.disconnect_receipt.headers['receipt-id'],
       "xyz789", "receipt sent and received should match")
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test publish and immediate subscribe.
   def test_publish_then_sub
+    mn = "test_publish_then_sub" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.publish make_destination, message_text
     message = nil
     @client.subscribe(make_destination) {|m| message = m}
     sleep 0.01 until message
 
     assert_equal message_text, message.body
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?() 
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test that Client subscribe requires a block.
   def test_subscribe_requires_block
+    mn = "test_subscribe_requires_block" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     assert_raise(Stomp::Error::NoListenerGiven) do
       @client.subscribe make_destination
     end
-    checkEmsg(@client)
-  end unless RUBY_ENGINE =~ /jruby/
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
+  end
 
   # Test transaction publish.
   def test_transactional_publish
+    mn = "test_transactional_publish" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.begin 'tx1'
     @client.publish make_destination, message_text, :transaction => 'tx1'
     @client.commit 'tx1'
@@ -137,11 +178,15 @@ class TestClient < Test::Unit::TestCase
     sleep 0.01 until message
 
     assert_equal message_text, message.body
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test transaction publish and abort.
   def test_transaction_publish_then_rollback
+    mn = "test_transaction_publish_then_rollback" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.begin 'tx1'
     @client.publish make_destination, "first_message", :transaction => 'tx1'
     @client.abort 'tx1'
@@ -154,12 +199,16 @@ class TestClient < Test::Unit::TestCase
     @client.subscribe(make_destination) {|m| message = m}
     sleep 0.01 until message
     assert_equal "second_message", message.body
-    checkEmsg(@client)
-  end unless RUBY_ENGINE =~ /jruby/
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
+  end
 
   # Test transaction publish and abort, receive with new client.
   # New client uses ack => client.
   def test_tran_ack_abrt_newcli_cli
+    mn = "test_tran_ack_abrt_newcli_cli" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close if @client && @client.open? # allow tests to close
     @client = get_client()
     q = make_destination
@@ -180,17 +229,17 @@ class TestClient < Test::Unit::TestCase
     case @client.protocol()
       when Stomp::SPL_10
         @client.acknowledge message, :transaction => 'tx1'
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
         @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       else # 1.2+
         @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
     end
     message = nil # reset
     @client.abort 'tx1' # now abort
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
     # lets recreate the connection
     @client.close
     @client = get_client()
@@ -209,22 +258,26 @@ class TestClient < Test::Unit::TestCase
     case @client.protocol()
       when Stomp::SPL_10
         @client.acknowledge message2, :transaction => 'tx2'
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
         @client.acknowledge message2, :transaction => 'tx2', :subscription => message2.headers['subscription']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       else # 1.2+
         @client.acknowledge message2, :transaction => 'tx2', :id => message2.headers['ack']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
     end
     @client.commit 'tx2'
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
     @client.close
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test transaction publish and abort, receive with new client.
   # New client uses ack => auto.
   def test_tran_ack_abrt_newcli_auto
+    mn = "test_tran_ack_abrt_newcli_auto" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close if @client && @client.open? # allow tests to close
     @client = get_client()
     q = make_destination
@@ -245,17 +298,17 @@ class TestClient < Test::Unit::TestCase
     case @client.protocol()
       when Stomp::SPL_10
         @client.acknowledge message, :transaction => 'tx1'
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
         @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       else # 1.2+
         @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
     end
     message = nil # reset
     @client.abort 'tx1' # now abort
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
     # lets recreate the connection
     @client.close
 
@@ -273,42 +326,58 @@ class TestClient < Test::Unit::TestCase
     assert_not_nil message2
     assert_equal data, message2.body
     @client.commit 'tx2'
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
     @client.close
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless ENV['STOMP_ARTEMIS'] # See Artemis docs for 1.3, page 222
 
   # Test that subscription destinations must be unique for a Client.
   def test_raise_on_multiple_subscriptions_to_same_make_destination
+    mn = "test_raise_on_multiple_subscriptions_to_same_make_destination" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest) {|m| nil }
     assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest) {|m| nil }
     end
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test that subscription IDs must be unique for a Client.
   def test_raise_on_multiple_subscriptions_to_same_id
+    mn = "test_raise_on_multiple_subscriptions_to_same_id" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
     assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
     end
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test that subscription IDs must be unique for a Client, mixed id specification.
   def test_raise_on_multiple_subscriptions_to_same_id_mixed
+    mn = "test_raise_on_multiple_subscriptions_to_same_id_mixed" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     subscribe_dest = make_destination
     @client.subscribe(subscribe_dest, {'id' => 'myid'}) {|m| nil }
     assert_raise(Stomp::Error::DuplicateSubscription) do
       @client.subscribe(subscribe_dest, {:id => 'myid'}) {|m| nil }
     end
-    checkEmsg(@client)
+    checkEmsg(@client)  unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test wildcard subscribe.  Primarily for AMQ.
   def  test_asterisk_wildcard_subscribe
+    mn = "test_asterisk_wildcard_subscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     queue_base_name = make_destination
     queue1 = queue_base_name + ".a"
     queue2 = queue_base_name + ".b"
@@ -336,10 +405,14 @@ class TestClient < Test::Unit::TestCase
     end
     assert results.all?{|a| a == true }
     checkEmsg(@client)
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless ENV['STOMP_NOWILD']
 
   # Test wildcard subscribe with >.  Primarily for AMQ.
   def test_greater_than_wildcard_subscribe
+    mn = "test_greater_than_wildcard_subscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     queue_base_name = make_destination + "."
     queue1 = queue_base_name + "foo.a"
     queue2 = queue_base_name + "bar.a"
@@ -371,10 +444,14 @@ class TestClient < Test::Unit::TestCase
     end
     assert results.all?{|a| a == true }
     checkEmsg(@client)
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless ENV['STOMP_NOWILD'] || ENV['STOMP_DOTQUEUE']
 
   # Test transaction with client side reacknowledge.
   def test_transaction_with_client_side_reack
+    mn = "test_transaction_with_client_side_reack" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close if @client && @client.open? # allow tests to close
     @client = get_client()
     q = make_destination
@@ -395,13 +472,13 @@ class TestClient < Test::Unit::TestCase
     case @client.protocol()
       when Stomp::SPL_10
         @client.acknowledge message, :transaction => 'tx1'
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
         @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       else # 1.2+
         @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
     end
     message = nil
     @client.abort 'tx1'
@@ -413,28 +490,36 @@ class TestClient < Test::Unit::TestCase
     case @client.protocol()
       when Stomp::SPL_10
         @client.acknowledge message, :transaction => 'tx2'
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
         @client.acknowledge message, :transaction => 'tx2', :subscription => message.headers['subscription']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
       else # 1.2+
         @client.acknowledge message, :transaction => 'tx2', :id => message.headers['ack']
-        checkEmsg(@client)
+        checkEmsg(@client) unless jruby?()
     end
     @client.commit 'tx2'
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
     @client.close
     @client = nil
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test that a connection frame is received.
   def test_connection_frame
+    mn = "test_connection_frame" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     assert_not_nil @client.connection_frame
     checkEmsg(@client)
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless RUBY_ENGINE =~ /jruby/
 
   # Test basic unsubscribe.
   def test_unsubscribe
+    mn = "test_unsubscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close if @client && @client.open? # close setup work
     @client = nil
     message = nil
@@ -473,12 +558,16 @@ class TestClient < Test::Unit::TestCase
     end
     assert_equal to_send, message_copy.body, "second body check"
     assert_equal message.headers['message-id'], message_copy.headers['message-id'], "header check" unless ENV['STOMP_RABBIT']
-    checkEmsg(client)
+    checkEmsg(client) unless jruby?()
     client.close
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test subscribe from a worker thread.
   def test_thread_one_subscribe
+    mn = "test_thread_one_subscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     msg = nil
     dest = make_destination
     Thread.new(@client) do |acli|
@@ -497,10 +586,14 @@ class TestClient < Test::Unit::TestCase
     sleep 1
     assert_not_nil msg
     checkEmsg(@client)
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless RUBY_ENGINE =~ /jruby/
 
   # Test subscribe from multiple worker threads.
   def test_thread_multi_subscribe
+    mn = "test_thread_multi_subscribe" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     #
     lock = Mutex.new
     msg_ctr = 0
@@ -547,11 +640,15 @@ class TestClient < Test::Unit::TestCase
       sleep sleep_incr
     end
     assert_equal @max_msgs, msg_ctr
-    checkEmsg(@client)
+    checkEmsg(@client) unless jruby?()
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # Test that methods detect no client connection is present.
   def test_closed_checks_client
+    mn = "test_closed_checks_client" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close
     #
     assert_raise Stomp::Error::NoCurrentConnection do
@@ -590,19 +687,27 @@ class TestClient < Test::Unit::TestCase
     assert_raise Stomp::Error::NoCurrentConnection do
       @client.close("dummy_data")
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # test JRuby detection
   def test_jruby_presence
+    mn = "test_jruby_presence" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     if defined?(RUBY_ENGINE) && RUBY_ENGINE =~ /jruby/
       assert @client.jruby?
     else
       assert !@client.jruby?
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # test max redeliveries is not broken (6c2c1c1)
   def test_max_redeliveries
+    mn = "test_max_redeliveries" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close
     2.upto(2) do |max_re|
       rdmsg = "To Be Redelivered: #{max_re.to_s}"
@@ -626,12 +731,17 @@ class TestClient < Test::Unit::TestCase
       assert_equal max_re, rm_actual - 1
       @client.close
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end unless ENV['STOMP_ARTEMIS'] # need to investigate this, but skip
   # Artemis for now
 
   # test issue99, OK values
   def test_cli_iss99_ok
+
     return unless host() == "localhost" && port() == 61613
+    mn = "test_cli_iss99_ok" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close
     #
     ok_vals = dflt_data_ok()
@@ -639,11 +749,15 @@ class TestClient < Test::Unit::TestCase
       cli = Stomp::Client.open(hsv)
       cli.close
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   # test issue99, exception values
   def test_cli_iss99_ex
     return unless host() == "localhost" && port() == 61613
+    mn = "test_cli_iss99_ex" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     @client.close
     #
     ex_vals = dflt_data_ex()
@@ -652,24 +766,37 @@ class TestClient < Test::Unit::TestCase
         _ = Stomp::Client.open(hsv)
       end
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   def test_cli_nodest_sub
+    mn = "test_cli_nodest_sub" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     assert_raise Stomp::Error::DestinationRequired do
       @client.subscribe(nil) {|msg| puts msg}
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   def test_cli_nodest_unsub
+    mn = "test_cli_nodest_unsub" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     assert_raise Stomp::Error::DestinationRequired do
       @client.unsubscribe(nil)
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   def test_cli_nodest_pub
+    mn = "test_cli_nodest_pub" if @tcldbg
+    p [ "01", mn, "starts" ] if @tcldbg
+
     assert_raise Stomp::Error::DestinationRequired do
       @client.publish(nil, "msg")
     end
+    p [ "99", mn, "ends" ] if @tcldbg
   end
 
   private
