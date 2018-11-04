@@ -54,6 +54,7 @@ class TestURLLogins < Test::Unit::TestCase
     @badparms = "failover://(stomp://#{hostname}:#{portnum})?a=b&noequal"
 
     @client = nil
+    @turdbg = ENV['TURDBG'] ? true : false
   end
 
   def teardown
@@ -62,16 +63,23 @@ class TestURLLogins < Test::Unit::TestCase
 
   # test stomp:// URLs
   def test_0010_stomp_urls()
+    mn = "test_0010_stomp_urls" if @turdbg
+    p [ "01", mn, "starts" ] if @turdbg
+
     @tdstomp.each_with_index do |url, ndx|
       c = Stomp::Client.new(url)
       assert !c.nil?, url
       assert c.open?, url
       c.close
     end
+    p [ "99", mn, "ends" ] if @turdbg
   end
 
   # test failover:// urls - tcp
   def test_0020_failover_urls_tcp()
+    mn = "test_0020_failover_urls_tcp" if @turdbg
+    p [ "01", mn, "starts" ] if @turdbg
+
     @tdfailover.each_with_index do |url, ndx|
       # p [ "xurl", url, "xndx", ndx ]
       c = Stomp::Client.new(url)
@@ -79,10 +87,14 @@ class TestURLLogins < Test::Unit::TestCase
       assert c.open?, url
       c.close
     end
+    p [ "99", mn, "ends" ] if @turdbg
   end
 
   # test failover:// urls - ssl
-  def test_0020_failover_urls_ssl()
+  def test_0030_failover_urls_ssl()
+    mn = "test_0030_failover_urls_ssl" if @turdbg
+    p [ "01", mn, "starts" ] if @turdbg
+
     @sslfailover.each_with_index do |url, ndx|
       # p [ "sslxurl", url, "sslxndx", ndx ]
       c = Stomp::Client.new(url)
@@ -90,13 +102,18 @@ class TestURLLogins < Test::Unit::TestCase
       assert c.open?, url
       c.close
     end
+    p [ "99", mn, "ends" ] if @turdbg
   end if ENV['STOMP_TESTSSL']
 
   # test failover:// with bad parameters
-  def test_0020_failover_badparms()
+  def test_0040_failover_badparms()
+    mn = "test_0040_failover_badparms" if @turdbg
+    p [ "01", mn, "starts" ] if @turdbg
+
     assert_raise(Stomp::Error::MalformedFailoverOptionsError) {
       _ = Stomp::Client.new(@badparms)
     }
+    p [ "99", mn, "ends" ] if @turdbg
   end
 
 end unless ENV['STOMP_RABBIT']
