@@ -47,7 +47,7 @@ module TestBase
 
   # Get SSL port
   def ssl_port
-    (ENV['STOMP_SSLPORT'] || 61612).to_i
+    (ENV['STOMP_SSLPORT'] || 61611).to_i
   end
 
   # Helper for minitest on 1.9
