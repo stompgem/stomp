@@ -1,5 +1,11 @@
 # Stomp Gem Change Log
 
+## 1.4.6 20181105
+
+* Fix broken JRuby support.  Issue #153.
+* Rework many tests for JRuby support.
+* Add optional debug output to all tests.
+
 ## 1.4.5 20181027
 
 * Add option for no timeout on network read

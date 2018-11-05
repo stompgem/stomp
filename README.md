@@ -94,7 +94,8 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
-* Gem version 1.4.5. Miscellaneous fixes, see CHANGELOG.md for details.
+* Gem version 1.4.6. Fix version 1.4.5 which breaks JRuby support.
+* Gem version 1.4.5. JRuby broken here.  Use is not recommended.
 * Gem version 1.4.4. Miscellaneous fixes, see CHANGELOG.md for details.
 * Gem version 1.4.3. Fix broken install.  Do not try to install 1.4.2.
 * Gem version 1.4.2. Fix memory leak, and others !: see CHANGELOG.md for details.
@@ -319,7 +320,7 @@ Rafael Rosa
 2010-03-23
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0074)
+(0087)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -805,3 +806,4 @@ Meg Richards
 </td>
 </tr>
 </table>
+
