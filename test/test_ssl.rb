@@ -50,6 +50,9 @@ class TestSSL < Test::Unit::TestCase
     p [ "01", mn, "starts" ] if @tssdbg
 
     _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_file => "dummy2")
+    _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_text => "dummy3")
+    _ = Stomp::SSLParams.new(:cert_text => "dummy1", :key_file => "dummy2")
+    _ = Stomp::SSLParams.new(:cert_text => "dummy4", :key_text => "dummy3")
     _ = Stomp::SSLParams.new(:ts_files => "dummyts1")
     _ = Stomp::SSLParams.new(:ts_files => "dummyts1", 
       :cert_file => "dummy1", :key_file => "dummy2")
@@ -61,11 +64,42 @@ class TestSSL < Test::Unit::TestCase
     mn = "test_ssl_0030_raise" if @tssdbg
     p [ "01", mn, "starts" ] if @tssdbg
 
+    key_text = '-----BEGIN PRIVATE KEY-----
+    fake_key
+    -----END PRIVATE KEY-----'
+    cert_text = '------BEGIN CERTIFICATE-----
+    fake_cert
+    ------END CERTIFICATE-----'
+
     assert_raise(Stomp::Error::SSLClientParamsError) {
       _ = Stomp::SSLParams.new(:cert_file => "dummy1")
     }
     assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:cert_text => cert_text)
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
       _ = Stomp::SSLParams.new(:key_file => "dummy2")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:key_text => key_text)
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:cert_text => cert_text, :cert_file => "dummy1")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:key_text => key_text, :cert_text => cert_text, :cert_file => "dummy1")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:key_file => "dummy2", :cert_text => cert_text, :cert_file => "dummy1")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:key_text => key_text, :key_file => "dummy2")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:cert_file => "dummy1", :key_text => key_text, :key_file => "dummy2")
+    }
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:cert_text => cert_text, :key_text => key_text, :key_file => "dummy2")
     }
     p [ "99", mn, "ends" ] if @tssdbg
   end
@@ -87,24 +121,6 @@ class TestSSL < Test::Unit::TestCase
       _ = Stomp::SSLParams.new(:ts_files => "/tmp/not-likely-here.txt", 
         :fsck => true)
     }
-    p [ "99", mn, "ends" ] if @tssdbg
-  end
-
-  # Test using file cert_text and key_text (normally stored in ENVs)
-  def test_ssl_0050_certtext
-    mn = "test_ssl_0050_certtext" if @tssdbg
-    p [ "01", mn, "starts" ] if @tssdbg
-    key_text = '-----BEGIN PRIVATE KEY-----
-    fake_key
-    -----END PRIVATE KEY-----'
-    cert_text = '------BEGIN CERTIFICATE-----
-    fake_cert
-    ------END CERTIFICATE-----'
-
-    assert_raise(Stomp::Error::SSLClientParamsError) {
-      _ = Stomp::SSLParams.new(:cert_text => cert_text, :key_text => key_text)
-    }
-
     p [ "99", mn, "ends" ] if @tssdbg
   end
 
