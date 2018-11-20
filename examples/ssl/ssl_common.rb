@@ -51,6 +51,30 @@ module SSLCommon
 		ENV['CLI_KEY'] || pck() # The client private key File
   end
 
+  # Client cert file name.  Change or specify.
+  # This is the author's default.
+  def cli_cert_text()
+    fake_cert = '------BEGIN CERTIFICATE-----
+    fake_cert
+    ------END CERTIFICATE-----'
+
+    # The client cert text is stored in environmental variable
+    ENV['CLI_CERT_TEXT'] || fake_cert
+    
+  end
+
+  # Client private key .  Change or specify.
+  # This is the author's default.
+  # This file should not be exposed to the outside world.
+  def cli_key_text()
+    fake_key = '-----BEGIN PRIVATE KEY-----
+    fake_key
+    -----END PRIVATE KEY-----'
+
+    # The client private key text is stored in environment variable
+    ENV['CLI_KEY_TEXT'] ||  fake_key
+  end
+
 	# Server Data.
 
   # Server file location/directory.  Change or specify.

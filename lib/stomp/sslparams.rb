@@ -18,6 +18,12 @@ module Stomp
   # The client private key file.
   attr_accessor :key_file
 
+# The client certificate text.
+  attr_accessor :cert_text
+
+  # The client private key text.
+  attr_accessor :key_text
+
   # The client private key password.
   attr_accessor :key_password
 
@@ -52,12 +58,20 @@ module Stomp
    # or a CSV list of cert file names
 
    # Client authentication parameters
-   @cert_file = opts[:cert_file]         # Client cert
-   @key_file = opts[:key_file]           # Client key
-   @key_password = opts[:key_password]           # Client key password
+   @cert_file = opts[:cert_file]         # Client cert file
+   @key_file = opts[:key_file]           # Client key file
+   @cert_text = opts[:cert_text]         # Client cert text
+   @key_text = opts[:key_text]           # Client key text
+   @key_password = opts[:key_password]   # Client key password
    #
-   raise Stomp::Error::SSLClientParamsError if @cert_file.nil? && !@key_file.nil?
-   raise Stomp::Error::SSLClientParamsError if !@cert_file.nil? && @key_file.nil?
+   raise Stomp::Error::SSLClientParamsError if !@cert_file.nil? && @key_file.nil? && @key_text.nil?
+   raise Stomp::Error::SSLClientParamsError if !@cert_text.nil? && @key_file.nil? && @key_text.nil?
+   raise Stomp::Error::SSLClientParamsError if !@cert_text.nil? && !@cert_file.nil?
+
+   raise Stomp::Error::SSLClientParamsError if !@key_file.nil? && @cert_file.nil? && @cert_text.nil?
+   raise Stomp::Error::SSLClientParamsError if !@key_text.nil? && @cert_file.nil? && @cert_text.nil?
+   raise Stomp::Error::SSLClientParamsError if !@key_text.nil? && !@key_file.nil?
+
    #
    @ciphers = opts[:ciphers]
    @use_ruby_ciphers = opts[:use_ruby_ciphers] ? opts[:use_ruby_ciphers] : false

@@ -90,6 +90,24 @@ class TestSSL < Test::Unit::TestCase
     p [ "99", mn, "ends" ] if @tssdbg
   end
 
+  # Test using file cert_text and key_text (normally stored in ENVs)
+  def test_ssl_0050_certtext
+    mn = "test_ssl_0050_certtext" if @tssdbg
+    p [ "01", mn, "starts" ] if @tssdbg
+    key_text = '-----BEGIN PRIVATE KEY-----
+    fake_key
+    -----END PRIVATE KEY-----'
+    cert_text = '------BEGIN CERTIFICATE-----
+    fake_cert
+    ------END CERTIFICATE-----'
+
+    assert_raise(Stomp::Error::SSLClientParamsError) {
+      _ = Stomp::SSLParams.new(:cert_text => cert_text, :key_text => key_text)
+    }
+
+    p [ "99", mn, "ends" ] if @tssdbg
+  end
+
   #
 end if ENV['STOMP_TESTSSL']
 
