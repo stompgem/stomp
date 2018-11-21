@@ -393,7 +393,8 @@ module Stomp
             end
 
             if @ssl.key_text
-              ctx.key  = OpenSSL::PKey::RSA.new(@ssl.key_text, @ssl.key_password)
+              nt = @ssl.key_text.gsub(/\t/, "")
+              ctx.key  = OpenSSL::PKey::RSA.new(nt, @ssl.key_password)
             end
 
             # Cipher list

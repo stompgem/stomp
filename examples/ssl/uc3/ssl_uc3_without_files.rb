@@ -44,7 +44,7 @@ class ExampleSSL3woFiles
     # Possibly change the cert file(s) name(s) here.    
     ssl_opts = Stomp::SSLParams.new(
       :key_text => cli_key_text().to_s,  # the client's private key, private data
-      :cert_text => cli_cert().to_s      # the client's signed certificate 
+      :cert_text => cli_cert_text().to_s      # the client's signed certificate 
     )
     puts "SSLOPTS: #{ssl_opts.inspect}"
     #
