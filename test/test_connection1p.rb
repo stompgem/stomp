@@ -197,6 +197,7 @@ class TestConnection1P < Test::Unit::TestCase
   end if ENV['STOMP_HB11LONG']
 
   # Test only receiving heartbeats.
+  # This is a no-no with Artemis, you must send, see docs
   def test_conn_1p_0090
     mn = "test_conn_1p_0090" if @tc1dbg
     p [ "01", mn, "starts" ] if @tc1dbg
@@ -215,7 +216,7 @@ class TestConnection1P < Test::Unit::TestCase
     conn.disconnect
     hb_asserts_recv(conn)
     p [ "99", mn, "ends" ] if @tc1dbg
-  end if ENV['STOMP_HB11LONG']
+  end if ENV['STOMP_HB11LONG'] && !ENV['STOMP_ARTEMIS']
 
   # Test sending and receiving heartbeats.
   def test_conn_1p_0100

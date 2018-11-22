@@ -169,9 +169,10 @@ class TestClient < Test::Unit::TestCase
     mn = "test_transactional_publish" if @tcldbg
     p [ "01", mn, "starts" ] if @tcldbg
 
-    @client.begin 'tx1'
-    @client.publish make_destination, message_text, :transaction => 'tx1'
-    @client.commit 'tx1'
+    tid = "tx1A"
+    @client.begin tid
+    @client.publish make_destination, message_text, :transaction => tid
+    @client.commit tid
 
     message = nil
     @client.subscribe(make_destination) {|m| message = m}
@@ -180,20 +181,20 @@ class TestClient < Test::Unit::TestCase
     assert_equal message_text, message.body
     checkEmsg(@client) unless jruby?()
     p [ "99", mn, "ends" ] if @tcldbg
-  end
+  end unless ENV['STOMP_ARTEMIS']
 
   # Test transaction publish and abort.
   def test_transaction_publish_then_rollback
     mn = "test_transaction_publish_then_rollback" if @tcldbg
     p [ "01", mn, "starts" ] if @tcldbg
 
-    @client.begin 'tx1'
-    @client.publish make_destination, "first_message", :transaction => 'tx1'
-    @client.abort 'tx1'
+    @client.begin tid
+    @client.publish make_destination, "first_message", :transaction => tid
+    @client.abort tid
 
-    @client.begin 'tx1'
-    @client.publish make_destination, "second_message", :transaction => 'tx1'
-    @client.commit 'tx1'
+    @client.begin tid
+    @client.publish make_destination, "second_message", :transaction => tid
+    @client.commit tid
 
     message = nil
     @client.subscribe(make_destination) {|m| message = m}
@@ -201,7 +202,7 @@ class TestClient < Test::Unit::TestCase
     assert_equal "second_message", message.body
     checkEmsg(@client) unless jruby?()
     p [ "99", mn, "ends" ] if @tcldbg
-  end
+  end unless ENV['STOMP_ARTEMIS']
 
   # Test transaction publish and abort, receive with new client.
   # New client uses ack => client.
@@ -209,13 +210,14 @@ class TestClient < Test::Unit::TestCase
     mn = "test_tran_ack_abrt_newcli_cli" if @tcldbg
     p [ "01", mn, "starts" ] if @tcldbg
 
+    tid = "tx1B"
     @client.close if @client && @client.open? # allow tests to close
     @client = get_client()
     q = make_destination
     data = message_text
     @client.publish q, data
 
-    @client.begin 'tx1'
+    @client.begin tid
     message = nil
     sid = nil
     if @client.protocol() == Stomp::SPL_10
@@ -228,24 +230,25 @@ class TestClient < Test::Unit::TestCase
     assert_equal data, message.body
     case @client.protocol()
       when Stomp::SPL_10
-        @client.acknowledge message, :transaction => 'tx1'
+        @client.acknowledge message, :transaction => tid
         checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
-        @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
+        @client.acknowledge message, :transaction => tid, :subscription => message.headers['subscription']
         checkEmsg(@client) unless jruby?()
       else # 1.2+
-        @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
+        @client.acknowledge message, :transaction => tid, :id => message.headers['ack']
         checkEmsg(@client) unless jruby?()
     end
     message = nil # reset
-    @client.abort 'tx1' # now abort
+    @client.abort tid # now abort
     checkEmsg(@client) unless jruby?()
     # lets recreate the connection
     @client.close
     @client = get_client()
     sid = nil
     message2 = nil
-    @client.begin 'tx2'
+    tid2 = "tx2A"
+    @client.begin tid2
     if @client.protocol() == Stomp::SPL_10
       @client.subscribe(q, :ack => 'client') {|m| message2 = m}
     else # 1.1 and 1.2 are the same for this
@@ -257,16 +260,16 @@ class TestClient < Test::Unit::TestCase
     assert_equal data, message2.body
     case @client.protocol()
       when Stomp::SPL_10
-        @client.acknowledge message2, :transaction => 'tx2'
+        @client.acknowledge message2, :transaction => tid2
         checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
-        @client.acknowledge message2, :transaction => 'tx2', :subscription => message2.headers['subscription']
+        @client.acknowledge message2, :transaction => tid2, :subscription => message2.headers['subscription']
         checkEmsg(@client) unless jruby?()
       else # 1.2+
-        @client.acknowledge message2, :transaction => 'tx2', :id => message2.headers['ack']
+        @client.acknowledge message2, :transaction => tid2, :id => message2.headers['ack']
         checkEmsg(@client) unless jruby?()
     end
-    @client.commit 'tx2'
+    @client.commit tid2
     checkEmsg(@client) unless jruby?()
     @client.close
     p [ "99", mn, "ends" ] if @tcldbg
@@ -278,13 +281,14 @@ class TestClient < Test::Unit::TestCase
     mn = "test_tran_ack_abrt_newcli_auto" if @tcldbg
     p [ "01", mn, "starts" ] if @tcldbg
 
+    tid = "tx1C"
     @client.close if @client && @client.open? # allow tests to close
     @client = get_client()
     q = make_destination
     data = message_text
     @client.publish q, data
 
-    @client.begin 'tx1'
+    @client.begin tid
     message = nil
     sid = nil
     if @client.protocol() == Stomp::SPL_10
@@ -297,17 +301,17 @@ class TestClient < Test::Unit::TestCase
     assert_equal data, message.body
     case @client.protocol()
       when Stomp::SPL_10
-        @client.acknowledge message, :transaction => 'tx1'
+        @client.acknowledge message, :transaction => tid
         checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
-        @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
+        @client.acknowledge message, :transaction => tid, :subscription => message.headers['subscription']
         checkEmsg(@client) unless jruby?()
       else # 1.2+
-        @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
+        @client.acknowledge message, :transaction => tid, :id => message.headers['ack']
         checkEmsg(@client) unless jruby?()
     end
     message = nil # reset
-    @client.abort 'tx1' # now abort
+    @client.abort tid # now abort
     checkEmsg(@client) unless jruby?()
     # lets recreate the connection
     @client.close
@@ -315,7 +319,8 @@ class TestClient < Test::Unit::TestCase
     @client = get_client()
     sid = nil
     message2 = nil
-    @client.begin 'tx2'
+    tid2 = "tx2C"
+    @client.begin tid2 
     if @client.protocol() == Stomp::SPL_10
       @client.subscribe(q, :ack => 'auto') {|m| message2 = m}
     else # 1.1 and 1.2 are the same for this
@@ -325,7 +330,7 @@ class TestClient < Test::Unit::TestCase
     sleep 0.01 until message2
     assert_not_nil message2
     assert_equal data, message2.body
-    @client.commit 'tx2'
+    @client.commit tid2 
     checkEmsg(@client) unless jruby?()
     @client.close
     p [ "99", mn, "ends" ] if @tcldbg
@@ -457,8 +462,8 @@ class TestClient < Test::Unit::TestCase
     q = make_destination
     data = message_text
     @client.publish q, data
-
-    @client.begin 'tx1'
+    tid = "tx1D"
+    @client.begin tid
     message = nil
     sid = nil
     if @client.protocol() == Stomp::SPL_10
@@ -471,39 +476,40 @@ class TestClient < Test::Unit::TestCase
     assert_equal data, message.body
     case @client.protocol()
       when Stomp::SPL_10
-        @client.acknowledge message, :transaction => 'tx1'
+        @client.acknowledge message, :transaction => tid
         checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
-        @client.acknowledge message, :transaction => 'tx1', :subscription => message.headers['subscription']
+        @client.acknowledge message, :transaction => tid, :subscription => message.headers['subscription']
         checkEmsg(@client) unless jruby?()
       else # 1.2+
-        @client.acknowledge message, :transaction => 'tx1', :id => message.headers['ack']
+        @client.acknowledge message, :transaction => tid, :id => message.headers['ack']
         checkEmsg(@client) unless jruby?()
     end
     message = nil
-    @client.abort 'tx1'
+    @client.abort tid
     # Wait for redlivery (Client logic)
     sleep 0.1 while message.nil?
     assert_not_nil message
     assert_equal data, message.body
-    @client.begin 'tx2'
+    tid2 = "tx2D"
+    @client.begin tid2
     case @client.protocol()
       when Stomp::SPL_10
-        @client.acknowledge message, :transaction => 'tx2'
+        @client.acknowledge message, :transaction => tid2
         checkEmsg(@client) unless jruby?()
       when Stomp::SPL_11
-        @client.acknowledge message, :transaction => 'tx2', :subscription => message.headers['subscription']
+        @client.acknowledge message, :transaction => tid2, :subscription => message.headers['subscription']
         checkEmsg(@client) unless jruby?()
       else # 1.2+
-        @client.acknowledge message, :transaction => 'tx2', :id => message.headers['ack']
+        @client.acknowledge message, :transaction => tid2, :id => message.headers['ack']
         checkEmsg(@client) unless jruby?()
     end
-    @client.commit 'tx2'
+    @client.commit tid2
     checkEmsg(@client) unless jruby?()
     @client.close
     @client = nil
     p [ "99", mn, "ends" ] if @tcldbg
-  end
+  end unless ENV['STOMP_ARTEMIS']
 
   # Test that a connection frame is received.
   def test_connection_frame
