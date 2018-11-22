@@ -164,7 +164,7 @@ module Stomp
           begin
             delta = curt - @lr
             if delta > sleeptime
-              slog(:on_hbfire, log_params, "receive_heartbeat", {})
+              slog(:on_hbfire, log_params, "receive_heartbeat", {:delta => delta})
               # Client code could be off doing something else (that is, no reading of
               # the socket has been requested by the caller).  Try to  handle that case.
               lock = @read_semaphore.try_lock
