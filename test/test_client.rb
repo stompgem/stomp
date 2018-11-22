@@ -188,6 +188,7 @@ class TestClient < Test::Unit::TestCase
     mn = "test_transaction_publish_then_rollback" if @tcldbg
     p [ "01", mn, "starts" ] if @tcldbg
 
+    tid = "txrb1"
     @client.begin tid
     @client.publish make_destination, "first_message", :transaction => tid
     @client.abort tid
