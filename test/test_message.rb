@@ -146,7 +146,7 @@ class TestMessage < Test::Unit::TestCase
     _ = Stomp::Message.new("ERROR\nh1:val1\n\njunk\0\n", false)
 
     p [ "99", mn, "ends" ] if @tmsdbg
-	end
+  end
 
 	# Test multiple headers with the same key
   def test_0050_mh_msg_create
