@@ -292,7 +292,7 @@ Thiago Morello
 2009-12-25
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0364)
+(0362)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -320,7 +320,7 @@ Rafael Rosa
 2010-03-23
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0087)
+(0092)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -805,5 +805,18 @@ Meg Richards
  / &lt;mouse@cmu.edu&gt;
 </td>
 </tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2018-11-19
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0003)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Katharine
+</span>
+ / &lt;krsibbald@gmail.com&gt;
+</td>
+</tr>
 </table>
-
