@@ -1,5 +1,12 @@
 # Stomp Gem Change Log
 
+## 1.4.7 20181210
+
+* Support SSL cert/key in text format.
+* Test adjustments for Artemis
+* Correct missing variable name
+* Fix Ruby 2.6 test indentation warning
+
 ## 1.4.6 20181105
 
 * Fix broken JRuby support.  Issue #153.
