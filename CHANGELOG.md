@@ -1,5 +1,10 @@
 # Stomp Gem Change Log
 
+## 1.4.8 20181219
+
+* Fix missed merge from 1.4.7 release.
+* Add global debug output flag to all unit tests.
+
 ## 1.4.7 20181210
 
 * Support SSL cert/key in text format.
@@ -38,7 +43,7 @@
 
 ## 1.4.3 20160821
 
-* Quick fix of install failures.  Do not try to use install 1.4.2.
+* Quick fix of install failures.  Do not try to install 1.4.2.
 
 ## 1.4.2 20160820
 

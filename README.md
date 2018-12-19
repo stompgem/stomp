@@ -94,6 +94,8 @@ A Stomp URL must begin with 'stomp://' and can be in one of the following forms:
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.8. Fix missed merge in 1.4.7 release.
+* Gem version 1.4.7. Add support for text SSL certs.  Do not use, use 1.4.8 instead.
 * Gem version 1.4.6. Fix version 1.4.5 which breaks JRuby support.
 * Gem version 1.4.5. JRuby broken here.  Use is not recommended.
 * Gem version 1.4.4. Miscellaneous fixes, see CHANGELOG.md for details.
