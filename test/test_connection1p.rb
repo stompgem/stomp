@@ -17,7 +17,7 @@ class TestConnection1P < Test::Unit::TestCase
   
   def setup
     @conn = get_connection()
-    @tc1dbg = ENV['TC1DBG'] ? true : false
+    @tc1dbg = ENV['TC1DBG'] || ENV['TDBGALL']  ? true : false
   end
 
   def teardown

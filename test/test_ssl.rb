@@ -17,7 +17,7 @@ class TestSSL < Test::Unit::TestCase
   
   def setup
     @conn = get_ssl_connection()
-    @tssdbg = ENV['TSSDBG'] ? true : false 
+    @tssdbg = ENV['TSSDBG'] || ENV['TDBGALL']  ? true : false 
   end
 
   def teardown

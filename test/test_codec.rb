@@ -20,7 +20,7 @@ class TestCodec < Test::Unit::TestCase
     # Data for multi_thread tests
     @max_threads = 20
     @max_msgs = 100
-    @tcodbg = ENV['TCODBG'] ? true : false
+    @tcodbg = ENV['TCODBG'] || ENV['TDBGALL']  ? true : false
   end
 
   def teardown

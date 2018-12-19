@@ -20,7 +20,7 @@ class TestAnonymous < Test::Unit::TestCase
     # Data for multi_thread tests
     @max_threads = 20
     @max_msgs = 100
-    @tandbg = ENV['TANDBG'] ? true : false
+    @tandbg = ENV['TANDBG'] || ENV['TDBGALL']  ? true : false
   end
 
   def teardown

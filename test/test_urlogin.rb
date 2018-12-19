@@ -54,7 +54,7 @@ class TestURLLogins < Test::Unit::TestCase
     @badparms = "failover://(stomp://#{hostname}:#{portnum})?a=b&noequal"
 
     @client = nil
-    @turdbg = ENV['TURDBG'] ? true : false
+    @turdbg = ENV['TURDBG'] || ENV['TDBGALL'] ? true : false
   end
 
   def teardown

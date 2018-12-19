@@ -20,7 +20,7 @@ class TestClient < Test::Unit::TestCase
     # Multi_thread test data
     @max_threads = 20
     @max_msgs = 50
-    @tcldbg = ENV['TCLDBG'] ? true : false
+    @tcldbg = ENV['TCLDBG'] || ENV['TDBGALL'] ? true : false
   end
 
   def teardown

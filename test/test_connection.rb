@@ -20,7 +20,7 @@ class TestConnection < Test::Unit::TestCase
     # Data for multi_thread tests
     @max_threads = 20
     @max_msgs = 100
-    @tcndbg = ENV['TCNDBG'] ? true : false
+    @tcndbg = ENV['TCNDBG'] || ENV['TDBGALL']  ? true : false
   end
 
   def teardown
