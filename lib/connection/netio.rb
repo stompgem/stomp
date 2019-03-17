@@ -248,6 +248,8 @@ module Stomp
           # Lets send this header in the message, so it can maintain state when using unreceive
           headers[:'content-length'] = "#{body_length_bytes}" unless headers[:suppress_content_length]
           headers[:'content-type'] = "text/plain; charset=UTF-8" unless headers[:'content-type'] || headers[:suppress_content_type]
+          p [ "_transmit_command", command ] if dtrdbg
+          p [ "_transmit_headers", headers ] if dtrdbg
           _wire_write(used_socket,command)
           headers.each do |k,v|
             if v.is_a?(Array)
@@ -260,6 +262,7 @@ module Stomp
           end
           _wire_write(used_socket,"")
           if body != ''
+            p [ "_transmit_body", body ] if dtrdbg
             if headers[:suppress_content_length]
               if tz = body.index("\00")
                 used_socket.write body[0..tz-1]
@@ -271,7 +274,8 @@ module Stomp
             end
           end
           used_socket.write "\0"
-          used_socket.flush if autoflush
+          # used_socket.flush if autoflush
+          used_socket.flush
 
           if @protocol >= Stomp::SPL_11
             @ls = Time.now.to_f if @hbs

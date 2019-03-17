@@ -87,11 +87,18 @@ class ConnectionPutGetExample
     #
     puts "\nConnection start puts"
     nm = nmsgs()
+    ph = {:persistent => true}
+    ph['suppress_content_length'] = 'yes' if suppresscl()
+    puts "Put Headers: #{ph}"
     1.upto(nm) do |n|
       data = "message payload: #{n} #{Time.now.to_f}"
-      conn.publish(qname, data)
+      conn.publish(qname, data, ph)
       puts "Sent: #{data}"
     end
+
+    #conn.disconnect()
+    #conn = get_connection()
+    
     puts
     puts "Connection start receives"
     # Receives

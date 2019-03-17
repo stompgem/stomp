@@ -38,7 +38,7 @@ class FilePutGet
     conn = get_connection()
     puts "pgf005: Qname is: #{@qname}"
     # Try to gracefully handle files that exceed broker size limits.
-    ph = {:presistent => true}
+    ph = {:persistent => true}
     ph['suppress_content_length'] = 'yes' if suppresscl()
     puts "pgf006: Headers are: #{ph.inspect}"
     begin
@@ -76,4 +76,4 @@ end
 #
 e = FilePutGet.new()
 e.doput()
-e.doget()
+# e.doget()
