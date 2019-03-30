@@ -82,9 +82,14 @@ class TestConnection < Test::Unit::TestCase
   def test_receipt
     mn = "test_receipt" if @tcndbg
     p [ "01", mn, "starts" ] if @tcndbg
+    p [ "02", @conn.protocol ] if @tcndbg
     conn_subscribe make_destination, :receipt => "abc"
     msg = @conn.receive
-    assert_equal "abc", msg.headers['receipt-id']
+    p [ "05", msg.headers['receipt-id'].class,  msg.headers['receipt-id'].is_a?(Array) ]  if @tcndbg
+    #
+    tval = msg.headers['receipt-id']
+    tval = msg.headers['receipt-id'][0] if msg.headers['receipt-id'].is_a?(Array)
+    assert_equal "abc", tval
     checkEmsg(@conn)
     p [ "99", mn, "ends" ] if @tcndbg
   end

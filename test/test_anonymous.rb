@@ -84,7 +84,9 @@ class TestAnonymous < Test::Unit::TestCase
     p [ "01", mn, "starts" ] if @tandbg
     conn_subscribe make_destination, :receipt => "abc"
     msg = @conn.receive
-    assert_equal "abc", msg.headers['receipt-id']
+    tval = msg.headers['receipt-id']
+    tval = msg.headers['receipt-id'][0] if msg.headers['receipt-id'].is_a?(Array)
+    assert_equal "abc", tval
     checkEmsg(@conn)
     p [ "99", mn, "ends" ] if @tandbg
   end
