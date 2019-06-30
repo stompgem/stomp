@@ -156,7 +156,8 @@ module Stomp
             raise sfex
           end
           #
-          if @protocol >= Stomp::SPL_11 && msg.command != Stomp::CMD_CONNECTED
+          # Always decode headers, even for 1.0. Issue #160.
+          if msg.command != Stomp::CMD_CONNECTED
             msg.headers = _decodeHeaders(msg.headers)
           end
           p [ "_receive_ends", msg.command, msg.headers ] if drdbg
@@ -227,9 +228,10 @@ module Stomp
         dtrdbg = ENV['DTRDBG'] ? true : false
         # p [ "wirewrite" ]
         # _dump_callstack()
-
+        p [ "_transmit_headers_in1", headers ] if dtrdbg
         if @protocol >= Stomp::SPL_11 && command != Stomp::CMD_CONNECT
           headers = _encodeHeaders(headers)
+          p [ "_transmit_headers_in2", headers ] if dtrdbg
         end
         @transmit_semaphore.synchronize do
           p [ "_transmit_lock", Thread::current() ] if dtrdbg
