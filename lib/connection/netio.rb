@@ -327,6 +327,7 @@ module Stomp
       # open_ssl_socket opens an SSL socket.
       def open_ssl_socket()
         require 'openssl' unless defined?(OpenSSL)
+        ossdbg = ENV['OSSDBG'] ? true : false
         begin # Any raised SSL exceptions
           ctx = @sslctx_newparm ? OpenSSL::SSL::SSLContext.new(@sslctx_newparm) : OpenSSL::SSL::SSLContext.new
           ctx.verify_mode = OpenSSL::SSL::VERIFY_NONE # Assume for now
@@ -372,37 +373,66 @@ module Stomp
               end
               ctx.cert_store = truststores
             end
-
+            #
+            p [ "OSSL50", "old code starts" ] if ossdbg
+            usecert = nil
+            usekey = nil
             # Client authentication
             # If cert exists as a file, then it should not be input as text
-            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_file.nil? && !@ssl.cert_text.nil?
+            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_file.nil? &&
+              !@ssl.cert_text.nil?
             # If cert exists as file, then key must exist, either as text or file
-            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_file.nil? && @ssl.key_file.nil? && @ssl.key_text.nil?
+            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_file.nil? &&
+              @ssl.key_file.nil? && @ssl.key_text.nil?
             if @ssl.cert_file
               raise Stomp::Error::SSLNoCertFileError if !File::exists?(@ssl.cert_file)
               raise Stomp::Error::SSLUnreadableCertFileError if !File::readable?(@ssl.cert_file)
-              ctx.cert = OpenSSL::X509::Certificate.new(File.read(@ssl.cert_file))
+              p [ "OSSL51", "old code cert file read" ] if ossdbg
+              usecert = OpenSSL::X509::Certificate.new(File.read(@ssl.cert_file))
             end
-
             # If cert exists as file, then key must exist, either as text or file
-            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_text.nil? && @ssl.key_file.nil? && @ssl.key_text.nil?
+            raise Stomp::Error::SSLClientParamsError if !@ssl.cert_text.nil? &&
+              @ssl.key_file.nil? && @ssl.key_text.nil?
             if @ssl.cert_text
-              ctx.cert = OpenSSL::X509::Certificate.new(@ssl.cert_text)
+              p [ "OSSL52", "old code cert text get" ] if ossdbg
+              usecert = OpenSSL::X509::Certificate.new(@ssl.cert_text)
             end
 
             # If key exists as a text, then it should not be input as file
-            raise Stomp::Error::SSLClientParamsError if !@ssl.key_text.nil? && !@ssl.key_file.nil?
+            raise Stomp::Error::SSLClientParamsError if !@ssl.key_text.nil? &&
+              !@ssl.key_file.nil?
             if @ssl.key_file
               raise Stomp::Error::SSLNoKeyFileError if !File::exists?(@ssl.key_file)
               raise Stomp::Error::SSLUnreadableKeyFileError if !File::readable?(@ssl.key_file)
-              ctx.key  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file), @ssl.key_password)
+              p [ "OSSL53", "old code key file read" ] if ossdbg
+              usekey  = OpenSSL::PKey::RSA.new(File.read(@ssl.key_file), @ssl.key_password)
             end
 
             if @ssl.key_text
               nt = @ssl.key_text.gsub(/\t/, "")
-              ctx.key  = OpenSSL::PKey::RSA.new(nt, @ssl.key_password)
+              p [ "OSSL54", "old code key text get" ] if ossdbg
+              usekey  = OpenSSL::PKey::RSA.new(nt, @ssl.key_password)
             end
-
+            #
+            # This style of code because:  in newer Ruby versions the 'cert'
+            # and 'key' attributes are deprecated.  It is suggested that the
+            # 'add_certificate' method be used instead.
+            #
+            if ctx.respond_to?(:add_certificate)  # Newer Ruby version ??
+              p [ "OSSL55", "new code option", usecert, usekey ] if ossdbg
+              if !usecert.nil? && !usekey.nil?
+                p [ "OSSL55", "new code add_certificate" ] if ossdbg
+                ctx.add_certificate(usecert, usekey)
+              else
+                p [ "OSSL56", "new code SKIP add_certificate" ] if ossdbg
+              end
+            else
+              # Older Ruby versions
+              p [ "OSSL56", "old code option", usecert, usekey ] if ossdbg
+              ctx.cert = usecert
+              ctx.key = usekey
+            end
+            p [ "OSSL99", "old code ends" ] if ossdbg
             # Cipher list
             # As of this writing, there are numerous problems with supplying
             # cipher lists to jruby.  So we do not attempt to do that here.
