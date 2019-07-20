@@ -251,8 +251,8 @@ module Stomp
           headers[:'content-length'] = "#{body_length_bytes}" unless headers[:suppress_content_length]
           headers[:'content-type'] = "text/plain; charset=UTF-8" unless headers[:'content-type'] || headers[:suppress_content_type]
           p [ "_transmit_command", command ] if dtrdbg
-          p [ "_transmit_headers", headers ] if dtrdbg
           _wire_write(used_socket,command)
+          p [ "_transmit_headers", headers ] if dtrdbg
           headers.each do |k,v|
             if v.is_a?(Array)
               v.each do |e|
@@ -262,6 +262,7 @@ module Stomp
               _wire_write(used_socket,"#{k}:#{v}")
             end
           end
+          p [ "_transmit_headers done" ] if dtrdbg
           _wire_write(used_socket,"")
           if body != ''
             p [ "_transmit_body", body ] if dtrdbg
