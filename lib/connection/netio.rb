@@ -493,8 +493,8 @@ module Stomp
             ssl.close
           end
           #
-          puts ex.backtrace
-          $stdout.flush
+          puts ex.backtrace if ossdbg
+          $stdout.flush if ossdbg
           raise # Reraise
         end
       end
