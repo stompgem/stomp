@@ -252,6 +252,7 @@ module Stomp
           noiosel = (@ssl || @jruby) ? true : false
           return _receive(used_socket, connread, noiosel)
         rescue Stomp::Error::MaxReconnectAttempts
+          @failure = $!
           unless slog(:on_miscerr, log_params, "Reached MaxReconnectAttempts")
             $stderr.print "Reached MaxReconnectAttempts\n"
           end

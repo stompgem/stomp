@@ -492,6 +492,7 @@ module Stomp
       super_result = __old_receive()
       if super_result.nil? && @reliable && !closed?
         errstr = "connection.receive returning EOF as nil - resetting connection.\n"
+        @failure = nil
         unless slog(:on_miscerr, log_params, "es_recv: " + errstr)
           $stderr.print errstr
         end
