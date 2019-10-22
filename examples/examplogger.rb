@@ -66,14 +66,7 @@ class Slogger
   def _init
     @log = Logger::new(STDOUT)		# User preference
     @log.level = Logger::DEBUG		# User preference
-  end
-
-  def marshal_dump
-    []
-  end
-
-  def marshal_load(array)
-    _init
+    @maxml = 100
   end
 
   # Log connecting events
@@ -98,6 +91,13 @@ class Slogger
   def on_connectfail(parms)
     begin
       @log.debug "Connect Fail #{info(parms)}"
+			@log.debug parms
+			@log.debug "Connect Fail Socket status: #{parms[:openstat]}"
+      if parms[:cur_failure]
+        @log.debug "Connect Fail Error Message: #{parms[:cur_failure].message}"
+				btr = parms[:cur_failure].backtrace.join("\n")
+				@log.debug "Backtrace CF: #{btr}"
+      end
     rescue
       @log.debug "Connect Fail oops"
     end
@@ -124,6 +124,19 @@ class Slogger
     begin
       @log.debug "Miscellaneous Error #{info(parms)}"
       @log.debug "Miscellaneous Error String #{errstr}"
+      @log.debug "Miscellaneous Error All Parms #{parms.inspect}"      
+			if parms[:ssl_exception]
+		    @log.debug "SSL Miscellaneous Error Parms: #{parms[:ssl_exception]}"
+		    @log.debug "SSL Miscellaneous Error Message: #{parms[:ssl_exception].message}"
+				btr = parms[:ssl_execption].backtrace.join("\n")
+				@log.debug "Backtrace SME: #{btr}"
+			end
+			if parms[:cur_failure]
+		    @log.debug "SSL Miscellaneous Error Parms2: #{parms[:cur_failure]}"
+		    @log.debug "SSL Miscellaneous Error Message2: #{parms[:cur_failure].message}"
+				btr = parms[:cur_failure].backtrace.join("\n")
+				@log.debug "Backtrace SME2: #{btr}"
+			end
     rescue
       @log.debug "Miscellaneous Error oops"
     end
@@ -163,8 +176,10 @@ class Slogger
   # Log Receive
   def on_receive(parms, result)
     begin
-      @log.debug "Receive Parms #{info(parms)}"
-      @log.debug "Receive Result #{result}"
+      @log.debug "Receive Message, Command: #{result.command}"
+      pl = result.body.length < @maxml ? result.body.length : @maxml
+      @log.debug "Receive Message, Body: #{result.body[0..pl]}"
+      @log.debug "Receive Message, Headers: #{result.headers}"
     rescue
       @log.debug "Receive oops"
     end
@@ -262,7 +277,13 @@ class Slogger
   def on_ssl_connectfail(parms)
     begin
       @log.debug "SSL Connect Fail Parms #{info(parms)}"
-      @log.debug "SSL Connect Fail Exception #{parms[:ssl_exception]}, #{parms[:ssl_exception].message}"
+			if parms[:ssl_exception]
+		    @log.debug "SSL Connect Fail Exception Parms: #{parms[:ssl_exception]}"
+		    @log.debug "SSL Connect Fail Message: #{parms[:ssl_exception].message}"
+				btr = parms[:ssl_exception].backtrace.join("\n")
+				@log.debug "Backtrace SCF: #{btr}"
+			end
+
     rescue
       @log.debug "SSL Connect Fail oops"
     end
@@ -278,6 +299,7 @@ class Slogger
     begin
       @log.debug "HeartBeat Fire Parms #{info(parms)}"
       @log.debug "HeartBeat Fire Send/Receive #{srind}"
+      @log.debug "HeartBeat Fire Firedata #{firedata.inspect}"
     rescue
       @log.debug "HeartBeat Fire oops"
     end

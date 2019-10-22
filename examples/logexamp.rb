@@ -40,6 +40,9 @@ class LoggerExample
     # //////////////////////////////////////////////////////////////////////////////
     # A hash type connect *MUST* be used to enable callback logging.
     # //////////////////////////////////////////////////////////////////////////////
+    # Note:  running this example will generate a number of connect failures,
+    # because of the fake host in this connect hash.
+    # //////////////////////////////////////////////////////////////////////////////
     hash = { :hosts => [
         {:login => user, :passcode => password, :host => 'noonehome', :port => 2525,
           :ssl => so},
