@@ -55,6 +55,7 @@ module Stomp1xCommon
       ],
       :connect_headers => conn_hdrs,
     }
+    conn_hash[:stompconn] = ENV["STOMP_USESTOMP"] ? true : false
     conn = Stomp::Connection.new(conn_hash)
   end
 
