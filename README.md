@@ -96,6 +96,7 @@ end
 
 See _CHANGELOG.rdoc_ for details.
 
+* Gem version 1.4.9. Fix two issues, enhance debugging and examples.
 * Gem version 1.4.8. Fix missed merge in 1.4.7 release.
 * Gem version 1.4.7. Add support for text SSL certs.  Do not use, use 1.4.8 instead.
 * Gem version 1.4.6. Fix version 1.4.5 which breaks JRuby support.
@@ -324,7 +325,7 @@ Rafael Rosa
 2010-03-23
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
-(0092)
+(0106)
 </td>
 <td style="border: 1px solid black;padding-left: 10px;" >
 <span style="font-weight: bold;" >
@@ -821,6 +822,34 @@ Meg Richards
 Katharine
 </span>
  / &lt;krsibbald@gmail.com&gt;
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2019-06-05
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Smit Patel
+</span>
+ / &lt;smitpatel24@gmail.com&gt;
+</td>
+</tr>
+<tr>
+<td style="border: 1px solid black;padding-left: 10px;" >
+2019-09-16
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+(0001)
+</td>
+<td style="border: 1px solid black;padding-left: 10px;" >
+<span style="font-weight: bold;" >
+Thiago Xavier
+</span>
+ / &lt;thiagoxvo@gmail.com&gt;
 </td>
 </tr>
 </table>

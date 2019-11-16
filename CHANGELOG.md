@@ -1,5 +1,16 @@
 # Stomp Gem Change Log
 
+## 1.4.9 20191116
+
+* More debugging messages in netio.rb.
+* Test workaround for Artemis-2289.
+* New put and get examples.
+* Fix issue #160.
+* Address issue #155.
+* Suppress SSL stacktrace to stdout.
+* Example logger enhancements.
+* Optional STOMP frame in examples.
+
 ## 1.4.8 20181219
 
 * Fix missed merge from 1.4.7 release.
