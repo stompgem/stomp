@@ -6,8 +6,10 @@ module Stomp
   module Version  #:nodoc: all
     MAJOR = 1
     MINOR = 4
-    PATCH = 9
-    # PATCH = "8.plvl.001"
-    STRING = "#{MAJOR}.#{MINOR}.#{PATCH}"
+    PATCH = "9"
+    MODLEVEL = "-m.1"
+    STRING = "#{MAJOR}.#{MINOR}.#{PATCH}#{MODLEVEL}"
+    # Alternate version string
+    Version = STRING
   end
 end
