@@ -116,7 +116,7 @@ module Stomp
           #
           # Note: experiments with JRuby seem to show that socket.ready? never
           # returns true.  It appears that in cases where Ruby returns true
-          # that JRuby returns a Fixnum.  We attempt to adjust for this
+          # that JRuby returns an Integer.  We attempt to adjust for this
           # in the _is_ready? method.
           #
           # Note 2: the draining of new lines must be done _after_ a message
@@ -178,7 +178,7 @@ module Stomp
           # rdy = true
           rdy = false # A test
         else
-          rdy = (rdy.class == Fixnum || rdy.class == TrueClass) ? true : false
+          rdy = (rdy.class == Integer || rdy.class == TrueClass) ? true : false
         end
         #p [ "isr?_last", rdy ]
         rdy
