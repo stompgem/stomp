@@ -37,7 +37,7 @@ describe Stomp::Connection do
         
     #POG:
     class Stomp::Connection
-      def _receive( s, connread = false )
+      def _receive( s, connread = false, niocheck = false )
       end
     end
     
