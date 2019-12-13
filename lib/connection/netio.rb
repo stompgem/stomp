@@ -277,8 +277,8 @@ module Stomp
             end
           end
           used_socket.write "\0"
-          # used_socket.flush if autoflush
-          used_socket.flush
+          used_socket.flush if @autoflush
+          # used_socket.flush
 
           if @protocol >= Stomp::SPL_11
             @ls = Time.now.to_f if @hbs
