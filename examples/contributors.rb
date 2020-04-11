@@ -14,6 +14,18 @@ class UserData
     "UserData: AuthorDate=>#{@ad}, AuthorDate=>#{@ad}, CommitCount =>#{@count}"
   end
 end
+#
+def partOne()
+  puts "# Contributors"
+  puts
+  puts "## Contributors (by first author date)"
+  puts
+  puts
+  puts "Contribution Information:"
+  puts
+  puts
+end
+#
 # tABLE Data
 ttab_s = "<table border=\"1\" style=\"width:100%;border: 1px solid black;\">\n"
 ttab_e = "</table>\n"
@@ -32,11 +44,12 @@ td_s = "<td style=\"border: 1px solid black;padding-left: 10px;\" >\n"
 td_e = "</td>\n"
 #
 #
+partOne()
 userList = {}
 while s = gets do
   s.chomp!
   ##puts
-  ##puts s
+  ##puts 
   sa = s.split(" ")
   ## puts sa
   ad = sa[-1]
