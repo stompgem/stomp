@@ -1,5 +1,14 @@
 # Stomp Gem Change Log
 
+## 1.4.10 20200819
+
+* Fix issue #165
+* Reinstate autoflush behavior
+* Correct _receive method signature
+* Update version
+
+* More debugging messages in netio.rb.
+
 ## 1.4.9 20191116
 
 * More debugging messages in netio.rb.
