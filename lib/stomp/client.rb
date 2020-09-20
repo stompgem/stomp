@@ -281,6 +281,14 @@ module Stomp
       @connection.closed?()
     end
 
+    # subscriber? checks if subscriber with destination is passed is present or not
+    # returns : boolean
+    def subscriber?(destination, headers = {})
+      headers = headers.symbolize_keys
+      headers = headers.merge(:id => build_subscription_id(destination, headers))
+      !@listeners[headers[:id]].nil?
+    end
+
     # jruby? tests if the connection has detcted a JRuby environment
     def jruby?()
       @connection.jruby
