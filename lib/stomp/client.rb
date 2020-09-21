@@ -281,8 +281,14 @@ module Stomp
       @connection.closed?()
     end
 
-    # subscriber? checks if subscriber with destination is passed is present or not
-    # returns : boolean
+    ##  Checks if subscriber with destination is passed is present or not
+    #   @returns [Boolean]
+    #
+    #   example
+    #     Stomp::Client.new().subscriber?('/topic/topicName')                                     => false
+    #     Stomp::Client.new().subscriber?('/queue/queueName')                                     => true
+    #     Stomp::Client.new().subscriber?('/queue/Consumer.subscriber1.VirtualTopic.topicName')   => true
+    #
     def subscriber?(destination, headers = {})
       headers = headers.symbolize_keys
       headers = headers.merge(:id => build_subscription_id(destination, headers))
