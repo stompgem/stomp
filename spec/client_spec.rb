@@ -471,8 +471,8 @@ describe Stomp::Client do
       it_behaves_like 'argument-safe method'
     end
 
-    describe '#subscriber?' do
-      subject { @client.subscriber?('/topic/topicName') }
+    describe '#subscribed?' do
+      subject { @client.subscribed?('/topic/topicName') }
 
       context 'When subscription is present' do
         before {

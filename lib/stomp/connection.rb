@@ -371,6 +371,13 @@ module Stomp
       transmit(Stomp::CMD_SUBSCRIBE, headers)
     end
 
+    def subscribed?(destination, subId = nil)
+      return false unless @reliable
+
+      subId = destination if subId.nil?
+      @subscriptions[subId].present?
+    end
+
     # Unsubscribe from a destination.   A subscription name is required.
     # For Stomp 1.1+ a session unique subscription ID is also required.
     def unsubscribe(destination, headers = {}, subId = nil)

@@ -289,7 +289,7 @@ module Stomp
     #     Stomp::Client.new().subscriber?('/queue/queueName')                                     => true
     #     Stomp::Client.new().subscriber?('/queue/Consumer.subscriber1.VirtualTopic.topicName')   => true
     #
-    def subscriber?(destination, headers = {})
+    def subscribed?(destination, headers = {})
       headers = headers.symbolize_keys
       headers = headers.merge(:id => build_subscription_id(destination, headers))
       !@listeners[headers[:id]].nil?
