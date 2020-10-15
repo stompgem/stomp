@@ -375,7 +375,7 @@ module Stomp
       return false unless @reliable
 
       subId = destination if subId.nil?
-      @subscriptions[subId].present?
+      !@subscriptions[subId].nil?
     end
 
     # Unsubscribe from a destination.   A subscription name is required.
