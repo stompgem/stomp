@@ -3,7 +3,6 @@
 require 'spec_helper'
 require 'client_shared_examples'
 
-
 describe Stomp::Client do
   let(:null_logger) { double("mock Stomp::NullLogger") }
 
@@ -192,7 +191,7 @@ describe Stomp::Client do
     it_should_behave_like "standard Client"
 
   end
-  
+
   describe "(created with authenticating stomp:// URL and non-TLD host)" do
 
     before(:each) do
@@ -283,7 +282,7 @@ describe Stomp::Client do
     it_should_behave_like "standard Client"
 
   end
-  
+
   describe "(created with failover URL)" do
     before(:each) do
 	  @client = Stomp::Client.new('failover://(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)')
@@ -312,23 +311,23 @@ describe Stomp::Client do
 	  client = Stomp::Client.new(url)
       expect(client.parameters).to eq(@parameters)
     end
-    
+
     it "should properly parse a URL with failover:" do
       url = "failover:(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost1:61617,stomp://login3:passcode3@remotehost2:61618)"
-      
+
       @parameters[:hosts] = [
         {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "login2", :passcode => "passcode2", :host => "remotehost1", :port => 61617, :ssl => false},
         {:login => "login3", :passcode => "passcode3", :host => "remotehost2", :port => 61618, :ssl => false}
       ]
-      
+
       @parameters.merge!({:logger => null_logger})
 	  @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
       client = Stomp::Client.new(url)
       expect(client.parameters).to eq(@parameters)
     end
-    
+
     it "should properly parse a URL without user and password" do
       url = "failover:(stomp://localhost:61616,stomp://remotehost:61617)"
 
@@ -336,39 +335,39 @@ describe Stomp::Client do
         {:login => "", :passcode => "", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "", :passcode => "", :host => "remotehost", :port => 61617, :ssl => false}
       ]
-      
+
       @parameters.merge!({:logger => null_logger})
       @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
-      
+
       client = Stomp::Client.new(url)
 	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
-    
+
     it "should properly parse a URL with user and/or password blank" do
       url = "failover:(stomp://@localhost:61616,stomp://@remotehost:61617)"
-      
+
       @parameters[:hosts] = [
         {:login => "", :passcode => "", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "", :passcode => "", :host => "remotehost", :port => 61617, :ssl => false}
       ]
-      
+
       @parameters.merge!({:logger => null_logger})
       @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
-      
+
       client = Stomp::Client.new(url)
 	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
-    
+
     it "should properly parse a URL with the options query" do
       query = "initialReconnectDelay=5000&maxReconnectDelay=60000&useExponentialBackOff=false&backOffMultiplier=3"
       query += "&maxReconnectAttempts=4&randomize=true&backup=true&timeout=10000"
-      
+
       url = "failover:(stomp://login1:passcode1@localhost:61616,stomp://login2:passcode2@remotehost:61617)?#{query}"
-      
+
       #
       @parameters = {
         :initial_reconnect_delay => 5.0,
@@ -380,21 +379,21 @@ describe Stomp::Client do
         :connect_timeout => 0,
         :reliable => true
       }
-      
+
       @parameters[:hosts] = [
         {:login => "login1", :passcode => "passcode1", :host => "localhost", :port => 61616, :ssl => false},
         {:login => "login2", :passcode => "passcode2", :host => "remotehost", :port => 61617, :ssl => false}
       ]
-      
+
       @parameters.merge!({:logger => null_logger})
       @parameters[:client_main] = @cli_thread
       expect(Stomp::Connection).to receive(:new).with(@parameters)
-      
+
       client = Stomp::Client.new(url)
 	  @parameters[:client_main] = client.parameters[:client_main]
       expect(client.parameters).to eq(@parameters)
     end
-    
+
   end
 
 
@@ -407,7 +406,7 @@ describe Stomp::Client do
         message.command = Stomp::CMD_ERROR
         message
       end
-  
+
       it 'should handle ProducerFlowControlException errors by raising' do
         expect do
           @client = Stomp::Client.new
@@ -470,6 +469,27 @@ describe Stomp::Client do
         @client.subscribe('destination', headers) {|dummy_subscriber| }
       }
       it_behaves_like 'argument-safe method'
+    end
+
+    describe '#subscribed?' do
+      subject { @client.subscribed?('/topic/topicName') }
+
+      context 'When subscription is present' do
+        before {
+          allow(@mock_connection).to receive(:subscribe)
+          @client.subscribe('/topic/topicName') { |message| }
+        }
+
+        it 'returns true' do
+          expect(subject).to be true
+        end
+      end
+
+      context 'When subscription is not present' do
+        it 'returns false' do
+          expect(subject).to be false
+        end
+      end
     end
 
     describe '#unsubscribe' do
@@ -563,6 +583,5 @@ describe Stomp::Client do
         it_behaves_like 'argument-safe method'
       end
     end
-
   end
 end
